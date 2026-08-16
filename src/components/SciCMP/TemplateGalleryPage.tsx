@@ -104,6 +104,10 @@ import {
   Unlock,
   BadgeCheck,
   Fingerprint,
+  
+  // Additional Icons for New Sections
+  GraduationCap,
+  Video,
 } from 'lucide-react';
 
 // ============================================================================
@@ -191,6 +195,15 @@ interface TemplateData {
   oneClickSetup: boolean;
   setupTime: string;
   prerequisites: string[];
+  
+  // External Portal - Opens in new browser for large tools
+  externalPortal?: {
+    name: string;           // Portal name (e.g., "NCBI BLAST", "Galaxy", "EBI")
+    url: string;            // Full URL to external tool
+    description: string;    // Why this needs external portal
+    requiresAuth?: boolean;  // Does it require login?
+    fileSizeLimit?: string; // File size limits if any
+  };
   
   // Compute Requirements
   computeRequirements: {
@@ -532,6 +545,185 @@ const templates: TemplateData[] = [
     lastUpdated: '2024-12-01',
     version: '3.2.1',
     tags: ['genomics', 'ngs', 'assembly', 'bioinformatics', 'de-novo'],
+    
+    hasDemo: true,
+    hasTutorial: true,
+    hasVideoGuide: true,
+  },
+  // ==========================================================================
+  // BLAST+ SEQUENCE ANALYSIS - EXTERNAL PORTAL (NCBI)
+  // Opens in new browser for large sequence files
+  // ==========================================================================
+  {
+    id: 'blast-sequence-analysis',
+    name: 'BLAST+ Sequence Analysis',
+    description: 'NCBI BLAST+ sequence similarity search with large file support',
+    longDescription: 'Powerful sequence analysis using NCBI BLAST+ suite for comparing biological sequences against massive databases. This template provides seamless integration with NCBI web services, supporting nucleotide-nucleotide (blastn), protein-protein (blastp), translated (tblastn/tblastx), and specialized searches (psi-blast, delta-blast). Ideal for large datasets that exceed local computational resources.',
+    category: 'bioinformatics',
+    icon: <Search className="w-8 h-8" />,
+    difficulty: 'beginner',
+    tier: 'free',
+    
+    oneClickSetup: true,
+    setupTime: '< 1 minute (portal launch)',
+    prerequisites: ['Sequence file (FASTA)', 'Web browser'],
+    
+    // External Portal Configuration - Opens in new browser tab
+    externalPortal: {
+      name: 'NCBI BLAST',
+      url: 'https://blast.ncbi.nlm.nih.gov/Blast.cgi',
+      description: 'Large sequence files and comprehensive database searches require NCBI cloud infrastructure. Supports files up to 2.5GB.',
+      requiresAuth: false, // Optional NCBI account for job history
+      fileSizeLimit: 'Up to 2.5GB per query, 250MB recommended for fast results',
+    },
+    
+    computeRequirements: {
+      cpu: 'NCBI Cloud (unlimited)',
+      memory: 'NCBI Cloud (unlimited)',
+      storage: 'NCBI Cloud databases (updated daily)',
+      estimatedCost: 'Free (NCBI funded)',
+    },
+    
+    parameterPresets: [
+      {
+        id: 'ncbi-blastn-standard',
+        name: 'Standard Nucleotide Search (blastn)',
+        description: 'Compare nucleotide sequence against NT/nr database',
+        category: 'beginner',
+        parameters: { program: 'blastn', database: 'nt', expectThreshold: 10, wordSize: 28 },
+        useCase: 'Gene identification, homology searching, contamination check',
+        expectedPerformance: 'Results in seconds-minutes depending on database size',
+      },
+      {
+        id: 'ncbi-blastp-standard',
+        name: 'Standard Protein Search (blastp)',
+        description: 'Compare protein sequence against nr/pdb databases',
+        category: 'beginner',
+        parameters: { program: 'blastp', database: 'nr', expectThreshold: 10, matrix: 'BLOSUM62' },
+        useCase: 'Protein function prediction, domain identification, ortholog finding',
+        expectedPerformance: 'Results in seconds-minutes',
+      },
+      {
+        id: 'ncbi-psiblast-sensitive',
+        name: 'PSI-BLAST Sensitive Search',
+        description: 'Iterative profile-based search for distant homologs',
+        category: 'advanced',
+        parameters: { program: 'psiblast', database: 'nr', iterations: 3, eThreshold: 0.005 },
+        useCase: 'Finding remote homologs, domain architecture analysis',
+        expectedPerformance: '5-30 minutes for 3 iterations',
+      },
+      {
+        id: 'ncbi-tblastx-translated',
+        name: 'Translated Search (tblastx)',
+        description: 'Compare translated nucleotide to protein database',
+        category: 'intermediate',
+        parameters: { program: 'tblastx', database: 'nr', geneticCode: 1, frameShiftPenalty: '-1' },
+        useCase: 'Finding proteins in novel genomes, ORF validation',
+        expectedPerformance: '1-10 minutes',
+      },
+    ],
+    configurableParameters: 18,
+    
+    bestPractices: [
+      {
+        id: 'blast-bp-1',
+        title: 'Choose Right Database',
+        description: 'Use "nr" for broad searches, specific organism databases for targeted work. Smaller databases = faster results.',
+        severity: 'critical',
+        category: 'performance',
+        implementation: 'Database selection guide with size/speed tradeoffs displayed.',
+      },
+      {
+        id: 'blast-bp-2',
+        title: 'Filter Low Complexity Regions',
+        description: 'Always enable low complexity filtering for accurate results. Prevents spurious matches in repetitive regions.',
+        severity: 'important',
+        category: 'accuracy',
+        implementation: 'Low complexity filter enabled by default in presets.',
+      },
+      {
+        id: 'blast-bp-3',
+        title: 'Check E-value Threshold',
+        description: 'Lower E-value = more stringent. Use 0.001-0.0001 for significant hits, 10-100 for remote homology detection.',
+        severity: 'important',
+        category: 'accuracy',
+        implementation: 'E-value explanation with preset recommendations per use case.',
+      },
+    ],
+    
+    communityContributions: [
+      {
+        id: 'cc-blast-1',
+        author: 'NCBI Development Team',
+        date: '2024-12-01',
+        type: 'plugin',
+        title: 'Batch BLAST Submission',
+        description: 'Submit multiple queries simultaneously via API',
+        stars: 3456,
+        downloads: 23400,
+        verified: true,
+      },
+      {
+        id: 'cc-blast-2',
+        author: 'Galaxy Project',
+        date: '2024-11-15',
+        type: 'extension',
+        title: 'Galaxy BLAST Integration',
+        description: 'Run BLAST within Galaxy workflows with history tracking',
+        stars: 1234,
+        downloads: 8900,
+        verified: true,
+      },
+    ],
+    communityRating: 4.9,
+    totalUses: 156700, // BLAST is one of the most used bioinformatics tools
+    successRate: '99.2%',
+    
+    papers: [
+      {
+        id: 'blast-paper-1',
+        title: 'Basic Local Alignment Search Tool',
+        authors: 'Altschul SF, Gish W, Miller W, Myers EW, Lipman DJ',
+        year: 1990,
+        journal: 'Journal of Molecular Biology',
+        doi: '10.1016/0022-2836(90)90020-7',
+        abstract: 'The original BLAST algorithm for rapid sequence comparison through heuristic extension of high-scoring pairs...',
+        citations: 89450,
+        relevanceScore: 100,
+      },
+      {
+        id: 'blast-paper-2',
+        title: 'Gapped BLAST and PSI-BLAST: A new generation of protein database search programs',
+        authors: 'Altschul SF, Madden TL, Schäffer AA, Zhang J, Zhang Z, Miller W, Lipman DJ',
+        year: 1997,
+        journal: 'Nucleic Acids Research',
+        doi: '10.1093/nar/25.17.3389',
+        abstract: 'Introduction of gapped alignment and position-specific scoring matrices for improved sensitivity...',
+        citations: 45670,
+        relevanceScore: 98,
+      },
+      {
+        id: 'blast-paper-3',
+        title: 'BLAST+: Architecture and applications',
+        authors: 'Camacho C, Coulouris G, Avagyan V, Ma N, Papadopoulos J, Bealer K, Madden TL',
+        year: 2009,
+        journal: 'BMC Bioinformatics',
+        doi: '10.1186/1471-2105-10-421',
+        abstract: 'Description of the BLAST+ architecture including new features like multiple database searches...',
+        citations: 12340,
+        relevanceScore: 95,
+      },
+    ],
+    researchPortalLink: 'https://www.ncbi.nlm.nih.gov/books/NBK276568/',
+    
+    features: ['NCBI Cloud infrastructure', 'Multiple BLAST variants', 'Large file support', 'Job history & saving', 'API access', 'Database updates'],
+    useCases: ['Gene identification', 'Homology searching', 'Contamination detection', 'Phylogenetics preparation', 'Domain annotation'],
+    integrations: ['NCBI API', 'Galaxy Platform', 'EBI Services', 'Ensembl', 'UniProt'],
+    
+    status: 'stable',
+    lastUpdated: '2024-12-15',
+    version: '2.16.0+',
+    tags: ['blast', 'sequence-analysis', 'ncbi', 'homology', 'bioinformatics', 'external-portal'],
     
     hasDemo: true,
     hasTutorial: true,
@@ -2538,6 +2730,59 @@ export default function TemplateGalleryPage() {
                       </div>
                     )}
 
+                    {/* External Portal - Opens in new browser for large tools */}
+                    {selectedTemplate.externalPortal && (
+                      <div className="p-6 rounded-xl bg-gradient-to-r from-blue-500/10 via-cyan-500/5 to-transparent border border-blue-500/20">
+                        <div className="flex items-start gap-4">
+                          <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                            <ExternalLink className="w-6 h-6 text-blue-500" />
+                          </div>
+                          
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
+                              Opens in {selectedTemplate.externalPortal.name}
+                              <BadgeCheck className="w-5 h-5 text-blue-500" />
+                            </h3>
+                            <p className="text-muted-foreground mb-3 text-sm">
+                              {selectedTemplate.externalPortal.description}
+                            </p>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                              <div className="p-3 rounded-lg bg-card border">
+                                <span className="text-xs font-medium text-muted-foreground">Portal</span>
+                                <p className="font-semibold text-sm">{selectedTemplate.externalPortal.name}</p>
+                              </div>
+                              <div className="p-3 rounded-lg bg-card border">
+                                <span className="text-xs font-medium text-muted-foreground">File Size Limit</span>
+                                <p className="font-semibold text-sm">{selectedTemplate.externalPortal.fileSizeLimit || 'No limit'}</p>
+                              </div>
+                              {selectedTemplate.externalPortal.requiresAuth && (
+                                <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 md:col-span-2">
+                                  <span className="text-xs font-medium text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                                    <Lock className="w-3 h-3" />
+                                    Authentication Required
+                                  </span>
+                                  <p className="text-xs mt-1 text-amber-600/80 dark:text-amber-400/80">
+                                    Free account recommended for job history and saved searches
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                            
+                            <Button 
+                              onClick={() => window.open(selectedTemplate.externalPortal.url, '_blank')}
+                              className="gap-2 bg-blue-600 hover:bg-blue-700 text-white border-0 w-full md:w-auto"
+                              aria-label={`Open ${selectedTemplate.externalPortal.name} in new tab`}
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                              Open in {selectedTemplate.externalPortal.name}
+                              <span className="hidden md:inline ml-1">→</span>
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Description */}
                     <div>
                       <h3 className="font-semibold text-lg mb-3">About this Template</h3>
@@ -2907,6 +3152,479 @@ export default function TemplateGalleryPage() {
       )}
 
       {/* ================================================================== */}
+      {/* QUICK START PROJECTS SECTION - Interactive Cards */}
+      {/* ================================================================== */}
+      <section className="py-16 bg-card/50" id="quick-start">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4">
+              <Rocket className="w-4 h-4 text-emerald-500" />
+              <span className="text-sm font-medium text-emerald-500">For Beginners</span>
+            </div>
+            
+            <h2 className="text-3xl font-bold mb-4">Quick Start Projects</h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Get up and running in minutes with these beginner-friendly templates. 
+              Perfect for learning, teaching, or first-time scientific computing projects.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {templates
+              .filter(t => t.difficulty === 'beginner' && t.oneClickSetup)
+              .slice(0, 6)
+              .map((template) => (
+                <button
+                  key={template.id}
+                  onClick={() => {
+                    setSelectedTemplate(template);
+                    setActiveTab('overview');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className={`group p-6 rounded-xl border text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
+                    selectedTemplate?.id === template.id ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'
+                  }`}
+                  aria-label={`Open ${template.name} template details`}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white bg-gradient-to-br ${getCategoryColor(template.category)}`}>
+                      {template.icon}
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                        {template.setupTime}
+                      </span>
+                      {template.externalPortal && (
+                        <span className="text-xs font-medium px-2 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                          <ExternalLink className="w-3 h-3" />
+                          Portal
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors">{template.name}</h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{template.description}</p>
+                  
+                  <div className="flex items-center gap-2 text-xs">
+                    <TierBadge tier={template.tier} />
+                    <span className="flex items-center gap-1 text-muted-foreground">
+                      <Users className="w-3 h-3" />
+                      {(template.totalUses / 1000).toFixed(1)}K uses
+                    </span>
+                  </div>
+                </button>
+              ))}
+          </div>
+
+          <div className="text-center mt-8">
+            <Button 
+              variant="outline" 
+              onClick={() => document.getElementById('templates-grid')?.scrollIntoView({ behavior: 'smooth' })}
+              className="gap-2"
+            >
+              View All Templates
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================== */}
+      {/* TEACHING & TRAINING RESOURCES */}
+      {/* ================================================================== */}
+      <section className="py-16" id="teaching-training">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 mb-4">
+              <BookOpen className="w-4 h-4 text-violet-500" />
+              <span className="text-sm font-medium text-violet-500">Educational Resources</span>
+            </div>
+            
+            <h2 className="text-3xl font-bold mb-4">Teaching & Training</h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Comprehensive educational materials, tutorials, and curriculum resources 
+              for instructors and self-paced learners.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Left Column - Tutorials */}
+            <div className="space-y-6">
+              <div className="p-6 rounded-xl border hover:border-violet-500/30 transition-colors cursor-pointer group"
+                   onClick={() => {
+                 const mlTemplate = templates.find(t => t.id === 'automated-ml-pipeline');
+                 if (mlTemplate) {
+                   setSelectedTemplate(mlTemplate);
+                   setActiveTab('presets');
+                   window.scrollTo({ top: 0, behavior: 'smooth' });
+                 }
+               }}>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white group-hover:scale-110 transition-transform">
+                    <Brain className="w-7 h-7" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg group-hover:text-violet-500 transition-colors">ML/AI Tutorial Track</h3>
+                    <p className="text-sm text-muted-foreground">From basics to advanced neural networks</p>
+                  </div>
+                </div>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-500" /> Introduction to ML</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-500" /> Deep Learning Fundamentals</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-500" /> Hands-on Projects</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-violet-500" /> Model Deployment</li>
+                </ul>
+                <div className="mt-4 flex items-center gap-2 text-sm text-violet-600 dark:text-violet-400 font-medium">
+                  <span>12 modules</span>
+                  <span>•</span>
+                  <span>~40 hours</span>
+                  <span>•</span>
+                  <span>Beginner-Friendly</span>
+                </div>
+              </div>
+
+              <div className="p-6 rounded-xl border hover:border-blue-500/30 transition-colors cursor-pointer group"
+                   onClick={() => {
+                 const bioTemplate = templates.find(t => t.id === 'blast-sequence-analysis');
+                 if (bioTemplate) {
+                   setSelectedTemplate(bioTemplate);
+                   setActiveTab('presets');
+                   window.scrollTo({ top: 0, behavior: 'smooth' });
+                 }
+               }}>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-white group-hover:scale-110 transition-transform">
+                    <Dna className="w-7 h-7" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg group-hover:text-blue-500 transition-colors">Bioinformatics Essentials</h3>
+                    <p className="text-sm text-muted-foreground">Sequence analysis and genomics workflows</p>
+                  </div>
+                </div>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-blue-500" /> BLAST Sequence Analysis</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-blue-500" /> Genome Assembly Basics</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-blue-500" /> Protein Structure Prediction</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-blue-500" /> Pathogen Detection</li>
+                </ul>
+                <div className="mt-4 flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 font-medium">
+                  <span>8 modules</span>
+                  <span>•</span>
+                  <span>~25 hours</span>
+                  <span>•</span>
+                  <span>NCBI Portal Available</span>
+                </div>
+              </div>
+
+              <div className="p-6 rounded-xl border hover:border-emerald-500/30 transition-colors cursor-pointer group"
+                   onClick={() => {
+                 const statsTemplate = templates.find(t => t.id === 'bayesian-inference-framework');
+                 if (statsTemplate) {
+                   setSelectedTemplate(statsTemplate);
+                   setActiveTab('practices');
+                   window.scrollTo({ top: 0, behavior: 'smooth' });
+                 }
+               }}>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white group-hover:scale-110 transition-transform">
+                    <Calculator className="w-7 h-7" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg group-hover:text-emerald-500 transition-colors">Statistics for Research</h3>
+                    <p className="text-sm text-muted-foreground">Bayesian inference and hypothesis testing</p>
+                  </div>
+                </div>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Probability Theory</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Statistical Testing</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> R/Python Implementation</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Data Visualization</li>
+                </ul>
+                <div className="mt-4 flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400 font-medium">
+                  <span>6 modules</span>
+                  <span>•</span>
+                  <span>~20 hours</span>
+                  <span>•</span>
+                  <span>R & Python Code</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column - Resources */}
+            <div className="space-y-6">
+              <div className="p-6 rounded-xl bg-gradient-to-br from-violet-500/5 to-transparent border border-violet-500/20">
+                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                  <GraduationCap className="w-5 h-5 text-violet-500" />
+                  Certification Paths
+                </h3>
+                <div className="space-y-3">
+                  <div className="p-3 rounded-lg bg-card/80 cursor-pointer hover:bg-card transition-colors">
+                    <h4 className="font-medium text-sm mb-1">Scientific Computing with Python</h4>
+                    <p className="text-xs text-muted-foreground">Comprehensive curriculum covering 10 domains</p>
+                    <div className="mt-2 flex items-center gap-2">
+                      <BadgeCheck className="w-4 h-4 text-violet-500" />
+                      <span className="text-xs text-violet-600">Certificate included</span>
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-lg bg-card/80 cursor-pointer hover:bg-card transition-colors">
+                    <h4 className="font-medium text-sm mb-1">ML Engineering Bootcamp</h4>
+                    <p className="text-xs text-muted-foreground">Intensive 12-week program with portfolio projects</p>
+                    <div className="mt-2 flex items-center gap-2">
+                      <BadgeCheck className="w-4 h-4 text-violet-500" />
+                      <span className="text-xs text-violet-600">Job-ready skills</span>
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-lg bg-card/80 cursor-pointer hover:bg-card transition-colors">
+                    <h4 className="font-medium text-sm mb-1">Bioinformatics Specialist</h4>
+                    <p className="text-xs text-muted-foreground">Genomics, transcriptomics, and structural biology</p>
+                    <div className="mt-2 flex items-center gap-2">
+                      <BadgeCheck className="w-4 h-4 text-violet-500" />
+                      <span className="text-xs text-violet-600">Industry recognized</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 rounded-xl bg-gradient-to-br from-blue-500/5 to-transparent border border-blue-500/20">
+                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                  <Video className="w-5 h-5 text-blue-500" />
+                  Video Workshops
+                </h3>
+                <div className="space-y-3">
+                  <a href="https://www.youtube.com/playlist?list=PLZoIqu8n2lUwqMVXGVbq9QjPQvJPP" target="_blank" rel="noopener noreferrer" className="block p-3 rounded-lg bg-card/80 hover:bg-card transition-all group">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-sm group-hover:text-blue-500 transition-colors">Introduction to SciCMPMATH</h4>
+                        <p className="text-xs text-muted-foreground">15 min • Overview tutorial</p>
+                      </div>
+                      <ExternalLink className="w-4 h-4 text-blue-500 opacity-0 group-hover:opacity-100" />
+                    </div>
+                  </a>
+                  <a href="https://www.youtube.com/c/NPTEL-NOC-IITM" target="_blank" rel="noopener noreferrer" className="block p-3 rounded-lg bg-card/80 hover:bg-card transition-all group">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-sm group-hover:text-blue-500 transition-colors">NPTEL Bioinformatics Course</h4>
+                        <p className="text-xs text-muted-foreground">40+ hours • Free certification</p>
+                      </div>
+                      <ExternalLink className="w-4 h-4 text-blue-500 opacity-0 group-hover:opacity-100" />
+                    </div>
+                  </a>
+                  <div className="block p-3 rounded-lg bg-card/80 hover:bg-card transition-all cursor-pointer"
+                       onClick={() => {
+                         const vizTemplate = templates.find(t => t.id === 'scientific-dashboard-kit');
+                         if (vizTemplate) {
+                           setSelectedTemplate(vizTemplate);
+                           window.scrollTo({ top: 0, behavior: 'smooth' });
+                         }
+                       }}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-sm group-hover:text-blue-500 transition-colors">Data Visualization Masterclass</h4>
+                        <p className="text-xs text-muted-foreground">Interactive • Self-paced</p>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-blue-500" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================== */}
+      {/* STANDARDIZATION ACROSS LABS */}
+      {/* ================================================================== */}
+      <section className="py-16 bg-amber-500/5" id="standardization">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 mb-4">
+              <Shield className="w-4 h-4 text-amber-600" />
+              <span className="text-sm font-medium text-amber-600">Reproducible Science</span>
+            </div>
+            
+            <h2 className="text-3xl font-bold mb-4">Standardization Across Labs</h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Standard operating procedures, protocol templates, and quality control measures 
+              to ensure reproducible research across different laboratories worldwide.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* SOP Templates */}
+            <div className="p-6 rounded-xl border bg-card hover:shadow-lg transition-shadow">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-amber-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">SOP Templates</h3>
+                  <p className="text-xs text-muted-foreground">Standard Operating Procedures</p>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="p-3 rounded-lg bg-amber-500/5 border-l-2 border-amber-500">
+                  <h4 className="text-sm font-medium mb-1 flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-amber-600" />
+                    Lab Setup Protocol
+                  </h4>
+                  <p className="text-xs text-muted-foreground">Environment configuration checklist</p>
+                  <Button variant="ghost" size="sm" className="mt-2 text-amber-600 hover:bg-amber-500/10 h-8 w-full"
+                          onClick={() => {
+                            const sopTemplate = templates.find(t => t.id === 'genome-assembly-pipeline');
+                            if (sopTemplate) {
+                              setSelectedTemplate(sopTemplate);
+                              setActiveTab('practices');
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }
+                          }}>View Template</Button>
+                </div>
+                
+                <div className="p-3 rounded-lg bg-amber-500/5 border-l-2 border-amber-500">
+                  <h4 className="text-sm font-medium mb-1 flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-amber-600" />
+                    Data Management SOP
+                  </h4>
+                  <p className="text-xs text-muted-foreground">File naming, versioning, backup procedures</p>
+                  <Button variant="ghost" size="sm" className="mt-2 text-amber-600 hover:bg-amber-500/10 h-8 w-full"
+                          onClick={() => {
+                            const dataTemplate = templates.find(t => t.id === 'scientific-document-processor');
+                            if (dataTemplate) {
+                              setSelectedTemplate(dataTemplate);
+                              setActiveTab('overview');
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }
+                          }}>View Template</Button>
+                </div>
+                
+                <div className="p-3 rounded-lg bg-amber-500/5 border-l-2 border-amber-500">
+                  <h4 className="text-sm font-medium mb-1 flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-amber-600" />
+                    QC Checklist
+                  </h4>
+                  <p className="text-xs text-muted-foreground">Quality control at each analysis stage</p>
+                  <Button variant="ghost" size="sm" className="mt-2 text-amber-600 hover:bg-amber-500/10 h-8 w-full"
+                          onClick={() => {
+                            const qcTemplate = templates.find(t => t.id === 'molecular-docking-workflow');
+                            if (qcTemplate) {
+                              setSelectedTemplate(qcTemplate);
+                              setActiveTab('practices');
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }
+                          }}>View Template</Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Quality Metrics */}
+            <div className="p-6 rounded-xl border bg-card hover:shadow-lg transition-shadow">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Quality Metrics</h3>
+                  <p className="text-xs text-muted-foreground">Benchmarking & Validation Standards</p>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-emerald-500/5">
+                  <span className="text-sm font-medium">BUSCO Score Target</span>
+                  <span className="text-sm font-bold text-emerald-600">&gt;95%</span>
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-lg bg-emerald-500/5">
+                  <span className="text-sm font-medium">QUAST Score Target</span>
+                  <span className="text-sm font-bold text-emerald-600">&gt;90</span>
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-lg bg-emerald-500/5">
+                  <span className="text-sm font-medium">Reproducibility</span>
+                  <span className="text-sm font-bold text-emerald-600">100%</span>
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-lg bg-emerald-500/5">
+                  <span className="text-sm font-medium">Documentation</span>
+                  <span className="text-sm font-bold text-emerald-600">Complete</span>
+                </div>
+                
+                <Button variant="outline" size="sm" className="w-full mt-4 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/10"
+                        onClick={() => {
+                          const bestPracticeTemplate = templates.find(t => t.bestPractices.length > 0);
+                          if (bestPracticeTemplate) {
+                            setSelectedTemplate(bestPracticeTemplate);
+                            setActiveTab('practices');
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }
+                        }}>
+                  Explore Best Practices
+                </Button>
+              </div>
+            </div>
+
+            {/* Protocol Sharing */}
+            <div className="p-6 rounded-xl border bg-card hover:shadow-lg transition-shadow">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                  <Share2 className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Protocol Sharing</h3>
+                  <p className="text-xs text-muted-foreground">Community-curated protocols</p>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="p-3 rounded-lg bg-blue-500/5 border-l-2 border-blue-500">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-sm font-medium text-blue-700">NIH Common Fund</h4>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-600">Required</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Data sharing and metadata standards</p>
+                </div>
+                
+                <div className="p-3 rounded-lg bg-blue-500/5 border-l-2 border-blue-500">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-sm font-medium text-blue-700">FAIR Principles</h4>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-600">Recommended</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Findable, Accessible, Interoperable, Reusable</p>
+                </div>
+                
+                <div className="p-3 rounded-lg bg-blue-500/5 border-l-2 border-blue-500">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-sm font-medium text-blue-700">Galaxy Workflows</h4>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-600">Available</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Reproducible analysis pipelines</p>
+                </div>
+                
+                <Button variant="outline" size="sm" className="w-full mt-4 text-blue-600 border-blue-500/30 hover:bg-blue-500/10"
+                        onClick={() => window.open('https://usegalaxy.org/', '_blank')}>
+                  Explore Galaxy Platform
+                  <ExternalLink className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center mt-12">
+            <p className="text-sm text-muted-foreground mb-4">
+              All templates include embedded best practices to ensure consistency across your lab.
+            </p>
+            <Button 
+              variant="outline"
+              onClick={() => document.getElementById('templates-grid')?.scrollIntoView({ behavior: 'smooth' })}
+              className="gap-2"
+            >
+              Browse All Templates with Best Practices
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* COMMUNITY CTA SECTION */}
       {/* ================================================================== */}
       <section className="py-20 bg-gradient-to-b from-primary/5 to-transparent">
@@ -3053,6 +3771,11 @@ function TemplateCard({
                 <Zap className="w-4 h-4" />
               </span>
             )}
+            {template.externalPortal && (
+              <span className="p-1.5 rounded-lg bg-blue-500/10 text-blue-500" title={`Opens in ${template.externalPortal.name}`}>
+                <ExternalLink className="w-4 h-4" />
+              </span>
+            )}
           </div>
         </div>
 
@@ -3148,6 +3871,12 @@ function TemplateListItem({
             <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-xs flex items-center gap-1">
               <Zap className="w-3 h-3" />
               One-Click
+            </span>
+          )}
+          {template.externalPortal && (
+            <span className="px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500 text-xs flex items-center gap-1">
+              <ExternalLink className="w-3 h-3" />
+              Portal
             </span>
           )}
         </div>
