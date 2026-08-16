@@ -108,6 +108,15 @@ import {
   // Additional Icons for New Sections
   GraduationCap,
   Video,
+  
+  // Portal-specific Icons
+  Code,
+  Terminal,
+  User,
+  Send,
+  ZoomIn,
+  ZoomOut,
+  Flag,
 } from 'lucide-react';
 
 // ============================================================================
@@ -2213,10 +2222,721 @@ export default function TemplateGalleryPage() {
     }));
   }, []);
 
+  // ====================================================================
+  // REVOLUTIONARY TEMPLATE PORTAL STATE MANAGEMENT
+  // ====================================================================
+  
+  /** Portal view modes for the enhanced template experience */
+  type PortalView = 'overview' | 'playground' | 'ai-assistant' | 'workflow' | 'compute' | 'community';
+  const [portalView, setPortalView] = useState<PortalView>('overview');
+  
+  /** Code editor state for interactive playground */
+  const [codeEditorContent, setCodeEditorContent] = useState<string>('');
+  const [codeLanguage, setCodeLanguage] = useState<string>('python');
+  const [isRunningCode, setIsRunningCode] = useState(false);
+  const [codeOutput, setCodeOutput] = useState<string>('');
+  
+  /** AI Research Assistant state */
+  const [aiChatMessages, setAiChatMessages] = useState<Array<{role: 'user' | 'assistant', content: string, timestamp: Date}>>([]);
+  const [aiInputMessage, setAiInputMessage] = useState<string>('');
+  const [isAiThinking, setIsAiThinking] = useState(false);
+  
+  /** Workflow visualization state */
+  const [activeWorkflowStep, setActiveWorkflowStep] = useState<number>(0);
+  const [workflowZoomLevel, setWorkflowZoomLevel] = useState<number>(100);
+  
+  /** Compute simulator state */
+  const [computeSimulation, setComputeSimulation] = useState<{
+    estimatedTime: string;
+    resourceUsage: {cpu: number; memory: number; gpu: number};
+    costEstimate: string;
+    progress: number;
+    isSimulating: boolean;
+  }>({
+    estimatedTime: '~15 min',
+    resourceUsage: { cpu: 0, memory: 0, gpu: 0 },
+    costEstimate: '$0.00',
+    progress: 0,
+    isSimulating: false,
+  });
+  
+  /** Template customization state */
+  const [customParameters, setCustomParameters] = useState<Record<string, string>>({});
+  const [showCustomizer, setShowCustomizer] = useState(false);
+  
+  /** Collaboration & activity state */
+  const [recentActivity, setRecentActivity] = useState<Array<{
+    user: string;
+    action: string;
+    templateName: string;
+    timestamp: Date;
+    avatar?: string;
+  }>>([]);
+  
+  /** Portal initialization when template is selected */
+  const initializePortalForTemplate = useCallback((template: TemplateData) => {
+    // Set default code based on template category
+    const defaultCodes: Record<string, string> = {
+      bioinformatics: `# ${template.name} - SciCMPMATH Template
+# Auto-generated starter code
+
+import scicmppath as sci
+from Bio import SeqIO
+
+# Initialize the analysis pipeline
+pipeline = sci.Pipeline("${template.id}")
+
+# Load your data (auto-detected format)
+data = pipeline.load_data("your_file.fasta")
+
+# Configure parameters
+config = {
+    "evalue": 1e-5,
+    "max_target_seqs": 10,
+    "word_size": 11,
+}
+
+# Run the analysis with one click
+results = pipeline.run(data, config)
+
+# Visualize results automatically
+pipeline.visualize(results)
+pipeline.export(results, format="pdf")
+
+print(f"✅ Analysis complete! Found {len(results.hits)} significant matches")`,
+      
+      'machine-learning': `# ${template.name} - SciCMPMATH Template
+# Enterprise ML Pipeline
+
+import scicmppath as sci
+import torch
+import transformers
+
+# Initialize ML environment
+ml_env = sci.MLEnvironment(
+    gpu_acceleration=True,
+    distributed=False
+)
+
+# Load pre-trained model or train from scratch
+model = ml_env.load_model(
+    architecture="${template.category}",
+    pretrained=True
+)
+
+# Prepare dataset with auto-augmentation
+dataset = ml_env.prepare_dataset(
+    path="./data",
+    augmentation=True,
+    split_ratio=[0.8, 0.1, 0.1]
+)
+
+# Train with hyperparameter optimization
+trainer = ml_env.Trainer(
+    model=model,
+    dataset=dataset,
+    optimizer="adamw",
+    learning_rate=2e-5,
+    epochs=10,
+    early_stopping=True
+)
+
+# Execute training with live monitoring
+results = trainer.train(
+    monitor_metrics=["loss", "accuracy", "f1"],
+    checkpoint_best=True
+)
+
+# Evaluate and deploy
+evaluation = model.evaluate(dataset.test)
+ml_env.deploy(model, endpoint="/api/v1/predict")`,
+
+      'chemistry': `# ${template.name} - SciCMPMATH Template
+# Molecular Analysis Pipeline
+
+import scicmppath as sci
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+
+# Initialize molecular workspace
+mol_workspace = sci.MolecularWorkspace()
+
+# Input molecule (SMILES, InChI, or file)
+molecule = mol_workspace.load_molecule(
+    smiles="CCO",  # Example: ethanol
+    format="smiles"
+)
+
+# Run computational chemistry analysis
+analysis = mol_workspace.analyze(molecule, methods=[
+    "energy_minimization",
+    "conformational_search",
+    "molecular_docking",
+    "property_prediction"
+])
+
+# Get predicted properties
+properties = analysis.get_properties([
+    "LogP",
+    "MolecularWeight",
+    "TPSA",
+    "HBD",
+    "HBA"
+])
+
+# Visualize molecular orbitals
+analysis.visualize_orbitals()
+analysis.export_results(format="sdf")`,
+
+      'physics': `# ${template.name} - SciCMPMATH Template
+# Quantum Simulation Framework
+
+import scicmppath as sci
+import numpy as np
+
+# Initialize quantum simulator
+simulator = sci.QuantumSimulator(
+    method="density_functional_theory",
+    basis_set="def2-TZVP"
+)
+
+# Define system Hamiltonian
+hamiltonian = simulator.create_hamiltonian(
+    particles=10,
+    dimensions=3,
+    potential="harmonic_oscillator"
+)
+
+# Set initial conditions
+initial_state = simulator.prepare_state(
+    temperature=300,  # Kelvin
+    magnetic_field=1.0  # Tesla
+)
+
+# Run time evolution simulation
+evolution = simulator.evolve(
+    hamiltonian=hamiltonian,
+    initial_state=initial_state,
+    time_steps=1000,
+    dt=0.001
+)
+
+# Extract observables
+observables = evolution.measure([
+    "energy",
+    "position_momentum",
+    "spin_correlation"
+])
+
+# Generate publication-quality plots
+sci.plotting.quantum_evolution(observables)
+evolution.export_data("simulation_results.hdf5")`,
+
+      'visualization': `# ${template.name} - SciCMPMATH Template
+# Scientific Visualization Suite
+
+import scicmppath as sci
+import plotly.graph_objects as go
+import matplotlib.pyplot as plt
+
+# Initialize visualization engine
+viz = sci.VisualizationEngine(
+    theme="scientific_dark",
+    dpi=300,
+    export_format="vector"
+)
+
+# Load your dataset
+data = viz.load_dataset("experimental_results.csv")
+
+# Create multi-panel scientific figure
+fig = viz.create_figure(rows=2, cols=2, figsize=(12, 10))
+
+# Panel 1: Main data visualization
+viz.add_plot(fig, position=(0, 0), type="scatter_3d",
+             x=data.x, y=data.y, z=data.z,
+             color=data.intensity,
+             title="3D Data Distribution")
+
+# Panel 2: Statistical analysis
+viz.add_plot(fig, position=(0, 1), type="histogram",
+             data=data.values,
+             distribution="normal",
+             title="Statistical Distribution")
+
+# Panel 3: Time series
+viz.add_plot(fig, position=(1, 0), type="line",
+             x=data.time, y=data.signal,
+             error_bars=True,
+             title="Signal Evolution")
+
+# Panel 4: Correlation matrix
+viz.add_plot(fig, position=(1, 1), type="heatmap",
+             data=data.correlation_matrix(),
+             clustering=True,
+             title="Feature Correlations")
+
+# Export in multiple formats
+fig.export("figure.pdf")
+fig.export("figure.svg")
+fig.export("figure.png", transparent=True)`,
+
+      'statistics': `# ${template.name} - SciCMPMATH Template
+# Statistical Analysis Framework
+
+import scicmppath as sci
+import scipy.stats as stats
+import pandas as pd
+
+# Initialize statistical environment
+stats_env = sci.StatisticalEnvironment(
+    significance_level=0.05,
+    multiple_testing="bonferroni"
+)
+
+# Load and preprocess data
+data = pd.read_csv("research_data.csv")
+cleaned = stats_env.preprocess(data, methods=[
+    "handle_missing",
+    "remove_outliers",
+    "normalize"
+])
+
+# Perform comprehensive statistical tests
+results = stats_env.analyze(cleaned, tests={
+    "normality": ["shapiro-wilk", "anderson-darling"],
+    "comparison": ["t-test", "mann-whitney", "anova"],
+    "correlation": ["pearson", "spearman", "kendall"],
+    "regression": ["linear", "multiple", "logistic"]
+})
+
+# Bayesian inference (if applicable)
+bayesian_results = stats_env.bayesian_analysis(
+    data=cleaned,
+    priors="informative",
+    mcmc_samples=10000
+)
+
+# Generate statistical report
+report = stats_env.generate_report(
+    results=results,
+    bayesian=bayesian_results,
+    format="apa7",
+    include_tables=True,
+            include_figures=True
+)
+
+report.save("statistical_analysis.pdf")
+print(f"📊 Analysis complete: p-value = {results.min_p_value:.4f}")`,
+      
+      'quantum': `# ${template.name} - SciCMPMATH Template
+# Quantum Computing Interface
+
+import scicmppath as sci
+from qiskit import QuantumCircuit, Aer, execute
+
+# Initialize quantum backend
+backend = sci.QuantumBackend(
+    provider="ibmq",
+    simulator=True,  # Set False for real quantum hardware
+    qubits=5
+)
+
+# Create quantum circuit for algorithm
+qc = QuantumCircuit(backend.qubits)
+
+# Implement ${template.name.split(' ')[0].toLowerCase()} algorithm
+# Circuit construction
+qc.h(0)  # Superposition
+for i in range(backend.qubits - 1):
+    qc.cx(i, i + 1)  # Entanglement
+    
+# Parameterized rotation gates
+theta = sci.Parameter("θ")
+qc.rz(theta, range(backend.qubits))
+
+# Measurement
+qc.measure_all()
+
+# Execute on quantum simulator
+job = backend.run(qc, shots=8192)
+result = job.result()
+
+# Analyze quantum statistics
+counts = result.get_counts()
+probability_distribution = backend.analyze_counts(counts)
+
+# Visualize quantum state
+backend.plot_bloch_sphere(qc)
+backend.plot_histogram(counts)
+
+# Export quantum circuit diagram
+qc.draw(output="mpl", filename="circuit_diagram.png")`,
+
+      'imaging': `# ${template.name} - SciCMPMATH Template
+# Medical Image Processing Pipeline
+
+import scicmppath as sci
+import numpy as np
+import SimpleITK as sitk
+
+# Initialize medical imaging environment
+med_img = sci.MedicalImagingEnvironment(
+    modality="MRI",  # CT, MRI, PET, X-ray
+    output_dtype=np.float32
+)
+
+# Load medical image series
+image_series = med_img.load_series(
+    path="./patient_scans/",
+    format="DICOM"
+)
+
+# Preprocessing pipeline
+preprocessed = med_img.preprocess(image_series, steps=[
+    ("noise_reduction", {"method": "gaussian", "sigma": 1.0}),
+    ("intensity_normalization", {"method": "percentile"}),
+    ("registration", {"reference": "atlas"}),
+    ("skull_stripping", {"method": "bet"})
+)
+
+# AI-powered segmentation (U-Net, Transformer, etc.)
+segmentation_model = med_img.load_model(
+    architecture="nnUNet",
+    pretrained="medical_net"
+)
+
+mask = segmentation_model.segment(preprocessed)
+segments = med_img.extract_segments(mask, labels=[
+    "gray_matter",
+    "white_matter", 
+    "csf",
+    "lesions"
+])
+
+# Quantitative analysis
+measurements = med_img.analyze(segments, metrics=[
+    "volume",
+    "surface_area",
+    "mean_intensity",
+    "texture_features"
+])
+
+# Generate clinical report with visualizations
+report = med_img.generate_report(
+    measurements=measurements,
+    mask_overlay=True,
+    slices_to_show=[30, 50, 70]
+)
+report.export("clinical_report.pdf")`,
+
+      'documentation': `# ${template.name} - SciCMPMATH Template
+# Scientific Document Processor
+
+import scicmppath as sci
+from docx import Document
+from bibtex.parser import bibtex_parser
+
+# Initialize document processor
+doc_processor = sci.DocumentProcessor(
+    format="latex",  # latex, word, markdown
+    citation_style="nature"  # apa, ieee, nature, science
+)
+
+# Load source materials
+paper = doc_processor.load_paper("manuscript.tex")
+references = doc_processor.load_references("references.bib")
+figures = doc_processor.load_figures("./figures/")
+
+# Automated formatting and style check
+formatted = doc_processor.format(paper, style_guide="nature_template")
+style_issues = doc_processor.check_style(formatted)
+
+# Citation management
+citations = doc_processor.manage_citations(
+    paper=formatted,
+    references=references,
+    auto_complete=True,
+    detect_duplicates=True
+)
+
+# Figure and table processing
+processed_figures = doc_processor.process_figures(
+    figures,
+    resolution=300,
+    format="vector",
+    compress=True
+)
+
+# Generate multiple output formats
+outputs = doc_processor.export(
+    paper=citations,
+    formats=["pdf", "html", "docx"],
+    include_supplementary=True,
+    plagiarism_check=True
+)
+
+print(f"📄 Document processed: {len(outputs)} formats generated")`,
+
+      'time-series': `# ${template.name} - SciCMPMATH Template
+# Time Series Analysis Engine
+
+import scicmppath as sci
+import pandas as pd
+import prophet
+from sklearn.ensemble import IsolationForest
+
+# Initialize time series environment
+ts_env = sci.TimeSeriesEnvironment(
+    frequency="D",  # Daily data
+    seasonality_mode="multiplicative"
+)
+
+# Load temporal data
+data = pd.read_csv("time_series_data.csv", parse_dates=["date"])
+ts = ts_env.create_series(data, date_column="date", value_column="value")
+
+# Exploratory analysis
+decomposition = ts_env.decompose(ts, method="STL")
+stationarity_test = ts_env.test_stationarity(ts, tests=["adf", "kpss", "pp"])
+
+# Feature engineering
+features = ts_env.engineer_features(ts, lags=[1, 7, 30], 
+                                     rolling_windows=[7, 14, 30],
+                                     fourier_terms=4)
+
+# Multiple forecasting models
+models = {
+    "prophet": ts_env.fit_prophet(ts, seasonality=True),
+    "arima": ts_env.fit_arima(ts, order=(5, 1, 1)),
+    "lstm": ts_env.fit_lstm(features, lookback=30),
+    "ensemble": ts_env.fit_ensemble([prophet, arima, lstm])
+}
+
+# Anomaly detection
+anomaly_detector = IsolationForest(contamination=0.05)
+anomalies = ts_env.detect_anomalies(ts, detector=anomaly_detector)
+
+# Forecasting with uncertainty quantification
+forecast = models["ensemble"].forecast(
+    periods=90,
+    confidence_intervals=[0.80, 0.95],
+    simulation_runs=1000
+)
+
+# Comprehensive visualization
+ts_env.plot_forecast(forecast, anomalies=anomalies)
+ts_env.plot_decomposition(decomposition)
+forecast.save("forecast_results.pkl")`
+    };
+    
+    setCodeEditorContent(defaultCodes[template.category] || defaultCodes['bioinformatics']);
+    setCodeLanguage('python');
+    
+    // Initialize AI assistant with context
+    setAiChatMessages([{
+      role: 'assistant',
+      content: `Hello! I'm your **SciCMPMATH Research Assistant** for the **${template.name}** template. I can help you:\n\n• 🧬 Understand the underlying algorithms\n• ⚙️ Optimize parameters for your specific use case\n• 🔍 Troubleshoot common issues\n• 📚 Find relevant papers and citations\n• 💡 Suggest improvements or extensions\n\nWhat would you like to explore?`,
+      timestamp: new Date()
+    }]);
+    
+    // Simulate recent community activity
+    setRecentActivity([
+      {
+        user: "Dr. Sarah Chen",
+        action: "ran analysis with",
+        templateName: template.name,
+        timestamp: new Date(Date.now() - 5 * 60000),
+        avatar: "SC"
+      },
+      {
+        user: "Prof. Marcus Rodriguez",
+        action: "forked and modified",
+        templateName: template.name,
+        timestamp: new Date(Date.now() - 23 * 60000),
+        avatar: "MR"
+      },
+      {
+        user: "Yuki Tanaka",
+        action: "shared results from",
+        templateName: template.name,
+        timestamp: new Date(Date.now() - 47 * 60000),
+        avatar: "YT"
+      },
+      {
+        user: "AI Lab Stanford",
+        action: "deployed production version of",
+        templateName: template.name,
+        timestamp: new Date(Date.now() - 2 * 3600000),
+        avatar: "AI"
+      }
+    ]);
+    
+    // Reset compute simulation
+    setComputeSimulation({
+      estimatedTime: template.setupTime === '<5 min' ? '~3 min' : template.setupTime === '<15 min' ? '~12 min' : '~45 min',
+      resourceUsage: {
+        cpu: Math.floor(Math.random() * 40) + 60,
+        memory: Math.floor(Math.random() * 30) + 50,
+        gpu: template.computeRequirements.gpu ? Math.floor(Math.random() * 60) + 40 : 0
+      },
+      costEstimate: `$${(Math.random() * 2 + 0.5).toFixed(2)}`,
+      progress: 0,
+      isSimulating: false
+    });
+    
+    // Set portal view to overview
+    setPortalView('overview');
+  }, []);
+
   // Scroll handler - uses SCROLL_THRESHOLD_PX constant for consistency
   const handleScroll = useCallback(() => {
     setShowScrollTop(window.scrollY > SCROLL_THRESHOLD_PX);
   }, []);
+
+  // ====================================================================
+  // PORTAL INTERACTION HANDLERS
+  // ====================================================================
+
+  /** Run code in the playground with simulated output */
+  const handleRunCode = useCallback(async () => {
+    setIsRunningCode(true);
+    setCodeOutput('');
+    
+    // Simulate code execution with progressive output
+    const steps = [
+      '🔧 Initializing SciCMPMATH environment...',
+      '📦 Loading dependencies and modules...',
+      '⚙️ Configuring parameters...',
+      '🚀 Executing analysis pipeline...'
+    ];
+    
+    for (let i = 0; i < steps.length; i++) {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setCodeOutput(prev => prev + steps[i] + '\n');
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const successOutput = `\n✅ Execution completed successfully!
+    
+📊 Results Summary:
+   • Processed 1,247 data points
+   • Found 23 significant patterns
+   • Generated 4 visualization outputs
+   • Computed statistics: p < 0.001
+   
+💾 Output files:
+   • results/analysis_output.csv
+   • figures/main_plot.pdf
+   • data/processed_data.pkl
+   • report/summary.html
+
+⏱️  Total runtime: ${(Math.random() * 10 + 5).toFixed(1)}s
+🖥️  Memory usage: ${(Math.random() * 500 + 200).toFixed(0)} MB
+🎯  Accuracy: ${(Math.random() * 5 + 94).toFixed(1)}%
+
+Ready for next operation...`;
+    
+    setCodeOutput(prev => prev + successOutput);
+    setIsRunningCode(false);
+  }, []);
+
+  /** Send message to AI Research Assistant */
+  const handleSendMessage = useCallback(async () => {
+    if (!aiInputMessage.trim()) return;
+    
+    const userMessage = aiInputMessage;
+    setAiInputMessage('');
+    setIsAiThinking(true);
+    
+    // Add user message
+    setAiChatMessages(prev => [...prev, {
+      role: 'user',
+      content: userMessage,
+      timestamp: new Date()
+    }]);
+    
+    // Simulate AI thinking and response
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const aiResponses: Record<string, string> = {
+      default: `Great question! Based on my analysis of **${selectedTemplate?.name}**:\n\n## Key Insights\n\n### 🔬 Technical Details\nThe underlying algorithm uses **optimized implementations** with O(n log n) complexity for large-scale datasets.\n\n### 📈 Performance Characteristics\n- **Speed**: 3-5x faster than traditional methods\n- **Accuracy**: 94-97% on benchmark datasets\n- **Scalability**: Tested up to 10M data points\n\n### 💡 Recommendations\n1. Start with the "Beginner" preset for initial exploration\n2. Increase batch size for production workloads\n3. Enable GPU acceleration for 10x speedup\n\nWould you like me to elaborate on any specific aspect?`,
+      
+      parameters: `Let me help you optimize the parameters for **${selectedTemplate?.name}**:\n\n## Recommended Configuration\n\n| Parameter | Value | Rationale |\n|-----------|-------|----------|\n| Learning Rate | 2e-5 | Optimal convergence |\n| Batch Size | 32 | Balance speed/memory |\n| Epochs | 50 | With early stopping |\n| Dropout | 0.1 | Prevent overfitting |\n\n### Advanced Tips\n\n✨ Use **adaptive learning** for non-stationary data\n✨ Enable **mixed precision** training (faster, less memory)\n✨ Consider **gradient accumulation** for effective larger batches\n\nShall I generate a custom configuration file for you?`,
+      
+      error: `I understand you're encountering issues. Let me help troubleshoot:\n\n## Common Solutions\n\n### 🔍 Diagnosis Steps\n1. Check input data format compatibility\n2. Verify all dependencies are installed\n3. Ensure sufficient memory allocation\n\n### 🛠️ Quick Fixes\n\`\`\`bash\n# Clear cache and reinstall\nscicmppath --clear-cache\npip install --force-reinstall scicmppath-core\n\`\`\`\n\n### 📞 Next Steps\nIf the issue persists:\n• Share error logs (redact sensitive info)\n• Check system requirements\n• Try the "Minimal" preset first\n\nWhat specific error message are you seeing?`,
+      
+      papers: `Here are the key publications for **${selectedTemplate?.name}**:\n\n## 📚 Foundational Papers\n\n1. **Original Method** (2020)\n   - Citation count: 2,847\n   - DOI: 10.1038/s41586-020-2649-2\n   - Impact: Introduced the core algorithm\n\n2. **Optimization Breakthrough** (2022)\n   - Citation count: 1,523\n   - DOI: 10.1126/science.abq1158\n   - Impact: 10x performance improvement\n\n3. **Recent Advances** (2024)\n   - Citation count: 342\n   - DOI: 10.1038/s41467-024-44876-5\n   - Impact: Extended to multimodal data\n\n## 🔗 Quick Actions\n\n[Export BibTeX] [Open in Scholar] [Find related work]\n\nWant me to summarize any specific paper?`
+    };
+    
+    // Determine response type based on user input
+    let responseType = 'default';
+    if (userMessage.toLowerCase().includes('parameter') || userMessage.toLowerCase().includes('config') || userMessage.toLowerCase().includes('setting')) {
+      responseType = 'parameters';
+    } else if (userMessage.toLowerCase().includes('error') || userMessage.toLowerCase().includes('issue') || userMessage.toLowerCase().includes('problem')) {
+      responseType = 'error';
+    } else if (userMessage.toLowerCase().includes('paper') || userMessage.toLowerCase().includes('citation') || userMessage.toLowerCase().includes('reference')) {
+      responseType = 'papers';
+    }
+    
+    setAiChatMessages(prev => [...prev, {
+      role: 'assistant',
+      content: aiResponses[responseType],
+      timestamp: new Date()
+    }]);
+    
+    setIsAiThinking(false);
+  }, [aiInputMessage, selectedTemplate]);
+
+  /** Run compute simulation */
+  const handleRunSimulation = useCallback(async () => {
+    setComputeSimulation(prev => ({ ...prev, isSimulating: true, progress: 0 }));
+    
+    const duration = 3000; // 3 seconds simulation
+    const interval = 100;
+    const steps = duration / interval;
+    let currentStep = 0;
+    
+    const simulationInterval = setInterval(() => {
+      currentStep++;
+      const progress = Math.min((currentStep / steps) * 100, 100);
+      
+      setComputeSimulation({
+        estimatedTime: `${(Math.random() * 15 + 5).toFixed(0)} min`,
+        resourceUsage: {
+          cpu: Math.floor(Math.random() * 30) + 65,
+          memory: Math.floor(Math.random() * 25) + 60,
+          gpu: Math.floor(Math.random() * 40) + 55
+        },
+        costEstimate: `$${(Math.random() * 3 + 0.75).toFixed(2)}`,
+        progress: progress,
+        isSimulating: progress < 100
+      });
+      
+      if (progress >= 100) {
+        clearInterval(simulationInterval);
+      }
+    }, interval);
+  }, []);
+
+  /** Handle template selection with portal initialization */
+  const handleTemplateSelect = useCallback((template: TemplateData) => {
+    setSelectedTemplate(template);
+    setActiveTab('overview');
+    initializePortalForTemplate(template);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [initializePortalForTemplate]);
+
+  /** Format timestamp to relative time */
+  const formatTimeAgo = (date: Date): string => {
+    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+    
+    if (seconds < 60) return 'Just now';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    return `${Math.floor(seconds / 86400)}d ago`;
+  };
 
   if (typeof window !== 'undefined') {
     window.addEventListener('scroll', handleScroll);
@@ -2593,7 +3313,7 @@ export default function TemplateGalleryPage() {
                 <TemplateCard
                   key={template.id}
                   template={template}
-                  onSelect={() => setSelectedTemplate(template)}
+                  onSelect={() => handleTemplateSelect(template)}
                   getCategoryColor={getCategoryColor}
                   TierBadge={TierBadge}
                   DifficultyBadge={DifficultyBadge}
@@ -2607,7 +3327,7 @@ export default function TemplateGalleryPage() {
                 <TemplateListItem
                   key={template.id}
                   template={template}
-                  onSelect={() => setSelectedTemplate(template)}
+                  onSelect={() => handleTemplateSelect(template)}
                   getCategoryColor={getCategoryColor}
                   TierBadge={TierBadge}
                   DifficultyBadge={DifficultyBadge}
@@ -2620,547 +3340,874 @@ export default function TemplateGalleryPage() {
       </section>
 
       {/* ================================================================== */}
-      {/* TEMPLATE DETAIL MODAL */}
+      {/* REVOLUTIONARY SCICMPMATH TEMPLATE PORTAL */}
       {/* ================================================================== */}
       {selectedTemplate && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSelectedTemplate(null)} />
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-md" onClick={() => setSelectedTemplate(null)} />
           
-          <div className="relative min-h-screen flex items-start justify-center p-4 pt-20">
-            <div className="relative w-full max-w-5xl bg-card rounded-2xl border shadow-2xl overflow-hidden">
-              {/* Modal Header */}
-              <div className={`bg-gradient-to-r ${getCategoryColor(selectedTemplate.category)} p-8 text-white relative`}>
-                <button
-                  onClick={() => setSelectedTemplate(null)}
-                  className="absolute top-4 right-4 p-2 rounded-lg bg-black/20 hover:bg-black/30 transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-                
-                <button
-                  onClick={() => {
-                    /* Maximize functionality */
-                  }}
-                  className="absolute top-4 right-14 p-2 rounded-lg bg-black/20 hover:bg-black/30 transition-colors"
-                >
-                  <Maximize2 className="w-5 h-5" />
-                </button>
-
-                <div className="flex items-start gap-6">
-                  <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
+          <div className="relative min-h-screen flex items-start justify-center p-2 sm:p-4 pt-16">
+            <div className="relative w-full max-w-7xl bg-card rounded-3xl border shadow-2xl overflow-hidden flex flex-col lg:flex-row min-h-[85vh]">
+              
+              {/* ================================================================== */}
+              {/* PORTAL SIDEBAR - Quick Navigation Hub */}
+              {/* ================================================================== */}
+              <div className="w-full lg:w-72 bg-gradient-to-b from-muted/50 to-background border-r p-4 space-y-2 order-2 lg:order-1">
+                <div className="flex items-center gap-2 mb-4 pb-4 border-b">
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${getCategoryColor(selectedTemplate.category)} flex items-center justify-center text-white`}>
                     {selectedTemplate.icon}
                   </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-sm truncate">{selectedTemplate.name}</h3>
+                    <p className="text-xs text-muted-foreground">Portal Mode</p>
+                  </div>
+                </div>
+
+                {/* Portal Navigation Buttons */}
+                {[
+                  { id: 'overview' as PortalView, label: 'Overview', icon: <Eye className="w-4 h-4" />, color: 'text-blue-500', bgColor: 'bg-blue-500/10' },
+                  { id: 'playground' as PortalView, label: 'Code Lab', icon: <Code className="w-4 h-4" />, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' },
+                  { id: 'ai-assistant' as PortalView, label: 'AI Assistant', icon: <Brain className="w-4 h-4" />, color: 'text-violet-500', bgColor: 'bg-violet-500/10' },
+                  { id: 'workflow' as PortalView, label: 'Workflow', icon: <GitBranch className="w-4 h-4" />, color: 'text-orange-500', bgColor: 'bg-orange-500/10' },
+                  { id: 'compute' as PortalView, label: 'Compute Sim', icon: <Cpu className="w-4 h-4" />, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10' },
+                  { id: 'community' as PortalView, label: 'Community', icon: <Users className="w-4 h-4" />, color: 'text-pink-500', bgColor: 'bg-pink-500/10' },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setPortalView(item.id)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                      portalView === item.id 
+                        ? `${item.bgColor} ${item.color} font-medium border` 
+                        : 'hover:bg-muted/50 text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {item.icon}
+                    <span className="text-sm">{item.label}</span>
+                    {portalView === item.id && <ChevronRight className="w-4 h-4 ml-auto" />}
+                  </button>
+                ))}
+
+                {/* Quick Stats */}
+                <div className="pt-4 mt-4 border-t space-y-3">
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Quick Stats</h4>
                   
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <TierBadge tier={selectedTemplate.tier} />
-                      <DifficultyBadge difficulty={selectedTemplate.difficulty} />
-                      <StatusBadge status={selectedTemplate.status} />
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="p-2 rounded-lg bg-background border text-center">
+                      <div className="text-lg font-bold text-primary">{selectedTemplate.communityRating}</div>
+                      <div className="text-xs text-muted-foreground">Rating</div>
                     </div>
+                    <div className="p-2 rounded-lg bg-background border text-center">
+                      <div className="text-lg font-bold text-emerald-500">{(selectedTemplate.totalUses / 1000).toFixed(1)}K</div>
+                      <div className="text-xs text-muted-foreground">Uses</div>
+                    </div>
+                  </div>
+
+                  <Button 
+                    className="w-full gap-2 gradient-bg text-white border-0"
+                    size="sm"
+                    onClick={() => {
+                      setPortalView('playground');
+                      handleRunCode();
+                    }}
+                  >
+                    <Rocket className="w-4 h-4" />
+                    Quick Launch
+                  </Button>
+                </div>
+              </div>
+
+              {/* ================================================================== */}
+              {/* MAIN PORTAL CONTENT AREA */}
+              {/* ================================================================== */}
+              <div className="flex-1 flex flex-col order-1 lg:order-2 min-h-0">
+                
+                {/* Portal Header */}
+                <div className={`bg-gradient-to-r ${getCategoryColor(selectedTemplate.category)} p-6 text-white relative`}>
+                  <div className="flex items-start justify-between">
+                    <button
+                      onClick={() => setSelectedTemplate(null)}
+                      className="absolute top-4 right-4 p-2 rounded-lg bg-black/20 hover:bg-black/30 transition-colors z-10"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
                     
-                    <h2 className="text-2xl font-bold mb-2">{selectedTemplate.name}</h2>
-                    <p className="text-white/90 leading-relaxed">{selectedTemplate.description}</p>
-                    
-                    <div className="flex items-center gap-6 mt-4 text-sm text-white/80">
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 fill-current text-yellow-300" />
-                        <span>{selectedTemplate.communityRating}</span>
+                    <div className="flex items-start gap-4 pr-16">
+                      <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
+                        {selectedTemplate.icon}
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Users className="w-4 h-4" />
-                        <span>{(selectedTemplate.totalUses / 1000).toFixed(1)}K uses</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <CheckCircle2 className="w-4 h-4" />
-                        <span>{selectedTemplate.successRate} success rate</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
-                        <span>Setup: {selectedTemplate.setupTime}</span>
+                      
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <TierBadge tier={selectedTemplate.tier} />
+                          <DifficultyBadge difficulty={selectedTemplate.difficulty} />
+                          <StatusBadge status={selectedTemplate.status} />
+                        </div>
+                        
+                        <h2 className="text-xl font-bold mb-1">{selectedTemplate.name}</h2>
+                        <p className="text-sm text-white/80 line-clamp-2">{selectedTemplate.description}</p>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Tab Navigation */}
-              <div className="border-b">
-                <nav className="flex overflow-x-auto">
-                  {[
-                    { id: 'overview', label: 'Overview', icon: <Eye className="w-4 h-4" /> },
-                    { id: 'papers', label: `Papers (${selectedTemplate.papers.length})`, icon: <BookOpen className="w-4 h-4" /> },
-                    { id: 'presets', label: `Presets (${selectedTemplate.parameterPresets.length})`, icon: <Settings className="w-4 h-4" /> },
-                    { id: 'community', label: `Community (${selectedTemplate.communityContributions.length})`, icon: <Users className="w-4 h-4" /> },
-                    { id: 'practices', label: `Best Practices (${selectedTemplate.bestPractices.length})`, icon: <Shield className="w-4 h-4" /> },
-                  ].map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                      className={`flex items-center gap-2 px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
-                        activeTab === tab.id
-                          ? 'border-primary text-primary'
-                          : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
-                      }`}
-                    >
-                      {tab.icon}
-                      {tab.label}
-                    </button>
-                  ))}
-                </nav>
-              </div>
-
-              {/* Tab Content */}
-              <div className="p-8 max-h-[60vh] overflow-y-auto">
-                {activeTab === 'overview' && (
-                  <div className="space-y-8">
-                    {/* One-Click Setup Banner */}
-                    {selectedTemplate.oneClickSetup && (
-                      <div className="p-6 rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20">
-                        <div className="flex items-start gap-4">
-                          <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
-                            <Rocket className="w-6 h-6 text-primary" />
-                          </div>
-                          
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
-                              One-Click Setup Available
-                              <BadgeCheck className="w-5 h-5 text-primary" />
-                            </h3>
-                            <p className="text-muted-foreground mb-4">
-                              Get started in {selectedTemplate.setupTime} with automated environment setup, dependency installation, and example data loading.
-                            </p>
-                            
-                            <div className="flex flex-wrap gap-3">
-                              <Button className="gap-2 gradient-bg text-white border-0">
-                                <Play className="w-4 h-4" />
-                                Launch Template
-                              </Button>
-                              <Button variant="outline" className="gap-2">
-                                <Download className="w-4 h-4" />
-                                Download Files
-                              </Button>
-                              <Button variant="ghost" className="gap-2 text-primary">
-                                <ExternalLink className="w-4 h-4" />
-                                Live Demo
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* External Portal - Opens in new browser for large tools */}
-                    {selectedTemplate.externalPortal && (
-                      <div className="p-6 rounded-xl bg-gradient-to-r from-blue-500/10 via-cyan-500/5 to-transparent border border-blue-500/20">
-                        <div className="flex items-start gap-4">
-                          <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-                            <ExternalLink className="w-6 h-6 text-blue-500" />
-                          </div>
-                          
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
-                              Opens in {selectedTemplate.externalPortal.name}
-                              <BadgeCheck className="w-5 h-5 text-blue-500" />
-                            </h3>
-                            <p className="text-muted-foreground mb-3 text-sm">
-                              {selectedTemplate.externalPortal.description}
-                            </p>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-                              <div className="p-3 rounded-lg bg-card border">
-                                <span className="text-xs font-medium text-muted-foreground">Portal</span>
-                                <p className="font-semibold text-sm">{selectedTemplate.externalPortal.name}</p>
-                              </div>
-                              <div className="p-3 rounded-lg bg-card border">
-                                <span className="text-xs font-medium text-muted-foreground">File Size Limit</span>
-                                <p className="font-semibold text-sm">{selectedTemplate.externalPortal.fileSizeLimit || 'No limit'}</p>
-                              </div>
-                              {selectedTemplate.externalPortal.requiresAuth && (
-                                <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 md:col-span-2">
-                                  <span className="text-xs font-medium text-amber-600 dark:text-amber-400 flex items-center gap-1">
-                                    <Lock className="w-3 h-3" />
-                                    Authentication Required
-                                  </span>
-                                  <p className="text-xs mt-1 text-amber-600/80 dark:text-amber-400/80">
-                                    Free account recommended for job history and saved searches
-                                  </p>
-                                </div>
-                              )}
-                            </div>
-                            
-                            <Button 
-                              onClick={() => window.open(selectedTemplate.externalPortal.url, '_blank')}
-                              className="gap-2 bg-blue-600 hover:bg-blue-700 text-white border-0 w-full md:w-auto"
-                              aria-label={`Open ${selectedTemplate.externalPortal.name} in new tab`}
-                            >
-                              <ExternalLink className="w-4 h-4" />
-                              Open in {selectedTemplate.externalPortal.name}
-                              <span className="hidden md:inline ml-1">→</span>
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Description */}
-                    <div>
-                      <h3 className="font-semibold text-lg mb-3">About this Template</h3>
-                      <p className="text-muted-foreground leading-relaxed">{selectedTemplate.longDescription}</p>
-                    </div>
-
-                    {/* Compute Requirements */}
-                    <div>
-                      <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                        <Cpu className="w-5 h-5 text-primary" />
-                        Compute Requirements
-                      </h3>
-                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                        <div className="p-4 rounded-xl bg-muted/50 border">
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                            <Cpu className="w-4 h-4" />
-                            CPU
-                          </div>
-                          <p className="font-semibold">{selectedTemplate.computeRequirements.cpu}</p>
-                        </div>
-                        <div className="p-4 rounded-xl bg-muted/50 border">
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                            <MemoryStick className="w-4 h-4" />
-                            Memory
-                          </div>
-                          <p className="font-semibold">{selectedTemplate.computeRequirements.memory}</p>
-                        </div>
-                        {selectedTemplate.computeRequirements.gpu && (
-                          <div className="p-4 rounded-xl bg-muted/50 border">
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                              <HardDrive className="w-4 h-4" />
-                              GPU
-                            </div>
-                            <p className="font-semibold">{selectedTemplate.computeRequirements.gpu}</p>
-                          </div>
-                        )}
-                        <div className="p-4 rounded-xl bg-muted/50 border">
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                            <HardDrive className="w-4 h-4" />
-                            Storage
-                          </div>
-                          <p className="font-semibold">{selectedTemplate.computeRequirements.storage}</p>
-                        </div>
-                        <div className="p-4 rounded-xl bg-muted/50 border">
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                            <DollarSign className="w-4 h-4" />
-                            Est. Cost
-                          </div>
-                          <p className="font-semibold">{selectedTemplate.computeRequirements.estimatedCost}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Features & Use Cases */}
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div>
-                        <h3 className="font-semibold text-lg mb-3">Features</h3>
-                        <ul className="space-y-2">
-                          {selectedTemplate.features.map((feature, idx) => (
-                            <li key={idx} className="flex items-center gap-2 text-sm">
-                              <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                              {feature}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                {/* Portal Content - Scrollable */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                  
+                  {/* ============================================================ */}
+                  {/* OVERVIEW PORTAL VIEW */}
+                  {/* ============================================================ */}
+                  {portalView === 'overview' && (
+                    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
                       
-                      <div>
-                        <h3 className="font-semibold text-lg mb-3">Use Cases</h3>
-                        <ul className="space-y-2">
-                          {selectedTemplate.useCases.map((useCase, idx) => (
-                            <li key={idx} className="flex items-center gap-2 text-sm">
-                              <Target className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                              {useCase}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
+                      {/* Action Cards Grid */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <button 
+                          onClick={() => setPortalView('playground')}
+                          className="group p-5 rounded-xl border bg-gradient-to-br from-emerald-500/5 to-transparent hover:from-emerald-500/10 hover:border-emerald-500/30 transition-all text-left"
+                        >
+                          <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <Code className="w-6 h-6 text-emerald-500" />
+                          </div>
+                          <h3 className="font-semibold mb-1 group-hover:text-emerald-600 transition-colors">Interactive Code Lab</h3>
+                          <p className="text-sm text-muted-foreground">Write, edit, and execute code with live output visualization</p>
+                        </button>
 
-                    {/* Integrations */}
-                    <div>
-                      <h3 className="font-semibold text-lg mb-3">Integrations</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {selectedTemplate.integrations.map((integration, idx) => (
-                          <span key={idx} className="px-3 py-1.5 rounded-lg bg-muted border text-sm">
-                            {integration}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
+                        <button 
+                          onClick={() => setPortalView('ai-assistant')}
+                          className="group p-5 rounded-xl border bg-gradient-to-br from-violet-500/5 to-transparent hover:from-violet-500/10 hover:border-violet-500/30 transition-all text-left"
+                        >
+                          <div className="w-12 h-12 rounded-xl bg-violet-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <Brain className="w-6 h-6 text-violet-500" />
+                          </div>
+                          <h3 className="font-semibold mb-1 group-hover:text-violet-600 transition-colors">AI Research Assistant</h3>
+                          <p className="text-sm text-muted-foreground">Get intelligent help with algorithms, parameters, and troubleshooting</p>
+                        </button>
 
-                    {/* Tags */}
-                    <div>
-                      <h3 className="font-semibold text-lg mb-3">Tags</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {selectedTemplate.tags.map((tag, idx) => (
-                          <span key={idx} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm">
-                            #{tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
+                        <button 
+                          onClick={() => setPortalView('workflow')}
+                          className="group p-5 rounded-xl border bg-gradient-to-br from-orange-500/5 to-transparent hover:from-orange-500/10 hover:border-orange-500/30 transition-all text-left"
+                        >
+                          <div className="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <GitBranch className="w-6 h-6 text-orange-500" />
+                          </div>
+                          <h3 className="font-semibold mb-1 group-hover:text-orange-600 transition-colors">Visual Workflow Builder</h3>
+                          <p className="text-sm text-muted-foreground">Interactive pipeline DAG with step-by-step execution</p>
+                        </button>
 
-                    {/* Prerequisites */}
-                    <div>
-                      <h3 className="font-semibold text-lg mb-3">Prerequisites</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {selectedTemplate.prerequisites.map((req, idx) => (
-                          <span key={idx} className="px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 text-sm flex items-center gap-1">
-                            <AlertCircle className="w-3 h-3" />
-                            {req}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
+                        <button 
+                          onClick={() => { setPortalView('compute'); handleRunSimulation(); }}
+                          className="group p-5 rounded-xl border bg-gradient-to-br from-cyan-500/5 to-transparent hover:from-cyan-500/10 hover:border-cyan-500/30 transition-all text-left"
+                        >
+                          <div className="w-12 h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <Cpu className="w-6 h-6 text-cyan-500" />
+                          </div>
+                          <h3 className="font-semibold mb-1 group-hover:text-cyan-600 transition-colors">Compute Simulator</h3>
+                          <p className="text-sm text-muted-foreground">Estimate resources, costs, and runtime before execution</p>
+                        </button>
 
-                {activeTab === 'papers' && (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="font-semibold text-lg">Related Research Papers</h3>
-                      {selectedTemplate.researchPortalLink && (
-                        <Button variant="outline" size="sm" className="gap-2">
-                          <ExternalLink className="w-4 h-4" />
-                          Research Portal
-                        </Button>
-                      )}
-                    </div>
-                    
-                    {selectedTemplate.papers.map((paper, idx) => (
-                      <div key={paper.id} className="p-5 rounded-xl border hover:border-primary/30 transition-colors">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="text-xs font-mono text-muted-foreground">#{idx + 1}</span>
-                              <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500">
-                                Relevance: {paper.relevanceScore}%
-                              </span>
-                              <span className="text-xs text-muted-foreground">{paper.year}</span>
+                        <button 
+                          onClick={() => setPortalView('community')}
+                          className="group p-5 rounded-xl border bg-gradient-to-br from-pink-500/5 to-transparent hover:from-pink-500/10 hover:border-pink-500/30 transition-all text-left"
+                        >
+                          <div className="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <Users className="w-6 h-6 text-pink-500" />
+                          </div>
+                          <h3 className="font-semibold mb-1 group-hover:text-pink-600 transition-colors">Community Hub</h3>
+                          <p className="text-sm text-muted-foreground">See who's using this template and recent activity</p>
+                        </button>
+
+                        {selectedTemplate.externalPortal && (
+                          <button 
+                            onClick={() => window.open(selectedTemplate.externalPortal?.url, '_blank')}
+                            className="group p-5 rounded-xl border bg-gradient-to-br from-blue-500/5 to-transparent hover:from-blue-500/10 hover:border-blue-500/30 transition-all text-left"
+                          >
+                            <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                              <ExternalLink className="w-6 h-6 text-blue-500" />
+                            </div>
+                            <h3 className="font-semibold mb-1 group-hover:text-blue-600 transition-colors">External Portal</h3>
+                            <p className="text-sm text-muted-foreground">Open in {selectedTemplate.externalPortal?.name} for full features</p>
+                          </button>
+                        )}
+                      </div>
+
+                      {/* One-Click Setup Banner */}
+                      {selectedTemplate.oneClickSetup && (
+                        <div className="p-6 rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20">
+                          <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+                              <Rocket className="w-6 h-6 text-primary" />
                             </div>
                             
-                            <h4 className="font-semibold mb-2 leading-snug">{paper.title}</h4>
-                            <p className="text-sm text-muted-foreground mb-2">{paper.authors}</p>
-                            <p className="text-sm italic text-muted-foreground mb-3">{paper.journal}</p>
-                            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{paper.abstract}</p>
-                            
-                            <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
-                              <span className="flex items-center gap-1">
-                                <BookOpen className="w-3 h-3" />
-                                {paper.citations.toLocaleString()} citations
-                              </span>
-                              {paper.doi && (
-                                <button
-                                  onClick={() => copyToClipboard(paper.doi!, `doi-${paper.id}`)}
-                                  className="flex items-center gap-1 hover:text-primary transition-colors"
-                                >
-                                  {copiedId === `doi-${paper.id}` ? (
-                                    <>
-                                      <Check className="w-3 h-3 text-emerald-500" />
-                                      Copied!
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Copy className="w-3 h-3" />
-                                      DOI: {paper.doi}
-                                    </>
-                                  )}
-                                </button>
-                              )}
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
+                                One-Click Setup Available
+                                <BadgeCheck className="w-5 h-5 text-primary" />
+                              </h3>
+                              <p className="text-muted-foreground mb-4 text-sm">
+                                Get started in {selectedTemplate.setupTime} with automated environment setup, dependency installation, and example data loading.
+                              </p>
+                              
+                              <div className="flex flex-wrap gap-3">
+                                <Button className="gap-2 gradient-bg text-white border-0" onClick={() => { setPortalView('playground'); setTimeout(() => handleRunCode(), 300); }}>
+                                  <Play className="w-4 h-4" />
+                                  Launch Template
+                                </Button>
+                                <Button variant="outline" className="gap-2" onClick={() => setPortalView('playground')}>
+                                  <Download className="w-4 h-4" />
+                                  View Starter Code
+                                </Button>
+                                <Button variant="ghost" className="gap-2 text-primary" onClick={() => window.open(selectedTemplate.externalPortal?.url, '_blank')}>
+                                  <ExternalLink className="w-4 h-4" />
+                                  Live Demo
+                                </Button>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      )}
 
-                {activeTab === 'presets' && (
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold text-lg">Parameter Presets</h3>
-                        <p className="text-sm text-muted-foreground">Pre-configured settings for common use cases</p>
-                      </div>
-                      <span className="text-sm text-muted-foreground">
-                        {selectedTemplate.configurableParameters} configurable parameters
-                      </span>
-                    </div>
-                    
-                    {selectedTemplate.parameterPresets.map((preset, idx) => (
-                      <div key={preset.id} className="p-6 rounded-xl border hover:border-primary/30 transition-all">
-                        <div className="flex items-start justify-between mb-4">
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <h4 className="font-semibold">{preset.name}</h4>
-                              <PresetCategoryBadge category={preset.category} />
-                            </div>
-                            <p className="text-sm text-muted-foreground">{preset.description}</p>
-                          </div>
+                      {/* Template Details */}
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                            <FileText className="w-5 h-5 text-primary" />
+                            About this Template
+                          </h3>
+                          <p className="text-muted-foreground leading-relaxed text-sm">{selectedTemplate.longDescription}</p>
                           
-                          <Button size="sm" className="gap-2 flex-shrink-0">
-                            <Play className="w-4 h-4" />
-                            Use Preset
+                          <h3 className="font-semibold text-lg mb-3 mt-6 flex items-center gap-2">
+                            <Target className="w-5 h-5 text-blue-500" />
+                            Key Features
+                          </h3>
+                          <ul className="space-y-2">
+                            {selectedTemplate.features.slice(0, 5).map((feature, idx) => (
+                              <li key={idx} className="flex items-center gap-2 text-sm">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                                {feature}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        
+                        <div>
+                          <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                            <Cpu className="w-5 h-5 text-primary" />
+                            Compute Requirements
+                          </h3>
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border">
+                              <span className="text-sm text-muted-foreground flex items-center gap-2"><Cpu className="w-4 h-4" /> CPU</span>
+                              <span className="font-semibold text-sm">{selectedTemplate.computeRequirements.cpu}</span>
+                            </div>
+                            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border">
+                              <span className="text-sm text-muted-foreground flex items-center gap-2"><MemoryStick className="w-4 h-4" /> Memory</span>
+                              <span className="font-semibold text-sm">{selectedTemplate.computeRequirements.memory}</span>
+                            </div>
+                            {selectedTemplate.computeRequirements.gpu && (
+                              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border">
+                                <span className="text-sm text-muted-foreground flex items-center gap-2"><HardDrive className="w-4 h-4" /> GPU</span>
+                                <span className="font-semibold text-sm">{selectedTemplate.computeRequirements.gpu}</span>
+                              </div>
+                            )}
+                            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50 border">
+                              <span className="text-sm text-muted-foreground flex items-center gap-2"><DollarSign className="w-4 h-4" /> Est. Cost</span>
+                              <span className="font-semibold text-sm">{selectedTemplate.computeRequirements.estimatedCost}</span>
+                            </div>
+                          </div>
+
+                          <h3 className="font-semibold text-lg mb-3 mt-6 flex items-center gap-2">
+                            <BookOpen className="w-5 h-5 text-violet-500" />
+                            Use Cases
+                          </h3>
+                          <ul className="space-y-2">
+                            {selectedTemplate.useCases.slice(0, 4).map((useCase, idx) => (
+                              <li key={idx} className="flex items-center gap-2 text-sm">
+                                <Target className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                                {useCase}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+
+                      {/* Tags & Integrations */}
+                      <div className="space-y-4">
+                        <div>
+                          <h3 className="font-semibold mb-2 text-sm">Integrations</h3>
+                          <div className="flex flex-wrap gap-2">
+                            {selectedTemplate.integrations.map((integration, idx) => (
+                              <span key={idx} className="px-3 py-1.5 rounded-lg bg-muted border text-xs font-medium">
+                                {integration}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <h3 className="font-semibold mb-2 text-sm">Tags</h3>
+                          <div className="flex flex-wrap gap-2">
+                            {selectedTemplate.tags.map((tag, idx) => (
+                              <span key={idx} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs">
+                                #{tag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ============================================================ */}
+                  {/* CODE PLAYGROUND PORTAL VIEW */}
+                  {/* ============================================================ */}
+                  {portalView === 'playground' && (
+                    <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="font-semibold text-lg flex items-center gap-2">
+                            <Code className="w-5 h-5 text-emerald-500" />
+                            Interactive Code Laboratory
+                          </h3>
+                          <p className="text-sm text-muted-foreground">Edit and run code with real-time feedback</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <select 
+                            value={codeLanguage}
+                            onChange={(e) => setCodeLanguage(e.target.value)}
+                            className="px-3 py-1.5 rounded-lg border bg-background text-sm"
+                          >
+                            <option value="python">Python</option>
+                            <option value="r">R</option>
+                            <option value="julia">Julia</option>
+                            <option value="bash">Bash</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Code Editor */}
+                      <div className="rounded-xl border overflow-hidden">
+                        <div className="bg-muted/80 px-4 py-2 border-b flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                            <span className="ml-2 text-xs text-muted-foreground">main.{codeLanguage === 'python' ? 'py' : codeLanguage === 'r' ? 'R' : codeLanguage}</span>
+                          </div>
+                          <Button 
+                            size="sm" 
+                            className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+                            onClick={handleRunCode}
+                            disabled={isRunningCode}
+                          >
+                            {isRunningCode ? (
+                              <>
+                                <RefreshCw className="w-4 h-4 animate-spin" />
+                                Running...
+                              </>
+                            ) : (
+                              <>
+                                <Play className="w-4 h-4" />
+                                Run Code
+                              </>
+                            )}
                           </Button>
                         </div>
-                        
-                        <div className="grid md:grid-cols-2 gap-4 mb-4">
-                          <div>
-                            <h5 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Use Case</h5>
-                            <p className="text-sm">{preset.useCase}</p>
-                          </div>
-                          <div>
-                            <h5 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Expected Performance</h5>
-                            <p className="text-sm text-emerald-600 dark:text-emerald-400">{preset.expectedPerformance}</p>
-                          </div>
+                        <textarea
+                          value={codeEditorContent}
+                          onChange={(e) => setCodeEditorContent(e.target.value)}
+                          className="w-full h-80 p-4 bg-slate-950 text-slate-100 font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                          spellCheck={false}
+                          placeholder="// Your code will appear here..."
+                        />
+                      </div>
+
+                      {/* Output Console */}
+                      <div className="rounded-xl border overflow-hidden">
+                        <div className="bg-muted/80 px-4 py-2 border-b flex items-center gap-2">
+                          <Terminal className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-xs font-medium text-muted-foreground">Output Console</span>
+                          {codeOutput && (
+                            <button 
+                              onClick={() => setCodeOutput('')}
+                              className="ml-auto text-xs text-muted-foreground hover:text-foreground"
+                            >
+                              Clear
+                            </button>
+                          )}
                         </div>
+                        <div className="h-48 p-4 bg-slate-950 text-slate-100 font-mono text-sm overflow-auto whitespace-pre-wrap">
+                          {codeOutput || (
+                            <span className="text-slate-500">// Output will appear here after running the code...</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Quick Actions */}
+                      <div className="flex flex-wrap gap-2">
+                        <Button variant="outline" size="sm" className="gap-2" onClick={() => navigator.clipboard.writeText(codeEditorContent)}>
+                          <Copy className="w-4 h-4" />
+                          Copy Code
+                        </Button>
+                        <Button variant="outline" size="sm" className="gap-2">
+                          <Download className="w-4 h-4" />
+                          Download .py
+                        </Button>
+                        <Button variant="outline" size="sm" className="gap-2">
+                          <Share2 className="w-4 h-4" />
+                          Share Snippet
+                        </Button>
+                        <Button variant="outline" size="sm" className="gap-2" onClick={() => setPortalView('ai-assistant')}>
+                          <Brain className="w-4 h-4" />
+                          Ask AI About Code
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ============================================================ */}
+                  {/* AI ASSISTANT PORTAL VIEW */}
+                  {/* ============================================================ */}
+                  {portalView === 'ai-assistant' && (
+                    <div className="flex flex-col h-[60vh] animate-in fade-in slide-in-from-right-4 duration-300">
+                      <div className="mb-4">
+                        <h3 className="font-semibold text-lg flex items-center gap-2">
+                          <Brain className="w-5 h-5 text-violet-500" />
+                          AI Research Assistant
+                        </h3>
+                        <p className="text-sm text-muted-foreground">Powered by advanced LLMs trained on scientific literature</p>
+                      </div>
+
+                      {/* Chat Messages */}
+                      <div className="flex-1 rounded-xl border bg-muted/20 overflow-y-auto p-4 space-y-4 mb-4">
+                        {aiChatMessages.map((msg, idx) => (
+                          <div key={idx} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                            {msg.role === 'assistant' && (
+                              <div className="w-8 h-8 rounded-lg bg-violet-500/20 flex items-center justify-center flex-shrink-0">
+                                <Brain className="w-4 h-4 text-violet-500" />
+                              </div>
+                            )}
+                            <div className={`max-w-[80%] p-4 rounded-2xl ${
+                              msg.role === 'user' 
+                                ? 'bg-primary text-primary-foreground' 
+                                : 'bg-card border'
+                            }`}>
+                              <div className="text-sm prose prose-sm dark:prose-invert max-w-none">
+                                {msg.content.split('\n').map((line, i) => (
+                                  <p key={i} className={line.startsWith('#') ? 'font-semibold mt-2 first:mt-0' : ''}>{line}</p>
+                                ))}
+                              </div>
+                              <div className="text-xs opacity-60 mt-2">
+                                {msg.timestamp.toLocaleTimeString()}
+                              </div>
+                            </div>
+                            {msg.role === 'user' && (
+                              <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center flex-shrink-0">
+                                <User className="w-4 h-4 text-primary" />
+                              </div>
+                            )}
+                          </div>
+                        ))}
                         
-                        <details className="group">
-                          <summary className="cursor-pointer text-sm text-primary flex items-center gap-1">
-                            <ChevronRight className="w-4 h-4 group-open:rotate-90 transition-transform" />
-                            View Parameters
-                          </summary>
-                          <div className="mt-3 p-4 rounded-lg bg-muted/50 font-mono text-sm space-y-1">
-                            {Object.entries(preset.parameters).map(([key, value]) => (
-                              <div key={key} className="flex justify-between">
-                                <span className="text-muted-foreground">{key}:</span>
-                                <span className="text-foreground">{String(value)}</span>
+                        {isAiThinking && (
+                          <div className="flex gap-3 justify-start">
+                            <div className="w-8 h-8 rounded-lg bg-violet-500/20 flex items-center justify-center flex-shrink-0">
+                              <Brain className="w-4 h-4 text-violet-500 animate-pulse" />
+                            </div>
+                            <div className="bg-card border p-4 rounded-2xl">
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <RefreshCw className="w-4 h-4 animate-spin" />
+                                Analyzing your question...
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Quick Suggestions */}
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {['Explain parameters', 'Optimize for speed', 'Common errors', 'Related papers'].map((suggestion) => (
+                          <button
+                            key={suggestion}
+                            onClick={() => setAiInputMessage(suggestion)}
+                            className="px-3 py-1.5 rounded-full bg-muted border text-xs hover:bg-muted/80 transition-colors"
+                          >
+                            {suggestion}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Input Area */}
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={aiInputMessage}
+                          onChange={(e) => setAiInputMessage(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                          placeholder="Ask about algorithms, parameters, troubleshooting..."
+                          className="flex-1 px-4 py-3 rounded-xl border bg-background focus:ring-2 focus:ring-violet-500/50 focus:outline-none"
+                          disabled={isAiThinking}
+                        />
+                        <Button 
+                          onClick={handleSendMessage}
+                          disabled={!aiInputMessage.trim() || isAiThinking}
+                          className="px-6 bg-violet-600 hover:bg-violet-700 text-white"
+                        >
+                          <Send className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ============================================================ */}
+                  {/* WORKFLOW VISUALIZER PORTAL VIEW */}
+                  {/* ============================================================ */}
+                  {portalView === 'workflow' && (
+                    <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="font-semibold text-lg flex items-center gap-2">
+                            <GitBranch className="w-5 h-5 text-orange-500" />
+                            Pipeline Workflow Visualizer
+                          </h3>
+                          <p className="text-sm text-muted-foreground">Interactive DAG showing analysis pipeline steps</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button variant="outline" size="sm" onClick={() => setWorkflowZoomLevel(Math.max(50, workflowZoomLevel - 25))}>
+                            <ZoomOut className="w-4 h-4" />
+                          </Button>
+                          <span className="text-sm text-muted-foreground w-12 text-center">{workflowZoomLevel}%</span>
+                          <Button variant="outline" size="sm" onClick={() => setWorkflowZoomLevel(Math.min(200, workflowZoomLevel + 25))}>
+                            <ZoomIn className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Workflow Diagram */}
+                      <div className="rounded-xl border bg-muted/20 p-6 overflow-auto" style={{ transform: `scale(${workflowZoomLevel / 100})`, transformOrigin: 'top left' }}>
+                        <div className="min-w-max">
+                          {/* Pipeline Steps Visualization */}
+                          <div className="flex items-center gap-4">
+                            {[
+                              { step: 1, name: 'Data Input', icon: <Database className="w-5 h-5" />, status: 'complete' },
+                              { step: 2, name: 'Preprocessing', icon: <Settings className="w-5 h-5" />, status: 'complete' },
+                              { step: 3, name: 'Analysis', icon: <Activity className="w-5 h-5" />, status: activeWorkflowStep >= 2 ? 'running' : 'pending' },
+                              { step: 4, name: 'Visualization', icon: <BarChart3 className="w-5 h-5" />, status: activeWorkflowStep >= 3 ? 'running' : 'pending' },
+                              { step: 5, name: 'Export Results', icon: <Download className="w-5 h-5" />, status: activeWorkflowStep >= 4 ? 'running' : 'pending' },
+                            ].map((item, idx) => (
+                              <div key={item.step} className="flex items-center">
+                                <button
+                                  onClick={() => setActiveWorkflowStep(idx)}
+                                  className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                                    activeWorkflowStep === idx 
+                                      ? 'border-primary bg-primary/10 scale-105' 
+                                      : item.status === 'complete'
+                                        ? 'border-emerald-500 bg-emerald-500/5'
+                                        : 'border-border hover:border-primary/30'
+                                  }`}
+                                >
+                                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                                    item.status === 'complete' ? 'bg-emerald-500/20 text-emerald-500' :
+                                    activeWorkflowStep === idx ? 'bg-primary/20 text-primary' :
+                                    'bg-muted text-muted-foreground'
+                                  }`}>
+                                    {item.icon}
+                                  </div>
+                                  <span className="text-xs font-medium text-center max-w-[80px]">{item.name}</span>
+                                  {item.status === 'complete' && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
+                                </button>
+                                
+                                {idx < 4 && (
+                                  <ChevronRight className="w-5 h-5 text-muted-foreground mx-1" />
+                                )}
                               </div>
                             ))}
                           </div>
-                        </details>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                )}
 
-                {activeTab === 'community' && (
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold text-lg">Community Contributions</h3>
-                        <p className="text-sm text-muted-foreground">Plugins, improvements, and extensions from the community</p>
+                      {/* Step Details */}
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="p-4 rounded-xl border">
+                          <h4 className="font-semibold mb-2 flex items-center gap-2">
+                            <Info className="w-4 h-4 text-primary" />
+                            Step {activeWorkflowStep + 1} Details
+                          </h4>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Estimated Time:</span>
+                              <span className="font-medium">~{(activeWorkflowStep + 1) * 2} min</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Resources Needed:</span>
+                              <span className="font-medium">{activeWorkflowStep === 2 ? 'GPU Required' : 'CPU Only'}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Configurable:</span>
+                              <span className="font-medium text-emerald-500">Yes ✓</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="p-4 rounded-xl border">
+                          <h4 className="font-semibold mb-2 flex items-center gap-2">
+                            <Lightbulb className="w-4 h-4 text-yellow-500" />
+                            Pro Tips
+                          </h4>
+                          <ul className="space-y-1 text-sm text-muted-foreground">
+                            <li>• Enable caching for repeated runs</li>
+                            <li>• Use checkpoint files for long pipelines</li>
+                            <li>• Monitor memory usage at each step</li>
+                          </ul>
+                        </div>
                       </div>
-                      <Button variant="outline" size="sm" className="gap-2">
-                        <Puzzle className="w-4 h-4" />
-                        Submit Contribution
+
+                      <Button className="w-full gap-2 gradient-bg text-white border-0" onClick={() => setActiveWorkflowStep(Math.min(activeWorkflowStep + 1, 4))}>
+                        <Play className="w-4 h-4" />
+                        Run Next Step
                       </Button>
                     </div>
-                    
-                    {selectedTemplate.communityContributions.map((contribution) => (
-                      <div key={contribution.id} className="p-5 rounded-xl border hover:border-primary/30 transition-all">
-                        <div className="flex items-start gap-4">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center flex-shrink-0">
-                            <Users className="w-5 h-5 text-primary" />
+                  )}
+
+                  {/* ============================================================ */}
+                  {/* COMPUTE SIMULATOR PORTAL VIEW */}
+                  {/* ============================================================ */}
+                  {portalView === 'compute' && (
+                    <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="font-semibold text-lg flex items-center gap-2">
+                            <Cpu className="w-5 h-5 text-cyan-500" />
+                            Resource & Cost Simulator
+                          </h3>
+                          <p className="text-sm text-muted-foreground">Estimate compute requirements before running</p>
+                        </div>
+                        <Button 
+                          className="gap-2 bg-cyan-600 hover:bg-cyan-700 text-white"
+                          onClick={handleRunSimulation}
+                          disabled={computeSimulation.isSimulating}
+                        >
+                          {computeSimulation.isSimulating ? (
+                            <>
+                              <RefreshCw className="w-4 h-4 animate-spin" />
+                              Simulating...
+                            </>
+                          ) : (
+                            <>
+                              <Play className="w-4 h-4" />
+                              Run Simulation
+                            </>
+                          )}
+                        </Button>
+                      </div>
+
+                      {/* Progress Bar */}
+                      {computeSimulation.isSimulating && (
+                        <div className="p-4 rounded-xl border bg-cyan-500/5">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-medium">Simulation Progress</span>
+                            <span className="text-sm text-cyan-600">{Math.round(computeSimulation.progress)}%</span>
                           </div>
-                          
-                          <div className="flex-1">
-                            <div className="flex items-start justify-between mb-2">
-                              <div>
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h4 className="font-semibold">{contribution.title}</h4>
-                                  {contribution.verified && (
-                                    <BadgeCheck className="w-4 h-4 text-primary" />
-                                  )}
-                                  <ContributionTypeBadge type={contribution.type} />
-                                </div>
-                                <p className="text-sm text-muted-foreground">
-                                  by {contribution.author} · {new Date(contribution.date).toLocaleDateString()}
-                                </p>
+                          <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-300 ease-out"
+                              style={{ width: `${computeSimulation.progress}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Resource Metrics Grid */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="p-4 rounded-xl border bg-gradient-to-br from-blue-500/5 to-transparent">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                            <Cpu className="w-4 h-4 text-blue-500" />
+                            CPU Usage
+                          </div>
+                          <div className="text-2xl font-bold text-blue-600">{computeSimulation.resourceUsage.cpu}%</div>
+                          <div className="mt-2 w-full h-2 bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-blue-500 transition-all" style={{ width: `${computeSimulation.resourceUsage.cpu}%` }} />
+                          </div>
+                        </div>
+
+                        <div className="p-4 rounded-xl border bg-gradient-to-br from-purple-500/5 to-transparent">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                            <MemoryStick className="w-4 h-4 text-purple-500" />
+                            Memory Usage
+                          </div>
+                          <div className="text-2xl font-bold text-purple-600">{computeSimulation.resourceUsage.memory}%</div>
+                          <div className="mt-2 w-full h-2 bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-purple-500 transition-all" style={{ width: `${computeSimulation.resourceUsage.memory}%` }} />
+                          </div>
+                        </div>
+
+                        {computeSimulation.resourceUsage.gpu > 0 && (
+                          <div className="p-4 rounded-xl border bg-gradient-to-br from-green-500/5 to-transparent">
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                              <HardDrive className="w-4 h-4 text-green-500" />
+                              GPU Usage
+                            </div>
+                            <div className="text-2xl font-bold text-green-600">{computeSimulation.resourceUsage.gpu}%</div>
+                            <div className="mt-2 w-full h-2 bg-muted rounded-full overflow-hidden">
+                              <div className="h-full bg-green-500 transition-all" style={{ width: `${computeSimulation.resourceUsage.gpu}%` }} />
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="p-4 rounded-xl border bg-gradient-to-br from-amber-500/5 to-transparent">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                            <DollarSign className="w-4 h-4 text-amber-500" />
+                            Estimated Cost
+                          </div>
+                          <div className="text-2xl font-bold text-amber-600">{computeSimulation.costEstimate}</div>
+                          <div className="text-xs text-muted-foreground mt-1">Per run</div>
+                        </div>
+                      </div>
+
+                      {/* Additional Metrics */}
+                      <div className="grid md:grid-cols-3 gap-4">
+                        <div className="p-4 rounded-xl border">
+                          <h4 className="text-sm font-medium text-muted-foreground mb-1">Estimated Runtime</h4>
+                          <p className="text-xl font-bold">{computeSimulation.estimatedTime}</p>
+                        </div>
+                        <div className="p-4 rounded-xl border">
+                          <h4 className="text-sm font-medium text-muted-foreground mb-1">Data Throughput</h4>
+                          <p className="text-xl font-bold">{(Math.random() * 900 + 100).toFixed(0)} MB/s</p>
+                        </div>
+                        <div className="p-4 rounded-xl border">
+                          <h4 className="text-sm font-medium text-muted-foreground mb-1">Efficiency Score</h4>
+                          <p className="text-xl font-bold text-emerald-600">{(Math.random() * 10 + 90).toFixed(1)}%</p>
+                        </div>
+                      </div>
+
+                      {/* Instance Recommendations */}
+                      <div className="p-4 rounded-xl border bg-muted/30">
+                        <h4 className="font-semibold mb-3 flex items-center gap-2">
+                          <Award className="w-5 h-5 text-primary" />
+                          Recommended Cloud Instances
+                        </h4>
+                        <div className="grid md:grid-cols-3 gap-3">
+                          {[
+                            { name: 'Standard', specs: '4 vCPUs, 16GB RAM', cost: '$0.24/hr', goodFor: 'Small datasets' },
+                            { name: 'GPU Accelerated', specs: '8 vCPUs, 32GB RAM, T4 GPU', cost: '$0.93/hr', goodFor: 'ML/AI workloads' },
+                            { name: 'High Memory', specs: '16 vCPUs, 128GB RAM', cost: '$1.28/hr', goodFor: 'Large genomes' },
+                          ].map((instance) => (
+                            <div key={instance.name} className="p-3 rounded-lg bg-card border hover:border-primary/30 transition-colors cursor-pointer">
+                              <h5 className="font-medium text-sm">{instance.name}</h5>
+                              <p className="text-xs text-muted-foreground">{instance.specs}</p>
+                              <div className="flex items-center justify-between mt-2">
+                                <span className="text-sm font-bold text-primary">{instance.cost}</span>
+                                <span className="text-xs text-muted-foreground">{instance.goodFor}</span>
                               </div>
                             </div>
-                            
-                            <p className="text-sm text-muted-foreground mb-3">{contribution.description}</p>
-                            
-                            <div className="flex items-center gap-4 text-sm">
-                              <span className="flex items-center gap-1 text-amber-500">
-                                <Star className="w-4 h-4 fill-current" />
-                                {contribution.stars}
-                              </span>
-                              <span className="flex items-center gap-1 text-blue-500">
-                                <Download className="w-4 h-4" />
-                                {contribution.downloads.toLocaleString()} downloads
-                              </span>
-                            </div>
-                          </div>
+                          ))}
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
-
-                {activeTab === 'practices' && (
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="font-semibold text-lg mb-2">Best Practices</h3>
-                      <p className="text-sm text-muted-foreground">Critical guidelines for successful template usage</p>
                     </div>
-                    
-                    {selectedTemplate.bestPractices.map((practice, idx) => (
-                      <div key={practice.id} className={`p-5 rounded-xl border-l-4 ${
-                        practice.severity === 'critical' ? 'border-l-red-500 bg-red-500/5' :
-                        practice.severity === 'important' ? 'border-l-amber-500 bg-amber-500/5' :
-                        'border-l-blue-500 bg-blue-500/5'
-                      }`}>
-                        <div className="flex items-start gap-3">
-                          <SeverityIcon severity={practice.severity} />
-                          
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <h4 className="font-semibold">{practice.title}</h4>
-                              <SeverityBadge severity={practice.severity} />
-                              <CategoryBadge category={practice.category} />
+                  )}
+
+                  {/* ============================================================ */}
+                  {/* COMMUNITY HUB PORTAL VIEW */}
+                  {/* ============================================================ */}
+                  {portalView === 'community' && (
+                    <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                      <div>
+                        <h3 className="font-semibold text-lg flex items-center gap-2">
+                          <Users className="w-5 h-5 text-pink-500" />
+                          Community Activity Hub
+                        </h3>
+                        <p className="text-sm text-muted-foreground">See what researchers are doing with this template</p>
+                      </div>
+
+                      {/* Live Activity Feed */}
+                      <div className="rounded-xl border divide-y">
+                        {recentActivity.map((activity, idx) => (
+                          <div key={idx} className="p-4 flex items-start gap-3 hover:bg-muted/30 transition-colors">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                              {activity.avatar}
                             </div>
-                            
-                            <p className="text-sm text-muted-foreground mb-3">{practice.description}</p>
-                            
-                            <div className="p-3 rounded-lg bg-card border text-sm">
-                              <span className="font-medium text-primary">Implementation:</span> {practice.implementation}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm">
+                                <span className="font-semibold">{activity.user}</span>{' '}
+                                <span className="text-muted-foreground">{activity.action}</span>{' '}
+                                <span className="font-medium text-primary">{activity.templateName}</span>
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {formatTimeAgo(activity.timestamp)}
+                              </p>
                             </div>
+                            <Button variant="ghost" size="sm" className="flex-shrink-0">
+                              <MessageSquare className="w-4 h-4" />
+                            </Button>
                           </div>
+                        ))}
+                      </div>
+
+                      {/* Community Stats */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="p-4 rounded-xl border bg-gradient-to-br from-pink-500/5 to-transparent text-center">
+                          <div className="text-2xl font-bold text-pink-600">{(selectedTemplate.totalUses / 1000).toFixed(1)}K+</div>
+                          <div className="text-xs text-muted-foreground">Total Runs</div>
+                        </div>
+                        <div className="p-4 rounded-xl border bg-gradient-to-br from-blue-500/5 to-transparent text-center">
+                          <div className="text-2xl font-bold text-blue-600">{Math.floor(selectedTemplate.totalUses * 0.3)}</div>
+                          <div className="text-xs text-muted-foreground">Active Users</div>
+                        </div>
+                        <div className="p-4 rounded-xl border bg-gradient-to-br from-emerald-500/5 to-transparent text-center">
+                          <div className="text-2xl font-bold text-emerald-600">{selectedTemplate.communityContributions.length}</div>
+                          <div className="text-xs text-muted-foreground">Contributors</div>
+                        </div>
+                        <div className="p-4 rounded-xl border bg-gradient-to-br from-orange-500/5 to-transparent text-center">
+                          <div className="text-2xl font-bold text-orange-600">4.9/5</div>
+                          <div className="text-xs text-muted-foreground">Avg Rating</div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
 
-              {/* Modal Footer */}
-              <div className="border-t p-6 bg-muted/30">
-                <div className="flex items-center justify-between">
+                      {/* Community Actions */}
+                      <div className="flex flex-wrap gap-3">
+                        <Button variant="outline" className="gap-2">
+                          <Star className="w-4 h-4" />
+                          Rate Template
+                        </Button>
+                        <Button variant="outline" className="gap-2">
+                          <GitBranch className="w-4 h-4" />
+                          Fork & Customize
+                        </Button>
+                        <Button variant="outline" className="gap-2">
+                          <MessageSquare className="w-4 h-4" />
+                          Join Discussion
+                        </Button>
+                        <Button variant="outline" className="gap-2">
+                          <Share2 className="w-4 h-4" />
+                          Share Results
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Portal Footer */}
+                <div className="border-t p-4 bg-muted/20 flex items-center justify-between">
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span>v{selectedTemplate.version}</span>
-                    <span>·</span>
-                    <span>Updated {selectedTemplate.lastUpdated}</span>
-                    <span>·</span>
                     <span className="flex items-center gap-1">
-                      <MessageSquare className="w-4 h-4" />
-                      Report Issue
+                      <Eye className="w-4 h-4" />
+                      {(selectedTemplate.totalUses / 1000).toFixed(1)}K views
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Heart className="w-4 h-4" />
+                      {Math.floor(selectedTemplate.totalUses * 0.15)} likes
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Bookmark className="w-4 h-4" />
+                      Saved by you
                     </span>
                   </div>
-                  
-                  <div className="flex items-center gap-3">
-                    <Button variant="ghost" size="sm" className="gap-2">
-                      <Bookmark className="w-4 h-4" />
-                      Save
-                    </Button>
-                    <Button variant="ghost" size="sm" className="gap-2">
-                      <Share2 className="w-4 h-4" />
-                      Share
-                    </Button>
+                  <div className="flex items-center gap-2">
                     <Button variant="ghost" size="sm" className="gap-2">
                       <ThumbsUp className="w-4 h-4" />
-                      Like
+                      Helpful
                     </Button>
-                    <Button className="gap-2 gradient-bg text-white border-0">
-                      <Rocket className="w-4 h-4" />
-                      Use Template
+                    <Button variant="ghost" size="sm" className="gap-2">
+                      <Flag className="w-4 h-4" />
+                      Report Issue
                     </Button>
                   </div>
                 </div>
@@ -3169,7 +4216,6 @@ export default function TemplateGalleryPage() {
           </div>
         </div>
       )}
-
       {/* ================================================================== */}
       {/* QUICK START PROJECTS SECTION - Interactive Accordion */}
       {/* ================================================================== */}
@@ -3213,11 +4259,7 @@ export default function TemplateGalleryPage() {
               .map((template) => (
                 <button
                   key={template.id}
-                  onClick={() => {
-                    setSelectedTemplate(template);
-                    setActiveTab('overview');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
+                  onClick={() => handleTemplateSelect(template)}
                   className={`group p-6 rounded-xl border text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
                     selectedTemplate?.id === template.id ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'
                   }`}
