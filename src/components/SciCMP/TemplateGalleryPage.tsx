@@ -2033,6 +2033,862 @@ function TemplateDetailView({ template, onBack }: { template: ScientificTemplate
 }
 
 // ============================================================================
+// FREE TIER PLATFORMS DATA
+// ============================================================================
+
+interface FreePlatform {
+  id: string;
+  name: string;
+  logo: string;
+  url: string;
+  description: string;
+  freeTierFeatures: string[];
+  limitations: string[];
+  computeSpecs: {
+    cpu?: string;
+    memory?: string;
+    gpu?: string;
+    storage?: string;
+    hoursPerMonth?: number;
+  };
+  categories: string[];
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  setupTime: string; // e.g., "2 minutes"
+  requiresAccount: boolean;
+  hasTemplateSupport: boolean;
+  popularFor: string[];
+  rating: number; // 1-5
+  studentBenefits?: string;
+  badge?: 'recommended' | 'popular' | 'new' | 'educational';
+}
+
+const freePlatforms: FreePlatform[] = [
+  // Google Colab - Most popular for ML/Bio
+  {
+    id: 'google-colab',
+    name: 'Google Colab',
+    logo: '📓',
+    url: 'https://colab.research.google.com/',
+    description: 'Free Jupyter notebook environment with GPU/TPU access. No setup required, runs entirely in cloud.',
+    freeTierFeatures: [
+      'Free T4 GPU access (12-15 hrs/day)',
+      'Free TPU for ML workloads',
+      'Pre-installed scientific packages (NumPy, Pandas, Scikit-learn)',
+      'Google Drive integration',
+      'GitHub integration (.ipynb files)',
+      'Shareable notebooks with comments'
+    ],
+    limitations: [
+      'Session timeout after ~12 hours idle',
+      'Max 15GB RAM on free tier',
+      'GPU not always available (quota limits)'
+    ],
+    computeSpecs: {
+      cpu: '2 vCPUs (upgradable)',
+      memory: '13 GB RAM',
+      gpu: 'NVIDIA T4 (free) / A100 / V100 (paid)',
+      storage: 'Google Drive (15GB free)',
+      hoursPerMonth: undefined // Usage-based
+    },
+    categories: ['machine-learning', 'data-processing', 'visualization'],
+    difficulty: 'beginner',
+    setupTime: '30 seconds',
+    requiresAccount: true,
+    hasTemplateSupport: true,
+    popularFor: ['ML prototyping', 'Education', 'Quick experiments', 'Tutorials'],
+    rating: 5,
+    studentBenefits: 'Extra compute quotas for .edu emails',
+    badge: 'recommended'
+  },
+
+  // Kaggle Kernels - Great for data science competitions
+  {
+    id: 'kaggle-kernels',
+    name: 'Kaggle Kernels',
+    logo: '🎯',
+    url: 'https://www.kaggle.com/kernels',
+    description: 'Free cloud environment with access to 50K+ public datasets and GPU computing.',
+    freeTierFeatures: [
+      'Free GPU (T4 x2, P100, or 30h/week TPU)',
+      '50GB+ of public datasets instantly available',
+      'Pre-built competition environments',
+      'Community code sharing & forking',
+      'Version control for notebooks',
+      'Output saving (datasets, models)'
+    ],
+    limitations: [
+      '30h GPU limit per week',
+      'No internet access in notebooks (security)',
+      '20GB output limit per run',
+      '9-hour session timeout'
+    ],
+    computeSpecs: {
+      cpu: '4 cores',
+      memory: '17 GB RAM',
+      gpu: '2x NVIDIA T4 or P100',
+      storage: '20GB scratch + Kaggle Datasets',
+      hoursPerMonth: 120 // GPU hours
+    },
+    categories: ['machine-learning', 'data-processing', 'statistics'],
+    difficulty: 'beginner',
+    setupTime: '1 minute',
+    requiresAccount: true,
+    hasTemplateSupport: true,
+    popularFor: ['Data competitions', 'Learning ML', 'Dataset exploration', 'Kaggle courses'],
+    rating: 5,
+    badge: 'popular'
+  },
+
+  // Binder/MyBinder - Reproducible research
+  {
+    id: 'mybinder',
+    name: 'MyBinder.org',
+    logo: '🔬',
+    url: 'https://mybinder.org/',
+    description: 'Turn any GitHub repo into interactive Jupyter notebooks. Perfect for reproducible research.',
+    freeTierFeatures: [
+      'Zero-config Jupyter environments from GitHub repos',
+      'Reproducible research (exact package versions)',
+      'Share links to live environments',
+      'Supports R, Python, Julia environments',
+      'Free persistent storage during session',
+      'Community-maintained infrastructure'
+    ],
+    limitations: [
+      'Queue time (2-10 min to start)',
+      'Session limited to ~8-12 hours',
+      'No GPU support (CPU only)',
+      'Dependent on GitHub repo availability'
+    ],
+    computeSpecs: {
+      cpu: '2 cores',
+      memory: '4 GB RAM',
+      storage: 'Ephemeral (session-based)',
+      hoursPerMonth: undefined
+    },
+    categories: ['bioinformatics', 'data-processing', 'visualization', 'teaching'],
+    difficulty: 'intermediate',
+    setupTime: '5 minutes (includes queue)',
+    requiresAccount: false,
+    hasTemplateSupport: true,
+    popularFor: ['Paper reproduction', 'Teaching demos', 'Workshop materials', 'Open science'],
+    rating: 4,
+    badge: 'educational'
+  },
+
+  // Hugging Face Spaces - For ML models/demos
+  {
+    id: 'huggingface-spaces',
+    name: 'Hugging Face Spaces',
+    logo: '🤗',
+    url: 'https://huggingface.co/spaces',
+    description: 'Host ML demos, apps, and models for free. Share your work with the AI community.',
+    freeTierFeatures: [
+      'Free CPU spaces (unlimited)',
+      '2 free GPU spaces (with queue)',
+      'Pre-built Gradio/Streamlit templates',
+      'Model hosting & versioning',
+      'Community discovery & sharing',
+      'API endpoints for your models'
+    ],
+    limitations: [
+      'GPU spaces have wait times when busy',
+      'Limited storage for large models',
+      'CPU-only for most free spaces',
+      'Rate limiting on API calls'
+    ],
+    computeSpecs: {
+      cpu: '2 vCPUs',
+      memory: '16 GB RAM',
+      gpu: 'T4 (limited, with queue)',
+      storage: '50GB (soft limit)',
+      hoursPerMonth: undefined
+    },
+    categories: ['machine-learning', 'visualization', 'data-processing'],
+    difficulty: 'intermediate',
+    setupTime: '3 minutes',
+    requiresAccount: true,
+    hasTemplateSupport: true,
+    popularFor: ['ML demos', 'Model deployment', 'Gradio apps', 'AI art generation'],
+    rating: 5,
+    badge: 'new'
+  },
+
+  // Observable - Data visualization notebooks
+  {
+    id: 'observable-hq',
+    name: 'Observable',
+    logo: '📊',
+    url: 'https://observablehq.com/',
+    description: 'Powerful data visualization platform with reactive notebooks. Excellent for data exploration.',
+    freeTierFeatures: [
+      '500+ free public notebooks',
+      'Reactive programming model',
+      'Built-in data visualization library (D3.js)',
+      'Real-time collaboration',
+      'SQL/CSV/database connections',
+      'Embeddable visualizations'
+    ],
+    limitations: [
+      'Private notebooks require paid plan',
+      'No custom Python packages',
+      'JavaScript/D3.js based (not Python)',
+      'Limited API access on free tier'
+    ],
+    computeSpecs: {
+      cpu: 'Shared (adequate for viz)',
+      memory: 'Adequate for data viz',
+      storage: 'Cloud-hosted',
+      hoursPerMonth: undefined
+    },
+    categories: ['visualization', 'statistics', 'data-processing'],
+    difficulty: 'intermediate',
+    setupTime: '1 minute',
+    requiresAccount: true,
+    hasTemplateSupport: true,
+    popularFor: ['Data journalism', 'Interactive dashboards', 'Data storytelling', 'Prototyping'],
+    rating: 4
+  },
+
+  // Deepnote - Collaborative data science
+  {
+    id: 'deepnote',
+    name: 'Deepnote',
+    logo: '📘',
+    url: 'https://deepnote.com/',
+    description: 'Collaborative data science notebook platform with real-time co-editing.',
+    freeTierFeatures: [
+      'Free personal workspace',
+      'Real-time collaboration (up to 5 editors)',
+      'PostgreSQL database included',
+      'GitHub/GitLab integration',
+      'Scheduled runs (cron jobs)',
+      'Environment variables & secrets'
+    ],
+    limitations: [
+      'Free tier: 60 hours compute/month',
+      'No GPU on free tier',
+      'Limited team features',
+      'Some integrations require upgrade'
+    ],
+    computeSpecs: {
+      cpu: '2-4 vCPUs',
+      memory: '8-16 GB RAM',
+      storage: '1 GB disk + DB',
+      hoursPerMonth: 60
+    },
+    categories: ['data-processing', 'visualization', 'statistics', 'bioinformatics'],
+    difficulty: 'beginner',
+    setupTime: '2 minutes',
+    requiresAccount: true,
+    hasTemplateSupport: true,
+    popularFor: ['Team projects', 'Data pipelines', 'Reporting', 'Collaborative analysis'],
+    rating: 4
+  },
+
+  // CoCalc/SageMath - Mathematical computing
+  {
+    id: 'cocalc',
+    name: 'CoCalc (SageMath)',
+    logo: '🧮',
+    url: 'https://cocalc.com/',
+    description: 'Complete mathematical computing environment with SageMath, R, Julia, Python, LaTeX.',
+    freeTierFeatures: [
+      'Full SageMath installation (no local setup needed)',
+      'R, Julia, Python, Octave pre-installed',
+      'LaTeX document editing & compilation',
+      'Terminal access (Linux environment)',
+      'Course management tools',
+      'Time travel (undo/redo entire project)'
+    ],
+    limitations: [
+      'Free project: 1 hour total runtime',
+      'No internet access from projects',
+      'Queue times during peak usage',
+      'Limited storage (1GB free)'
+    ],
+    computeSpecs: {
+      cpu: '1-2 cores',
+      memory: '2-4 GB RAM',
+      storage: '1 GB (expandable)',
+      hoursPerMonth: 1 // Very limited!
+    },
+    categories: ['statistics', 'quantum-computing', 'simulation', 'mathematics'],
+    difficulty: 'advanced',
+    setupTime: '3 minutes',
+    requiresAccount: true,
+    hasTemplateSupport: true,
+    popularFor: ['Pure mathematics', 'Number theory', 'Algebraic geometry', 'Teaching math'],
+    rating: 4,
+    badge: 'educational'
+  },
+
+  // Replit - Quick coding environment
+  {
+    id: 'replit',
+    name: 'Replit',
+    logo: '⚡',
+    url: 'https://replit.com/',
+    description: 'Instant online IDE for 50+ languages. Quick prototyping and template testing.',
+    freeTierFeatures: [
+      'Always-on dev environments (free tier)',
+      '50+ language support (Python, R, Julia, etc.)',
+      'Database hosting (PostgreSQL, MongoDB)',
+      'Secrets/ENV variables',
+      'Deploy to web (public URLs)',
+      'Mobile app for monitoring'
+    ],
+    limitations: [
+      'Free: 750ms cold start delay',
+      'Limited bandwidth (100MB/day outbound)',
+      'No dedicated GPUs',
+      'Sleeps after inactivity (5 min)'
+    ],
+    computeSpecs: {
+      cpu: '0.5-1 vCPU',
+      memory: '512 MB - 1 GB',
+      storage: '500 MB (persistent)',
+      hoursPerMonth: 750 // Always-on equivalent
+    },
+    categories: ['data-processing', 'teaching', 'quick-start'],
+    difficulty: 'beginner',
+    setupTime: '10 seconds',
+    requiresAccount: true,
+    hasTemplateSupport: false,
+    popularFor: ['Quick scripts', 'Web APIs', 'Learning to code', 'Bot development'],
+    rating: 4
+  },
+
+  // CodeOcean - Research computing
+  {
+    id: 'codeocean',
+    name: 'CodeOcean',
+    logo: '🌊',
+    url: 'https://codeocean.com/',
+    description: 'Research-grade reproducible computing. Used by top journals and institutions.',
+    freeTierFeatures: [
+      'Compute capsules (reproducible environments)',
+      'DOI assignment for computations',
+      'Integration with academic publishers',
+      'Pre-built scientific images',
+      'Git-like versioning for data',
+      'Collaboration features'
+    ],
+    limitations: [
+      'Free tier: Limited compute hours',
+      'Requires institutional email for some features',
+      'Smaller community than Colab/Kaggle',
+      'Learning curve for capsules concept'
+    ],
+    computeSpecs: {
+      cpu: '2-8 cores (varies)',
+      memory: '8-32 GB',
+      storage: '10-100 GB',
+      hoursPerMonth: 25 // Approximate
+    },
+    categories: ['bioinformatics', 'cheminformatics', 'simulation', 'research'],
+    difficulty: 'advanced',
+    setupTime: '5 minutes',
+    requiresAccount: true,
+    hasTemplateSupport: true,
+    popularFor: ['Academic publishing', 'Grant requirements', 'Reproducible research', 'Institutional use'],
+    rating: 4
+  }
+];
+
+// ============================================================================
+// USE CASE DEFINITIONS WITH PLATFORM MAPPINGS
+// ============================================================================
+
+interface UseCaseDefinition {
+  id: string;
+  title: string;
+  icon: React.ReactNode;
+  description: string;
+  scenarios: string[];
+  recommendedPlatforms: FreePlatform[];
+  quickStartGuide: string[];
+  estimatedTimeToFirstResult: string;
+  skillLevel: string;
+  outcomes: string[];
+}
+
+const useCaseDefinitions: UseCaseDefinition[] = [
+  {
+    id: 'quick-start-projects',
+    title: 'Quick Start Projects',
+    icon: <Rocket className="w-6 h-6" />,
+    description: 'Get running in under 5 minutes with pre-configured templates. Perfect for proof-of-concept, hackathons, or rapid prototyping.',
+    scenarios: [
+      'Validate a research idea quickly',
+      'Build a prototype for a grant proposal',
+      'Test a new algorithm before full implementation',
+      'Create demo for stakeholder presentation',
+      'Participate in weekend hackathon',
+      'Learn a new technique hands-on'
+    ],
+    recommendedPlatforms: [freePlatforms[0], freePlatforms[1], freePlatforms[7]], // Colab, Kaggle, Replit
+    quickStartGuide: [
+      'Choose a template from our gallery (click "Run Now")',
+      'Select your preferred free platform below',
+      'One-click clone to that platform',
+      'Upload your data or use sample dataset',
+      'Execute with default parameters',
+      'View results & iterate'
+    ],
+    estimatedTimeToFirstResult: '5-15 minutes',
+    skillLevel: 'Beginner-friendly',
+    outcomes: ['Working prototype', 'Results screenshot', 'Code understanding', 'Platform familiarity']
+  },
+  {
+    id: 'teaching-training',
+    title: 'Teaching & Training',
+    icon: <GraduationCapIcon className="w-6 h-6" />,
+    description: 'Classroom-ready environments with no installation headaches. Students start coding immediately while instructors track progress.',
+    scenarios: [
+      'University course laboratory sessions',
+      'Online workshop or bootcamp',
+      'Corporate training program',
+      'Self-paced learning curriculum',
+      'Thesis/dissertation methodology training',
+      'Conference tutorial session'
+    ],
+    recommendedPlatforms: [freePlatforms[2], freePlatforms[4], freePlatforms[6]], // Binder, Observable, CoCalc
+    quickStartGuide: [
+      'Select teaching-focused template variant',
+      'Choose platform with collaboration features',
+      'Set up shared workspace (or individual)',
+      'Distribute link to students/participants',
+      'Use built-in commenting for Q&A',
+      'Export results for grading/assessment'
+    ],
+    estimatedTimeToFirstResult: '15-30 minutes (class setup)',
+    skillLevel: 'All levels supported',
+    outcomes: ['Hands-on experience', 'Reproducible assignments', 'Portfolio pieces', 'Practical skills']
+  },
+  {
+    id: 'standardization-labs',
+    title: 'Standardization Across Labs',
+    icon: <Building2Icon className="w-6 h-6" />,
+    description: 'Ensure consistent analysis pipelines across multiple researchers, sites, or institutions. Eliminate "it works on my machine" problems.',
+    scenarios: [
+      'Multi-site clinical trial analysis',
+      'Consortium-wide genomics pipeline',
+      'Cross-lab validation studies',
+      'Regulatory submission reproducibility',
+      'Industry-academia collaboration',
+      'Longitudinal study consistency'
+    ],
+    recommendedPlatforms: [freePlatforms[5], freePlatforms[8], freePlatforms[0]], // Deepnote, CodeOcean, Colab
+    quickStartGuide: [
+      'Choose standardized template for your domain',
+      'Select enterprise/collaboration-ready platform',
+      'Configure shared parameters & settings',
+      'Set up version control integration',
+      'Document environment specifications',
+      'Deploy to all lab members simultaneously'
+    ],
+    estimatedTimeToFirstResult: '1-4 hours (setup), then instant',
+    skillLevel: 'Intermediate to Advanced',
+    outcomes: ['Reproducible pipelines', 'Consistent results', 'Audit trail', 'Compliance ready']
+  }
+];
+
+// ============================================================================
+// USE CASES COMPONENT WITH FREE ACCESS
+// ============================================================================
+
+function GraduationCapIcon(props: any) {
+  return (
+    <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+      <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+    </svg>
+  );
+}
+
+function Building2Icon(props: any) {
+  return (
+    <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="4" y="2" width="16" height="20" rx="2"/>
+      <path d="M9 22v-4h6v4"/>
+      <path d="M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01"/>
+    </svg>
+  );
+}
+
+function PlatformCard({ platform, isSelected, onSelect }: { 
+  platform: FreePlatform; 
+  isSelected: boolean; 
+  onSelect: () => void;
+}) {
+  const [showDetails, setShowDetails] = useState(false);
+  
+  return (
+    <div 
+      className={`rounded-xl border transition-all duration-300 cursor-pointer ${
+        isSelected 
+          ? 'border-primary shadow-lg shadow-primary/20 ring-2 ring-primary/20' 
+          : 'hover:border-primary/50 hover:shadow-md'
+      }`}
+      onClick={onSelect}
+    >
+      {/* Platform Header */}
+      <div className="p-4 border-b bg-muted/30">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">{platform.logo}</span>
+            <div>
+              <h4 className="font-bold">{platform.name}</h4>
+              {platform.badge && (
+                <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 mt-1">
+                  {platform.badge === 'recommended' ? '[Recommended]' :
+                   platform.badge === 'popular' ? '[Popular]' :
+                   platform.badge === 'new' ? '[New]' : '[Educational]'}
+                </span>
+              )}
+              <div className="flex items-center gap-1 mt-1">
+                {[...Array(platform.rating)].map((_, i) => (
+                  <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                ))}
+                <span className="text-xs text-muted-foreground ml-1">({platform.rating}/5)</span>
+              </div>
+            </div>
+          </div>
+          
+          <button
+            onClick={(e) => { e.stopPropagation(); setShowDetails(!showDetails); }}
+            className="p-1 rounded hover:bg-muted"
+          >
+            {showDetails ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+        </div>
+        
+        <p className="text-sm text-muted-foreground mt-2">{platform.description}</p>
+        
+        {/* Quick Specs */}
+        <div className="flex flex-wrap gap-2 mt-3">
+          {platform.computeSpecs.gpu && (
+            <span className="px-2 py-0.5 rounded text-xs bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 flex items-center gap-1">
+              <Zap className="w-3 h-3" /> {platform.computeSpecs.gpu}
+            </span>
+          )}
+          {platform.computeSpecs.memory && (
+            <span className="px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 flex items-center gap-1">
+              <HardDrive className="w-3 h-3" /> {platform.computeSpecs.memory}
+            </span>
+          )}
+          {platform.hoursPerMonth && (
+            <span className="px-2 py-0.5 rounded text-xs bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300 flex items-center gap-1">
+              <Clock className="w-3 h-3" /> {platform.hoursPerMonth}h/mo
+            </span>
+          )}
+        </div>
+      </div>
+      
+      {/* Expandable Details */}
+      {showDetails && (
+        <div className="p-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
+          {/* Free Tier Features */}
+          <div>
+            <h5 className="text-sm font-semibold mb-2 flex items-center gap-2 text-green-600">
+              <Gift className="w-4 h-4" />
+              What's Free ({platform.freeTierFeatures.length} features)
+            </h5>
+            <ul className="space-y-1">
+              {platform.freeTierFeatures.map((feature, idx) => (
+                <li key={idx} className="flex items-start gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          {/* Limitations */}
+          <div>
+            <h5 className="text-sm font-semibold mb-2 flex items-center gap-2 text-yellow-600">
+              <AlertCircle className="w-4 h-4" />
+              Limitations
+            </h5>
+            <ul className="space-y-1">
+              {platform.limitations.map((limit, idx) => (
+                <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <X className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <span>{limit}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          {/* Student Benefits */}
+          {platform.studentBenefits && (
+            <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900">
+              <h5 className="text-sm font-semibold mb-1 flex items-center gap-2 text-blue-600">
+                <GraduationCapIcon className="w-4 h-4" />
+                Student Benefits
+              </h5>
+              <p className="text-sm text-blue-700 dark:text-blue-300">{platform.studentBenefits}</p>
+            </div>
+          )}
+          
+          {/* Setup Time & Difficulty */}
+          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+            <div className="text-sm">
+              <span className="text-muted-foreground">Setup Time:</span> 
+              <span className="font-medium ml-1">{platform.setupTime}</span>
+            </div>
+            <DifficultyBadge difficulty={platform.difficulty} />
+          </div>
+          
+          {/* Action Button */}
+          <Button asChild className="w-full gap-2">
+            <a href={platform.url} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="w-4 h-4" />
+              Open {platform.name}
+              <span className="ml-auto opacity-70">→</span>
+            </a>
+          </Button>
+        </div>
+      )}
+      
+      {/* Collapsed State CTA */}
+      {!showDetails && (
+        <div className="p-3 border-t">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full gap-2"
+            onClick={(e) => { e.stopPropagation(); setShowDetails(true); }}
+          >
+            <Eye className="w-4 h-4" />
+            View Details & Access Options
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function UseCasesWithFreeAccess() {
+  const [selectedUseCase, setSelectedUseCase] = useState<string | null>(null);
+  const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
+  
+  const activeUseCase = useCaseDefinitions.find(uc => uc.id === selectedUseCase);
+  
+  return (
+    <div className="space-y-8">
+      {/* Use Case Cards */}
+      <div className="grid md:grid-cols-3 gap-6">
+        {useCaseDefinitions.map((useCase) => (
+          <button
+            key={useCase.id}
+            onClick={() => setSelectedUseCase(selectedUseCase === useCase.id ? null : useCase.id)}
+            className={`text-left p-6 rounded-2xl border transition-all duration-300 group ${
+              selectedUseCase === useCase.id
+                ? 'border-primary shadow-xl shadow-primary/10 bg-primary/5'
+                : 'hover:border-primary/50 hover:shadow-lg bg-card'
+            }`}
+          >
+            <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4 transition-transform group-hover:scale-110 ${
+              selectedUseCase === useCase.id 
+                ? 'bg-gradient-to-br from-primary to-secondary text-white' 
+                : 'bg-gradient-to-br from-emerald-500 to-teal-500 text-white'
+            }`}>
+              {useCase.icon}
+            </div>
+            
+            <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+              {useCase.title}
+            </h3>
+            
+            <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+              {useCase.description}
+            </p>
+            
+            <div className="space-y-2 mb-4">
+              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Common Scenarios
+              </div>
+              <ul className="space-y-1">
+                {useCase.scenarios.slice(0, 3).map((scenario, idx) => (
+                  <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Target className="w-3 h-3 flex-shrink-0" />
+                    <span className="truncate">{scenario}</span>
+                  </li>
+                ))}
+                {useCase.scenarios.length > 3 && (
+                  <li className="text-sm text-primary font-medium">
+                    +{useCase.scenarios.length - 3} more scenarios
+                  </li>
+                )}
+              </ul>
+            </div>
+            
+            <div className="flex items-center justify-between pt-4 border-t border-border/50">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Clock className="w-4 h-4" />
+                <span>{useCase.estimatedTimeToFirstResult}</span>
+              </div>
+              
+              {selectedUseCase === useCase.id ? (
+                <ChevronUp className="w-5 h-5 text-primary" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-muted-foreground" />
+              )}
+            </div>
+          </button>
+        ))}
+      </div>
+      
+      {/* Expanded Use Case Content */}
+      {activeUseCase && (
+        <div className="animate-in slide-in-from-bottom-4 duration-300">
+          {/* Quick Start Guide */}
+          <div className="rounded-2xl border bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 p-6 md:p-8 mb-8">
+            <div className="flex items-start gap-4 mb-6">
+              <div className="p-3 rounded-xl bg-primary/10 text-primary">
+                <Rocket className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold mb-2">Quick Start Guide</h3>
+                <p className="text-muted-foreground">
+                  Follow these steps to get your first results using {activeUseCase.title.toLowerCase()}
+                </p>
+              </div>
+            </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {activeUseCase.quickStartGuide.map((step, idx) => (
+                <div key={idx} className="flex items-start gap-3 p-4 rounded-xl bg-background border">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
+                    {idx + 1}
+                  </div>
+                  <p className="text-sm pt-1">{step}</p>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-6 pt-6 border-t border-border/50 grid sm:grid-cols-3 gap-4 text-center">
+              <div>
+                <div className="text-2xl font-bold text-primary">{activeUseCase.estimatedTimeToFirstResult.split(' ')[0]}</div>
+                <div className="text-sm text-muted-foreground">Time to First Result</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-primary">{activeUseCase.skillLevel.split(' ')[0]}</div>
+                <div className="text-sm text-muted-foreground">Skill Level Required</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-primary">{activeUseCase.outcomes.length}+</div>
+                <div className="text-sm text-muted-foreground">Expected Outcomes</div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Platform Selection */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold flex items-center gap-3">
+                <Globe className="w-7 h-7 text-primary" />
+                Choose Your Free Platform
+              </h3>
+              <div className="text-sm text-muted-foreground">
+                {activeUseCase.recommendedPlatforms.length} platforms recommended
+              </div>
+            </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {activeUseCase.recommendedPlatforms.map((platform) => (
+                <PlatformCard
+                  key={platform.id}
+                  platform={platform}
+                  isSelected={selectedPlatform === platform.id}
+                  onSelect={() => setSelectedPlatform(selectedPlatform === platform.id ? null : platform.id)}
+                />
+              ))}
+            </div>
+          </div>
+          
+          {/* Additional Platforms */}
+          <div className="rounded-2xl border border-dashed p-6 md:p-8">
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-primary" />
+              More Free Platforms Available
+            </h3>
+            <p className="text-muted-foreground mb-4">
+              Not finding what you need? Here are additional platforms that support this use case:
+            </p>
+            
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {freePlatforms
+                .filter(p => !activeUseCase.recommendedPlatforms.find(rp => rp.id === p.id))
+                .slice(0, 4)
+                .map((platform) => (
+                  <a
+                    key={platform.id}
+                    href={platform.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-4 rounded-xl border hover:border-primary/50 hover:shadow-md transition-all group"
+                  >
+                    <span className="text-2xl">{platform.logo}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm group-hover:text-primary transition-colors truncate">
+                        {platform.name}
+                      </div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {platform.setupTime} setup • {platform.rating}/5 ⭐
+                      </div>
+                    </div>
+                    <ExternalLink className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                  </a>
+                ))
+              }
+            </div>
+            
+            <div className="mt-6 text-center">
+              <Button variant="outline" size="sm" className="gap-2">
+                View All {freePlatforms.length} Free Platforms
+                <ExternalLink className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+          
+          {/* Expected Outcomes */}
+          <div className="rounded-2xl bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 p-6 md:p-8 border border-green-200 dark:border-green-900">
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-green-700 dark:text-green-300">
+              <Award className="w-6 h-6" />
+              What You'll Achieve
+            </h3>
+            
+            <div className="grid sm:grid-cols-2 gap-4">
+              {activeUseCase.outcomes.map((outcome, idx) => (
+                <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-white/50 dark:bg-black/20">
+                  <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
+                  <span className="font-medium text-green-800 dark:text-green-200">{outcome}</span>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-6 pt-6 border-t border-green-200 dark:border-green-800">
+              <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+                <div className="text-sm text-green-600 dark:text-green-400">
+                  💡 Pro tip: Start with Google Colab or Kaggle for the fastest setup time
+                </div>
+                <Button size="lg" className="gap-2 bg-green-600 hover:bg-green-700 text-white border-0">
+                  <Play className="w-5 h-5" />
+                  Get Started Now (It's Free!)
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================================
 // MAIN PAGE COMPONENT
 // ============================================================================
 
@@ -2415,6 +3271,25 @@ export default function TemplateGalleryPage() {
               </button>
             ))}
           </div>
+        </section>
+
+        {/* Interactive Use Cases with FREE Platform Access */}
+        <section className="mt-16 pt-16 border-t">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 mb-4">
+              <Gift className="w-4 h-4" />
+              <span className="text-sm font-medium">FREE Tier Access Available</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Start Using Templates Immediately
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Click on any use case below to get instant access to free scientific computing platforms. 
+              No credit card required. Start your research in minutes.
+            </p>
+          </div>
+
+          <UseCasesWithFreeAccess />
         </section>
 
         {/* Community CTA */}
