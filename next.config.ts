@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   
-  React strict mode disabled for preview
+  // React strict mode disabled for preview
   reactStrictMode: false,
   
   // Images configuration for static export
