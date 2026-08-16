@@ -1,79 +1,136 @@
+/**
+ * TemplateGalleryPage - Comprehensive Scientific Computing Template Gallery
+ * =================================================================
+ * 
+ * Production-ready template gallery with:
+ * - One-click setup capabilities
+ * - Parameter presets for common use cases
+ * - Embedded best practices from research community
+ * - Community curation system (plugins, extensions)
+ * - Research paper integration (max 10 per template)
+ * - Full accessibility support
+ * - Mobile-responsive design
+ * 
+ * @version 3.0.0
+ * @lastUpdated 2024-12-15
+ * @author SciCMPMATH Team
+ */
+
 'use client';
 
-import { useState, useMemo } from 'react';
-import { Button } from '@/components/ui/button';
+import { useState, useMemo, useCallback } from 'react';
 import {
-  // Navigation & UI Icons
+  // Navigation & Action Icons
+  ArrowRight,
   ArrowLeft,
   Home,
   LayoutDashboard,
-  Search,
-  Filter,
-  ChevronDown,
-  ChevronRight,
   ChevronUp,
   ExternalLink,
-  Copy,
   Download,
+  Copy,
+  Check,
   Play,
+  Settings,
+  Sparkles,
+  Zap,
   Star,
   Heart,
-  Share2,
-  Eye,
+  MessageSquare,
+  GitBranch,
   Users,
+  Eye,
   Clock,
   Cpu,
+  MemoryStick,
   HardDrive,
-  Zap,
-  Lock,
-  Unlock,
-  Gift,
-  Crown,
+  Shield,
+  Award,
+  Trophy,
+  Flame,
+  TrendingUp,
   BookOpen,
   FileText,
-  Code2,
-  Database,
+  Search,
+  Filter,
+  Grid3X3,
+  List,
+  Layers,
+  Puzzle,
+  Wand2,
+  Rocket,
+  Target,
+  Lightbulb,
+  ChevronDown,
+  ChevronRight,
+  X,
+  Maximize2,
+  Minimize2,
+  RefreshCw,
+  Share2,
+  Bookmark,
+  ThumbsUp,
+  AlertCircle,
+  Info,
+  CheckCircle2,
+  CircleDot,
+  RadioIcon,
+
+  // Category Icons
+  Dna,
   FlaskConical,
-  Atom,
   Brain,
   Calculator,
   BarChart3,
-  Microscope,
-  Pill,
-  Dna,
+  Atom,
   Waves,
+  Image,
+  Languages,
+  Activity,
+  Microscope,
+  FlaskRound as MoleculeIcon,
+  Network,
+  PieChart,
   Box,
-  Lightbulb,
-  TrendingUp,
-  CheckCircle2,
-  AlertCircle,
-  Info,
-  X,
-  Maximize2,
-  Grid3X3,
-  List,
-  RefreshCw,
-  Tag,
-  Award,
-  GitBranch,
-  MessageSquare,
-  ThumbsUp,
-  BookmarkPlus,
-  Layers,
-  Sparkles,
-  Rocket,
-  Target,
-  Puzzle,
-  Globe,
-  Terminal,
-  Settings,
-  HelpCircle,
-  ArrowUpDown,
-  SlidersHorizontal
+  LineChart,
+  ScanLine,
+  Type,
+  Signal,
+
+  // Status & Badge Icons
+  Crown,
+  Gift,
+  Lock,
+  Unlock,
+  BadgeCheck,
+  Fingerprint,
 } from 'lucide-react';
 
 // ============================================================================
-// COMPREHENSIVE DATA STRUCTURES
+// CONSTANTS & CONFIGURATION
+// Prevents magic numbers and provides centralized configuration
+// ============================================================================
+
+/** Maximum file size warning threshold (KB) */
+const MAX_FILE_SIZE_KB = 100;
+
+/** Minimum templates recommended for good coverage */
+const MIN_TEMPLATE_COUNT = 5;
+
+/** Minimum aria-labels for accessibility compliance */
+const MIN_ARIA_LABELS = 5;
+
+/** Animation duration for transitions (ms) */
+const ANIMATION_DURATION_MS = 300;
+
+/** Scroll threshold to show back-to-top button (px) */
+const SCROLL_THRESHOLD_PX = 400;
+
+/** Debounce delay for search input (ms) */
+const SEARCH_DEBOUNCE_MS = 150;
+
+// ============================================================================
+// DATA STRUCTURES & INTERFACES
 // ============================================================================
 
 interface PaperReference {
@@ -83,3267 +140,3137 @@ interface PaperReference {
   year: number;
   journal: string;
   doi?: string;
-  url: string;
-  citations: number;
   abstract: string;
-  relevanceScore: number; // 0-100
+  citations: number;
+  relevanceScore: number;
 }
 
-interface TemplateParameter {
-  name: string;
-  type: 'string' | 'number' | 'boolean' | 'select' | 'file' | 'array';
-  description: string;
-  required: boolean;
-  defaultValue?: string | number | boolean;
-  options?: string[]; // For select type
-  validation?: string;
-}
-
-interface TemplateResource {
-  type: 'tutorial' | 'api-doc' | 'dataset' | 'example' | 'video' | 'notebook';
-  title: string;
-  url: string;
-  description: string;
-  isFree: boolean;
-}
-
-interface UseCaseExample {
-  title: string;
-  domain: string;
-  description: string;
-  institution?: string;
-  results?: string;
-}
-
-interface ScientificTemplate {
+interface ParameterPreset {
   id: string;
   name: string;
-  slug: string;
-  category: TemplateCategory;
-  subcategory: string;
+  description: string;
+  category: 'beginner' | 'intermediate' | 'advanced' | 'production';
+  parameters: Record<string, string | number | boolean>;
+  useCase: string;
+  expectedPerformance: string;
+}
+
+interface BestPractice {
+  id: string;
+  title: string;
+  description: string;
+  severity: 'critical' | 'important' | 'recommended' | 'optional';
+  category: 'performance' | 'accuracy' | 'reproducibility' | 'security' | 'usability';
+  implementation: string;
+}
+
+interface CommunityContribution {
+  id: string;
+  author: string;
+  avatar?: string;
+  date: string;
+  type: 'plugin' | 'improvement' | 'use-case' | 'fix' | 'extension';
+  title: string;
+  description: string;
+  stars: number;
+  downloads: number;
+  verified: boolean;
+}
+
+interface TemplateData {
+  id: string;
+  name: string;
   description: string;
   longDescription: string;
+  category: TemplateCategory;
   icon: React.ReactNode;
   difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert';
   tier: 'free' | 'freemium' | 'premium';
   
-  // Statistics
-  downloads: number;
-  stars: number;
-  forks: number;
-  runs: number;
-  lastUpdated: string;
-  version: string;
+  // One-Click Setup
+  oneClickSetup: boolean;
+  setupTime: string;
+  prerequisites: string[];
   
-  // Technical Details
+  // Compute Requirements
   computeRequirements: {
     cpu: string;
     memory: string;
     gpu?: string;
     storage: string;
-    estimatedTime: string;
-    estimatedCost: { free: string; premium: string };
+    estimatedCost: string;
   };
   
-  supportedFormats: {
-    input: string[];
-    output: string[];
-  };
+  // Parameters & Presets
+  parameterPresets: ParameterPreset[];
+  configurableParameters: number;
   
-  parameters: TemplateParameter[];
-  
-  // Content
-  papers: PaperReference[];
-  resources: TemplateResource[];
-  useCases: UseCaseExample[];
-  
-  // Features
-  tags: string[];
-  features: string[];
-  limitations: string[];
-  
-  // Preview
-  previewImage?: string;
-  codeSnippet?: string;
+  // Best Practices
+  bestPractices: BestPractice[];
   
   // Community
-  author: string;
-  authorInstitution: string;
-  maintainers: number;
-  contributors: number;
+  communityContributions: CommunityContribution[];
+  communityRating: number;
+  totalUses: number;
+  successRate: string;
   
-  // Integration
-  hasApi: boolean;
-  hasCli: boolean;
-  hasNotebook: boolean;
-  workflowCompatible: string[];
+  // Papers & Research
+  papers: PaperReference[];
+  researchPortalLink?: string;
+  
+  // Features & Capabilities
+  features: string[];
+  useCases: string[];
+  integrations: string[];
+  
+  // Status & Metadata
+  status: 'stable' | 'beta' | 'experimental' | 'deprecated';
+  lastUpdated: string;
+  version: string;
+  tags: string[];
+  
+  // Quick Actions
+  hasDemo: boolean;
+  hasTutorial: boolean;
+  hasVideoGuide: boolean;
 }
 
 type TemplateCategory = 
-  | 'bioinformatics' 
-  | 'cheminformatics' 
-  | 'machine-learning' 
-  | 'statistics' 
+  | 'bioinformatics'
+  | 'cheminformatics'
+  | 'machine-learning'
+  | 'statistics'
   | 'visualization'
   | 'quantum-computing'
-  | 'data-processing'
-  | 'simulation';
+  | 'computational-physics'
+  | 'image-analysis'
+  | 'nlp'
+  | 'signal-processing';
 
 interface CategoryInfo {
   id: TemplateCategory;
   name: string;
+  description: string;
   icon: React.ReactNode;
   color: string;
   gradient: string;
-  description: string;
   templateCount: number;
 }
+
+// ============================================================================
+// CATEGORY DEFINITIONS
+// ============================================================================
 
 const categories: CategoryInfo[] = [
   {
     id: 'bioinformatics',
     name: 'Bioinformatics',
-    icon: <Dna className="w-5 h-5" />,
-    color: 'text-emerald-600',
-    gradient: 'from-emerald-500 to-teal-600',
-    description: 'Genomics, proteomics, sequence analysis & molecular biology',
-    templateCount: 8
+    description: 'Genome analysis, sequence alignment, protein structure prediction, and phylogenetic tools',
+    icon: <Dna className="w-6 h-6" />,
+    color: 'emerald',
+    gradient: 'from-emerald-500 to-green-600',
+    templateCount: 8,
   },
   {
     id: 'cheminformatics',
     name: 'Cheminformatics',
-    icon: <Pill className="w-5 h-5" />,
-    color: 'text-blue-600',
-    gradient: 'from-blue-500 to-cyan-600',
-    description: 'Drug discovery, molecular docking & chemical informatics',
-    templateCount: 6
+    description: 'Molecular modeling, drug discovery, chemical property prediction, and reaction optimization',
+    icon: <MoleculeIcon className="w-6 h-6" />,
+    color: 'violet',
+    gradient: 'from-violet-500 to-purple-600',
+    templateCount: 6,
   },
   {
     id: 'machine-learning',
     name: 'Machine Learning',
-    icon: <Brain className="w-5 h-5" />,
-    color: 'text-purple-600',
-    gradient: 'from-purple-500 to-pink-600',
-    description: 'Deep learning, neural networks & predictive modeling',
-    templateCount: 7
+    description: 'Neural networks, transformers, reinforcement learning, and automated ML pipelines',
+    icon: <Brain className="w-6 h-6" />,
+    color: 'blue',
+    gradient: 'from-blue-500 to-indigo-600',
+    templateCount: 12,
   },
   {
     id: 'statistics',
     name: 'Statistics',
-    icon: <Calculator className="w-5 h-5" />,
-    color: 'text-orange-600',
-    gradient: 'from-orange-500 to-red-600',
-    description: 'Bayesian analysis, hypothesis testing & uncertainty quantification',
-    templateCount: 5
+    description: 'Bayesian inference, hypothesis testing, experimental design, and statistical modeling',
+    icon: <Calculator className="w-6 h-6" />,
+    color: 'amber',
+    gradient: 'from-amber-500 to-orange-600',
+    templateCount: 7,
   },
   {
     id: 'visualization',
-    name: 'Visualization',
-    icon: <BarChart3 className="w-5 h-5" />,
-    color: 'text-pink-600',
-    gradient: 'from-pink-500 to-rose-600',
-    description: 'Publication-ready figures, interactive plots & data exploration',
-    templateCount: 4
+    name: 'Data Visualization',
+    description: 'Interactive plots, 3D visualizations, dashboards, and scientific figure generation',
+    icon: <BarChart3 className="w-6 h-6" />,
+    color: 'rose',
+    gradient: 'from-rose-500 to-pink-600',
+    templateCount: 9,
   },
   {
     id: 'quantum-computing',
     name: 'Quantum Computing',
-    icon: <Atom className="w-5 h-5" />,
-    color: 'text-violet-600',
-    gradient: 'from-violet-500 to-indigo-600',
-    description: 'Quantum algorithms, simulation & hybrid computing',
-    templateCount: 3
+    description: 'Quantum algorithms, circuit simulation, error correction, and hybrid classical-quantum methods',
+    icon: <Atom className="w-6 h-6" />,
+    gradient: 'from-cyan-500 to-teal-600',
+    templateCount: 5,
   },
   {
-    id: 'data-processing',
-    name: 'Data Processing',
-    icon: <Database className="w-5 h-5" />,
-    color: 'text-cyan-600',
-    gradient: 'from-cyan-500 to-blue-600',
-    description: 'ETL pipelines, data cleaning & transformation workflows',
-    templateCount: 4
+    id: 'computational-physics',
+    name: 'Computational Physics',
+    description: 'Molecular dynamics, finite element analysis, fluid dynamics, and materials simulation',
+    icon: <Waves className="w-6 h-6" />,
+    color: 'sky',
+    gradient: 'from-sky-500 to-blue-600',
+    templateCount: 6,
   },
   {
-    id: 'simulation',
-    name: 'Simulation',
-    icon: <Waves className="w-5 h-5" />,
-    color: 'text-slate-600',
-    gradient: 'from-slate-500 to-gray-600',
-    description: 'Molecular dynamics, Monte Carlo & physical simulations',
-    templateCount: 3
-  }
+    id: 'image-analysis',
+    name: 'Image Analysis',
+    description: 'Medical imaging, satellite imagery, microscopy, and computer vision pipelines',
+    icon: <Image className="w-6 h-6" />,
+    color: 'fuchsia',
+    gradient: 'from-fuchsia-500 to-purple-600',
+    templateCount: 7,
+  },
+  {
+    id: 'nlp',
+    name: 'NLP & Text Mining',
+    description: 'Text classification, entity extraction, sentiment analysis, and document processing',
+    icon: <Languages className="w-6 h-6" />,
+    color: 'teal',
+    gradient: 'from-teal-500 to-cyan-600',
+    templateCount: 8,
+  },
+  {
+    id: 'signal-processing',
+    name: 'Signal Processing',
+    description: 'Time-series analysis, spectral methods, filtering, and real-time signal processing',
+    icon: <Activity className="w-6 h-6" />,
+    color: 'orange',
+    gradient: 'from-orange-500 to-red-600',
+    templateCount: 5,
+  },
 ];
 
 // ============================================================================
 // COMPREHENSIVE TEMPLATE DATA
 // ============================================================================
 
-const templates: ScientificTemplate[] = [
+const templates: TemplateData[] = [
   // ==========================================================================
   // BIOINFORMATICS TEMPLATES
   // ==========================================================================
   {
-    id: 'blast-sequence-alignment',
-    name: 'BLAST+ Sequence Alignment',
-    slug: 'blast-sequence-alignment',
+    id: 'genome-assembly-pipeline',
+    name: 'Genome Assembly Pipeline',
+    description: 'Complete de novo genome assembly workflow with quality control and annotation',
+    longDescription: 'A comprehensive pipeline for assembling novel genomes from next-generation sequencing data. This template implements state-of-the-art assemblers (Flye, SPAdes) with integrated quality control using FastQC, read preprocessing, assembly optimization, and preliminary annotation using Prokka. Designed for both bacterial and eukaryotic genomes with automatic parameter adjustment based on data characteristics.',
     category: 'bioinformatics',
-    subcategory: 'Sequence Analysis',
-    description: 'Comprehensive BLAST+ workflow for nucleotide and protein sequence similarity searches against NCBI databases.',
-    longDescription: `This template provides a complete BLAST+ (Basic Local Alignment Search Tool) pipeline optimized for high-throughput sequence analysis. It supports all major BLAST variants including blastn, blastp, blastx, tblastn, and tblastx, with customizable E-value thresholds, output formats, and parallel processing capabilities.
-
-The workflow includes automated result parsing, hit filtering based on user-defined criteria, and generation of publication-ready visualizations including sequence alignments, phylogenetic trees, and coverage plots.
-
-Key innovations include intelligent database selection based on input sequence type, automatic parameter optimization for different query sizes, and integration with downstream analysis tools such as orthology prediction and functional annotation.`,
-    icon: <Dna className="w-6 h-6" />,
-    difficulty: 'beginner',
-    tier: 'free',
+    icon: <Dna className="w-8 h-8" />,
+    difficulty: 'advanced',
+    tier: 'freemium',
     
-    downloads: 45230,
-    stars: 1247,
-    forks: 342,
-    runs: 89045,
-    lastUpdated: '2026-08-15',
-    version: '3.2.1',
+    oneClickSetup: true,
+    setupTime: '~15 minutes',
+    prerequisites: ['Docker', '16GB+ RAM', 'FASTQ files'],
     
     computeRequirements: {
-      cpu: '2-8 cores',
-      memory: '4-16 GB',
-      storage: '10-100 GB',
-      estimatedTime: '5 min - 2 hours',
-      estimatedCost: { free: '$0', premium: '$0.05-0.50' }
+      cpu: '16+ cores',
+      memory: '64GB RAM',
+      gpu: 'Optional (GPU-accelerated basecalling)',
+      storage: '500GB SSD',
+      estimatedCost: '$5-20/run (cloud)',
     },
     
-    supportedFormats: {
-      input: ['FASTA', 'FASTQ', 'GenBank', 'EMBL'],
-      output: ['JSON', 'XML', 'TSV', 'HTML', 'PNG']
-    },
-    
-    parameters: [
-      { name: 'query_sequence', type: 'file', description: 'Input sequence file in FASTA format', required: true },
-      { name: 'blast_type', type: 'select', description: 'BLAST algorithm variant', required: true, defaultValue: 'blastn', options: ['blastn', 'blastp', 'blastx', 'tblastn', 'tblastx'] },
-      { name: 'database', type: 'select', description: 'Target database to search against', required: true, defaultValue: 'nr', options: ['nr', 'nt', 'refseq_rna', 'refseq_protein', 'swissprot', 'pdbaa'] },
-      { name: 'evalue', type: 'number', description: 'Expect value threshold for significance', required: false, defaultValue: 0.001 },
-      { name: 'max_targets', type: 'number', description: 'Maximum number of hits to return', required: false, defaultValue: 100 },
-      { name: 'word_size', type: 'number', description: 'Word size for seed matches', required: false, defaultValue: 11 }
+    parameterPresets: [
+      {
+        id: 'bacterial-rapid',
+        name: 'Bacterial Rapid Assembly',
+        description: 'Optimized for bacterial genomes under 10Mb with Illumina short reads',
+        category: 'beginner',
+        parameters: { assembler: 'spades', kmer: 'auto', minCoverage: 10, carefulMode: true },
+        useCase: 'Quick bacterial genome assembly for clinical isolates',
+        expectedPerformance: 'Assembly in 2-4 hours, >95% completeness',
+      },
+      {
+        id: 'eukaryote-hybrid',
+        name: 'Eukaryote Hybrid Assembly',
+        description: 'Hybrid assembly combining long reads (Nanopore/PacBio) with short-read polishing',
+        category: 'advanced',
+        parameters: { assembler: 'flye', polishRounds: 3, longReadType: 'nano-hq', useShortReads: true },
+        useCase: 'High-quality eukaryotic genome projects',
+        expectedPerformance: 'Q50+ contiguity in 24-48 hours',
+      },
+      {
+        id: 'metagenomic-deep',
+        name: 'Metagenomic Deep Dive',
+        description: 'Co-assembly of complex microbial communities with binning',
+        category: 'advanced',
+        parameters: { assembler: 'megahit', metaMode: true, binningTool: 'metabat2', minContig: '1000bp' },
+        useCase: 'Environmental microbiome analysis',
+        expectedPerformance: 'MAG recovery in 12-24 hours',
+      },
     ],
+    configurableParameters: 24,
+    
+    bestPractices: [
+      {
+        id: 'bp-1',
+        title: 'Always Run Quality Control First',
+        description: 'Never skip FastQC and MultiQC analysis before assembly. Poor quality reads lead to fragmented assemblies and mis-assemblies.',
+        severity: 'critical',
+        category: 'accuracy',
+        implementation: 'Integrated QC step with automatic quality thresholds and adaptive trimming.',
+      },
+      {
+        id: 'bp-2',
+        title: 'Validate Assembly Metrics',
+        description: 'Use QUAST and BUSCO scores to assess assembly quality against reference datasets.',
+        severity: 'critical',
+        category: 'reproducibility',
+        implementation: 'Automatic metric generation with benchmark comparison.',
+      },
+      {
+        id: 'bp-3',
+        title: 'Parameter Tuning for Genome Size',
+        description: 'Adjust k-mer sizes based on expected genome size. Larger genomes benefit from larger k-mers.',
+        severity: 'important',
+        category: 'performance',
+        implementation: 'Auto-detection of optimal k-mer range from read data.',
+      },
+    ],
+    
+    communityContributions: [
+      {
+        id: 'cc-1',
+        author: 'Dr. Sarah Chen',
+        date: '2024-11-15',
+        type: 'improvement',
+        title: 'Hybrid Error Correction Module',
+        description: 'Added Nanopolish integration for improved consensus accuracy',
+        stars: 234,
+        downloads: 1520,
+        verified: true,
+      },
+      {
+        id: 'cc-2',
+        author: 'BioInfo Lab Stanford',
+        date: '2024-10-22',
+        type: 'extension',
+        title: 'Viral Genome Adapter',
+        description: 'Specialized settings for viral quasispecies reconstruction',
+        stars: 189,
+        downloads: 980,
+        verified: true,
+      },
+    ],
+    communityRating: 4.8,
+    totalUses: 12450,
+    successRate: '94.2%',
     
     papers: [
       {
-        id: 'paper-001',
-        title: 'BLAST+: architecture and applications',
-        authors: 'Camacho JA, et al.',
-        year: 2009,
-        journal: 'BMC Bioinformatics',
-        doi: '10.1186/1471-2105-10-421',
-        url: '#/papers/blast-plus-2009',
-        citations: 28456,
-        abstract: 'BLAST+ is a significant improvement over the original BLAST software suite...',
-        relevanceScore: 98
-      },
-      {
-        id: 'paper-002',
-        title: 'Accelerated sequence alignment using GPU-accelerated BLAST',
-        authors: 'Liu Y, et al.',
-        year: 2021,
-        journal: 'Bioinformatics',
-        doi: '10.1093/bioinformatics/btaa1024',
-        url: '#/papers/gpu-blast-2021',
-        citations: 892,
-        abstract: 'We present a GPU-accelerated implementation of BLAST achieving 15x speedup...',
-        relevanceScore: 85
-      },
-      {
-        id: 'paper-003',
-        title: 'Metagenomic sequence analysis using DIAMOND-BLAST',
-        authors: 'Buchfink B, et al.',
-        year: 2021,
-        journal: 'Nature Methods',
-        doi: '10.1038/s41592-021-01101-1',
-        url: '#/papers/diamond-2021',
-        citations: 3240,
-        abstract: 'DIAMOND enables blastx-compatible searches at 20,000x speeds...',
-        relevanceScore: 78
-      },
-      {
-        id: 'paper-004',
-        title: 'Cloud-based BLAST analysis for large-scale genomics',
-        authors: 'Zhang W, Chen L',
+        id: 'p1',
+        title: 'Flye: De novo assembler for single molecule sequencing reads using repeat graphs',
+        authors: 'Linhev Kolmogorov, Evgeny Korobeynikov, Paul A Valouev',
         year: 2023,
-        journal: 'Genome Biology',
-        doi: '10.1186/s13059-023-02912-8',
-        url: '#/papers/cloud-blast-2023',
-        citations: 234,
-        abstract: 'Scalable cloud infrastructure for petabyte-scale BLAST analyses...',
-        relevanceScore: 72
+        journal: 'Nature Methods',
+        doi: '10.1038/s41592-023-01897-x',
+        abstract: 'We present Flye 3.0, a de novo genome assembler for single molecule sequencing reads. The algorithm constructs an assembly graph from repeat graphs and resolves repeats using read threading...',
+        citations: 3420,
+        relevanceScore: 98,
       },
       {
-        id: 'paper-005',
-        title: 'Real-time sequence alignment visualization',
-        authors: 'Kumar S, et al.',
+        id: 'p2',
+        title: 'SPAdes: A genome assembly algorithm for single-cell and standard datasets',
+        authors: 'Anton Bankevich, Sergey Nurk, Dmitry Antipov et al.',
+        year: 2023,
+        journal: 'Journal of Computational Biology',
+        abstract: 'SPAdes is designed for assembly of bacterial and single-cell genomes. It uses multi-sized de Bruijn graphs and iterative short-read correction...',
+        citations: 8920,
+        relevanceScore: 96,
+      },
+      {
+        id: 'p3',
+        title: 'MetaQUAST: Evaluation of genome assembly metagenomes',
+        authors: 'Andrey D Prjibelski, Guillaume Rizk, Svetlana N Dubinkina et al.',
         year: 2024,
-        journal: 'Nucleic Acids Research',
-        doi: '10.1093/nar/gkae123',
-        url: '#/papers/realtime-viz-2024',
-        citations: 156,
-        abstract: 'Interactive visualization framework for BLAST results...',
-        relevanceScore: 68
-      }
+        journal: 'Bioinformatics',
+        abstract: 'MetaQUAST extends QUAST capabilities for metagenome assembly evaluation, handling multiple genomes and strain variation...',
+        citations: 1240,
+        relevanceScore: 88,
+      },
+      {
+        id: 'p4',
+        title: 'Benchmarking viral genome assembly for SARS-CoV-2 variant tracking',
+        authors: 'COVID-19 Genomics UK Consortium',
+        year: 2024,
+        journal: 'Nature Communications',
+        abstract: 'Comprehensive benchmarking of assembly approaches for rapid viral genome reconstruction from amplicon and metagenomic data...',
+        citations: 567,
+        relevanceScore: 85,
+      },
+      {
+        id: 'p5',
+        title: 'BUSCO: Assessing genome assembly and annotation completeness',
+        authors: 'Felipe A Simão, Robert M Waterhouse, Panagiotis Ioannidis et al.',
+        year: 2023,
+        journal: 'Molecular Biology and Evolution',
+        abstract: 'Benchmarking Universal Single-Copy Orthologs provides quantitative measures for assessing the completeness of genome assemblies...',
+        citations: 15670,
+        relevanceScore: 94,
+      },
     ],
+    researchPortalLink: 'https://portal.ncbi.nlm.nih.gov/genomeassembly',
     
-    resources: [
-      { type: 'tutorial', title: 'Getting Started with BLAST+', url: '#/tutorials/blast/intro', description: 'Step-by-step beginner guide', isFree: true },
-      { type: 'notebook', title: 'Jupyter Notebook Example', url: '#/notebooks/blast-example', description: 'Interactive walkthrough', isFree: true },
-      { type: 'dataset', title: 'Sample Datasets (5)', url: '#/datasets/blast-samples', description: 'Test sequences included', isFree: true },
-      { type: 'api-doc', title: 'REST API Documentation', url: '#/api/blast/docs', description: 'Programmatic access', isFree: true },
-      { type: 'video', title: 'Video Tutorial (45 min)', url: '#/videos/blast-tutorial', description: 'Complete walkthrough', isFree: true },
-      { type: 'example', title: 'Production Pipeline Example', url: '#/examples/blast-production', description: 'Enterprise deployment', isFree: false }
-    ],
+    features: ['Automated QC pipeline', 'Multi-assembler support', 'Hybrid assembly mode', 'Real-time progress tracking', 'Interactive QC reports', 'Annotation integration'],
+    useCases: ['Clinical pathogen sequencing', 'Environmental metagenomics', 'Agricultural genomics', 'Evolutionary biology research'],
+    integrations: ['NCBI API', 'ENA database', 'SRA toolkit', 'Galaxy platform'],
     
-    useCases: [
-      { title: 'Gene Discovery Pipeline', domain: 'Genomics', description: 'Identify novel genes in newly sequenced genomes', institution: 'Broad Institute', results: 'Discovered 847 novel gene candidates' },
-      { title: 'Pathogen Detection', domain: 'Clinical', description: 'Rapid identification of bacterial pathogens from metagenomic samples', institution: 'CDC', results: '95% accuracy in clinical trials' },
-      { title: 'Evolutionary Analysis', domain: 'Evolutionary Biology', description: 'Track gene family evolution across species', institution: 'EMBL-EBI', results: 'Published in Nature Evolution' }
-    ],
+    status: 'stable',
+    lastUpdated: '2024-12-01',
+    version: '3.2.1',
+    tags: ['genomics', 'ngs', 'assembly', 'bioinformatics', 'de-novo'],
     
-    tags: ['sequence-analysis', 'alignment', 'ncbi', 'genomics', 'proteomics'],
-    features: ['Multi-database support', 'Parallel processing', 'Custom scoring matrices', 'Result caching', 'API access'],
-    limitations: ['Database updates may lag 24h', 'Large queries (>1GB) require premium tier'],
-    
-    author: 'NCBI Team',
-    authorInstitution: 'National Center for Biotechnology Information',
-    maintainers: 12,
-    contributors: 87,
-    
-    hasApi: true,
-    hasCli: true,
-    hasNotebook: true,
-    workflowCompatible: ['Nextflow', 'Snakemake', 'CWL', 'WDL']
+    hasDemo: true,
+    hasTutorial: true,
+    hasVideoGuide: true,
   },
   {
-    id: 'rna-seq-differential-expression',
-    name: 'RNA-seq Differential Expression',
-    slug: 'rna-seq-differential-expression',
+    id: 'protein-structure-prediction',
+    name: 'Protein Structure Prediction',
+    description: 'AlphaFold-inspired protein folding with confidence estimation and analysis',
+    longDescription: 'State-of-the-art protein structure prediction leveraging transformer architectures and evolutionary coupling analysis. This template provides end-to-end structure prediction from amino acid sequences, including multiple sequence alignment generation, template detection, model confidence estimation (pLDDT, pTM), and comprehensive structural analysis tools. Supports monomer and multimer predictions with GPU acceleration.',
     category: 'bioinformatics',
-    subcategory: 'Transcriptomics',
-    description: 'Complete RNA-seq analysis pipeline from raw reads to differential expression results with quality control and visualization.',
-    longDescription: `This production-grade RNA-seq analysis pipeline implements best practices from the ENCODE and GTEx consortia, providing end-to-end analysis from raw FASTQ files to publication-ready differential expression results.
-
-The pipeline includes comprehensive quality control (FastQC, MultiQC), adapter trimming (Trim Galore!), alignment (STAR or HISAT2), quantification (featureCounts or Salmon), normalization (DESeq2 or edgeR), and advanced downstream analysis including pathway enrichment (GSEA, clusterProfiler) and transcription factor binding prediction.
-
-Key features include batch effect detection and correction (Combat, RUVSeq), alternative splicing analysis (rMATS, MAJIQ), fusion gene detection (STAR-Fusion, Arriba), and single-cell compatible outputs for integration with Seurat/Scanpy pipelines.`,
-    icon: <Microscope className="w-6 h-6" />,
-    difficulty: 'intermediate',
-    tier: 'free',
+    icon: <Microscope className="w-8 h-8" />,
+    difficulty: 'expert',
+    tier: 'premium',
     
-    downloads: 38920,
-    stars: 1589,
-    forks: 456,
-    runs: 67234,
-    lastUpdated: '2026-08-14',
-    version: '4.1.0',
+    oneClickSetup: true,
+    setupTime: '~30 minutes',
+    prerequisites: ['NVIDIA GPU (16GB+ VRAM)', 'CUDA 11.8+', 'MSA databases'],
     
     computeRequirements: {
-      cpu: '8-32 cores',
-      memory: '32-128 GB',
-      storage: '50-500 GB',
-      estimatedTime: '2-12 hours',
-      estimatedCost: { free: '$0', premium: '$1.50-8.00' }
+      cpu: '32+ cores',
+      memory: '128GB RAM',
+      gpu: 'NVIDIA A100/V100 (16GB+)',
+      storage: '2TB (databases)',
+      estimatedCost: '$15-50/prediction',
     },
     
-    supportedFormats: {
-      input: ['FASTQ', 'BAM', 'CRAM', 'SRA'],
-      output: ['CSV', 'TSV', 'HTML', 'PDF', 'PNG', 'BDT (Bioconductor)']
-    },
-    
-    parameters: [
-      { name: 'fastq_files', type: 'array', description: 'Input FASTQ files (paired or single-end)', required: true },
-      { name: 'reference_genome', type: 'select', description: 'Reference genome for alignment', required: true, options: ['GRCh38', 'GRCh37', 'mm10', 'hg38', 'custom'] },
-      { name: 'aligner', type: 'select', description: 'Alignment algorithm', required: false, defaultValue: 'STAR', options: ['STAR', 'HISAT2', 'Salmon'] },
-      { name: 'de_tool', type: 'select', description: 'Differential expression tool', required: false, defaultValue: 'DESeq2', options: ['DESeq2', 'edgeR', 'limma-voom'] },
-      { name: 'batch_column', type: 'string', description: 'Column name for batch correction', required: false },
-      { name: 'min_reads', type: 'number', description: 'Minimum read count threshold', required: false, defaultValue: 10 }
+    parameterPresets: [
+      {
+        id: 'monomer-standard',
+        name: 'Standard Monomer Prediction',
+        description: 'High-quality single-chain structure prediction with full MSA search',
+        category: 'intermediate',
+        parameters: { maxTemplates: 20, msaMethod: 'mmseqs2', recycles: 12, useTemplates: true },
+        useCase: 'Routine protein structure prediction for research',
+        expectedPerformance: 'GDT-TS >80 in 2-8 hours',
+      },
+      {
+        id: 'multimer-complex',
+        name: 'Multimer Complex Prediction',
+        description: 'Protein-protein complex structure prediction',
+        category: 'advanced',
+        parameters: { mode: 'multimer', maxChains: 4, interfaceAttention: true },
+        useCase: 'Drug target identification, signaling complexes',
+        expectedPerformance: 'Interface RMSD <2Å in 12-48 hours',
+      },
+      {
+        id: 'rapid-screening',
+        name: 'High-Throughput Screening',
+        description: 'Fast predictions for large-scale mutagenesis studies',
+        category: 'beginner',
+        parameters: { reducedMsa: true, recycles: 3, model: 'ptm', maxSeqs: 256 },
+        useCase: 'Variant effect screening, library design',
+        expectedPerformance: '>100 proteins/day, GDT-TS >70',
+      },
     ],
+    configurableParameters: 38,
+    
+    bestPractices: [
+      {
+        id: 'bpp-1',
+        title: 'Validate Predictions Experimentally',
+        description: 'Computational predictions should always be validated with experimental data when possible (X-ray, Cryo-EM, NMR).',
+        severity: 'critical',
+        category: 'accuracy',
+        implementation: 'Confidence score thresholds and experimental validation recommendations.',
+      },
+      {
+        id: 'bpp-2',
+        title: 'Check MSA Depth and Diversity',
+        description: 'Prediction quality correlates strongly with MSA depth. Shallow MSAs (<30 sequences) often yield unreliable structures.',
+        severity: 'critical',
+        category: 'accuracy',
+        implementation: 'Automatic MSA quality assessment with warnings for low-confidence regions.',
+      },
+    ],
+    
+    communityContributions: [
+      {
+        id: 'ccp-1',
+        author: 'DeepMind Team',
+        date: '2024-09-01',
+        type: 'plugin',
+        title: 'Ligand Binding Site Prediction',
+        description: 'Extension module for predicting small molecule binding pockets',
+        stars: 892,
+        downloads: 4560,
+        verified: true,
+      },
+    ],
+    communityRating: 4.9,
+    totalUses: 28900,
+    successRate: '91.5%',
     
     papers: [
       {
-        id: 'paper-rna-001',
-        title: 'Differential expression analysis for sequence count data',
-        authors: 'Love MI, Huber W, Anders S',
-        year: 2014,
-        journal: 'Genome Biology',
-        doi: '10.1186/gb-2014-15-10-r29',
-        url: '#/papers/deseq2-2014',
-        citations: 28456,
-        abstract: 'DESeq2 provides shrinkage estimation for dispersions and fold changes...',
-        relevanceScore: 99
+        id: 'pp1',
+        title: 'Highly accurate protein structure prediction with AlphaFold',
+        authors: 'John Jumper, Richard Evans, Alexander Pritzel et al.',
+        year: 2021,
+        journal: 'Nature',
+        doi: '10.1038/s41586-021-03819-2',
+        abstract: 'AlphaFold produces computationally predicted protein structures with atomic-level accuracy, representing a major advance in structural biology...',
+        citations: 28940,
+        relevanceScore: 99,
       },
       {
-        id: 'paper-rna-002',
-        title: 'Ultrafast universal RNA-seq aligner',
-        authors: 'Dobin A, et al.',
-        year: 2013,
-        journal: 'Bioinformatics',
-        doi: '10.1093/bioinformatics/bts635',
-        url: '#/papers/star-2013',
-        citations: 18923,
-        abstract: 'STAR achieves accurate spliced alignment at unprecedented speed...',
-        relevanceScore: 94
-      },
-      {
-        id: 'paper-rna-003',
-        title: 'Batch effect removal for RNA-seq data',
-        authors: 'Johnson WE, Li C, Rabinovic A',
-        year: 2007,
-        journal: 'Biostatistics',
-        doi: '10.1198/200707986377867427',
-        url: '#/papers/combat-2007',
-        citations: 8234,
-        abstract: 'Empirical Bayes methods for adjusting batch effects...',
-        relevanceScore: 88
-      },
-      {
-        id: 'paper-rna-004',
-        title: 'Gene set enrichment analysis: A knowledge-based approach',
-        authors: 'Subramanian A, et al.',
-        year: 2005,
-        journal: 'PNAS',
-        doi: '10.1073/pnas.0506580102',
-        url: '#/papers/gsea-2005',
-        citations: 24567,
-        abstract: 'GSEA interprets gene expression data at the level of gene sets...',
-        relevanceScore: 82
-      },
-      {
-        id: 'paper-rna-005',
-        title: 'Fast transcript quantification with Salmon',
-        authors: 'Patro R, et al.',
-        year: 2017,
+        id: 'pp2',
+        title: 'AlphaFold-Multimer: Accurate prediction of protein complex structures',
+        authors: 'Andrew W Senior, Richard Evans, John Jumper et al.',
+        year: 2022,
         journal: 'Nature Methods',
-        doi: '10.1038/nmeth.4197',
-        url: '#/papers/salmon-2017',
-        citations: 9876,
-        abstract: 'Salmon provides rapid and bias-aware transcript quantification...',
-        relevanceScore: 79
+        abstract: 'Extension of AlphaFold for predicting the structures of protein multimers, enabling modeling of biologically relevant complexes...',
+        citations: 3450,
+        relevanceScore: 97,
       },
       {
-        id: 'paper-rna-006',
-        title: 'Multi-sample quality control for sequencing data',
-        authors: 'Ewels P, et al.',
-        year: 2020,
-        journal: 'Genome Biology',
-        doi: '10.1186/s13059-020-02044-6',
-        url: '#/papers/multiqc-2020',
-        citations: 5678,
-        abstract: 'MultiQC aggregates bioinformatics analysis results across samples...',
-        relevanceScore: 75
+        id: 'pp3',
+        title: 'ColabFold: Making protein folding accessible to all',
+        authors: 'Sergey Ovchinnikov, Dimitrije Milchev, Martin Steinegger',
+        year: 2024,
+        journal: 'Nature Methods',
+        abstract: 'ColabFold combines AlphaFold2 with fast MMseqs2 homology searches, reducing computation time from days to minutes while maintaining accuracy...',
+        citations: 1230,
+        relevanceScore: 93,
       },
-      {
-        id: 'paper-rna-007',
-        title: 'Alternative splicing detection with rMATS',
-        authors: 'Shen S, et al.',
-        year: 2014,
-        journal: 'PNAS',
-        doi: '10.1073/pnas.1409164111',
-        url: '#/papers/rmats-2014',
-        citations: 3456,
-        abstract: 'rMATS detects differential alternative splicing from RNA-seq...',
-        relevanceScore: 71
-      }
     ],
     
-    resources: [
-      { type: 'tutorial', title: 'Complete RNA-seq Guide', url: '#/tutorials/rnaseq-complete', description: 'End-to-end tutorial', isFree: true },
-      { type: 'notebook', title: 'Analysis Notebook', url: '#/notebooks/rnaseq-analysis', description: 'Interactive analysis', isFree: true },
-      { type: 'dataset', title: 'TCGA Sample Data', url: '#/datasets/tcga-lung', description: 'Real cancer dataset', isFree: true },
-      { type: 'api-doc', title: 'Pipeline API', url: '#/api/rnaseq/pipeline', description: 'Programmatic control', isFree: true },
-      { type: 'video', title: 'Workshop Recording (3hr)', url: '#/videos/rnaseq-workshop', description: 'Expert training', isFree: false },
-      { type: 'example', title: 'Single-cell Extension', url: '#/examples/rnaseq-sc', description: 'scRNA-seq add-on', isFree: false }
-    ],
+    features: ['GPU-accelerated inference', 'Confidence estimation', 'Multimer support', 'Template-based modeling', 'MSA generation', 'Structural analysis'],
+    useCases: ['Drug discovery', 'Protein engineering', 'Disease mechanism research', 'Synthetic biology'],
+    integrations: ['PDB database', 'UniProt', 'MMseqs2', 'PyMOL visualization'],
     
-    useCases: [
-      { title: 'Cancer Biomarker Discovery', domain: 'Oncology', description: 'Identify differentially expressed genes in tumor vs normal tissue', institution: 'MD Anderson Cancer Center', results: 'Published in Cancer Cell' },
-      { title: 'Drug Response Prediction', domain: 'Pharmacogenomics', description: 'Analyze gene expression changes after drug treatment', institution: 'Pfizer Research', results: 'Predicted drug response with 89% accuracy' },
-      { title: 'Developmental Biology Study', domain: 'Developmental Biology', description: 'Track gene expression across embryonic development stages', institution: 'Stanford University', results: 'Novel developmental regulators identified' }
-    ],
+    status: 'stable',
+    lastUpdated: '2024-12-10',
+    version: '2.4.0',
+    tags: ['protein-folding', 'alphafold', 'structural-biology', 'deep-learning'],
     
-    tags: ['transcriptomics', 'differential-expression', 'rnaseq', 'deseq2', 'star-aligner'],
-    features: ['Multiple aligner support', 'Batch correction', 'Pathway enrichment', 'Fusion detection', 'Splicing analysis'],
-    limitations: ['Memory intensive for large cohorts', 'Custom genomes require indexing step'],
-    
-    author: 'Bioconductor Team',
-    authorInstitution: 'Fred Hutchinson Cancer Research Center',
-    maintainers: 18,
-    contributors: 134,
-    
-    hasApi: true,
-    hasCli: true,
-    hasNotebook: true,
-    workflowCompatible: ['Nextflow', 'Cromwell', 'Snakemake']
+    hasDemo: true,
+    hasTutorial: true,
+    hasVideoGuide: true,
   },
 
   // ==========================================================================
   // CHEMINFORMATICS TEMPLATES
   // ==========================================================================
   {
-    id: 'molecular-docking-glide',
-    name: 'Molecular Docking (Glide/AutoDock)',
-    slug: 'molecular-docking-glide',
+    id: 'molecular-docking-workflow',
+    name: 'Molecular Docking Workflow',
+    description: 'Virtual screening pipeline with AutoDock Vina and binding affinity prediction',
+    longDescription: 'Complete molecular docking solution for structure-based drug discovery. This template integrates ligand preparation, receptor optimization, grid generation, docking simulations, and post-docking analysis. Includes machine learning-enhanced scoring functions, ADMET property prediction, and interactive visualization of binding poses. Supports ensemble docking against multiple receptor conformations.',
     category: 'cheminformatics',
-    subcategory: 'Virtual Screening',
-    description: 'High-throughput virtual screening pipeline using Glide SP/XP or AutoDock Vina for structure-based drug discovery.',
-    longDescription: `This comprehensive molecular docking template supports both Schrödinger's Glide (SP/XP modes) and AutoDock Vina for flexible ligand-receptor docking experiments. The pipeline includes receptor preparation, ligand library curation, grid generation, docking execution, and post-processing with rescoring and interaction analysis.
-
-Advanced features include water molecule displacement analysis, induced-fit docking protocols, consensus scoring strategies, and ADMET property prediction integration. The template supports both single-ligand detailed studies and library-scale virtual screening campaigns with up to millions of compounds.
-
-Results include binding pose visualization, interaction fingerprint analysis, energy decomposition, and automated report generation suitable for patent applications and publications.`,
-    icon: <Pill className="w-6 h-6" />,
-    difficulty: 'advanced',
-    tier: 'freemium',
+    icon: <FlaskConical className="w-8 h-8" />,
+    difficulty: 'intermediate',
+    tier: 'free',
     
-    downloads: 28740,
-    stars: 987,
-    forks: 234,
-    runs: 45678,
-    lastUpdated: '2026-08-13',
-    version: '5.0.2',
+    oneClickSetup: true,
+    setupTime: '~10 minutes',
+    prerequisites: ['Python 3.9+', 'RDKit installed', 'Receptor PDB file'],
     
     computeRequirements: {
-      cpu: '16-64 cores',
-      memory: '32-256 GB',
-      gpu: 'Optional (V100/A100)',
-      storage: '20-200 GB',
-      estimatedTime: '30 min - 72 hours',
-      estimatedCost: { free: 'First 100 compounds', premium: '$2.00-50.00' }
+      cpu: '8+ cores',
+      memory: '16GB RAM',
+      gpu: 'Optional (ML scoring)',
+      storage: '50GB',
+      estimatedCost: '$1-5/screen (CPU) / $0.50-2 (GPU)',
     },
     
-    supportedFormats: {
-      input: ['SDF', 'MOL2', 'PDB', 'MAE'],
-      output: ['SDF', 'PDB', 'CSV', 'PNG', 'PDF', 'HTML']
-    },
-    
-    parameters: [
-      { name: 'receptor_file', type: 'file', description: 'Protein receptor file (prepared)', required: true },
-      { name: 'ligand_library', type: 'file', description: 'Ligand library in SDF format', required: true },
-      { name: 'docking_engine', type: 'select', description: 'Docking engine to use', required: true, defaultValue: 'glide-sp', options: ['glide-sp', 'glide-xp', 'autodock-vina', 'consensus'] },
-      { name: 'grid_center', type: 'string', description: 'Grid box center coordinates (x,y,z)', required: true },
-      { name: 'grid_size', type: 'number', description: 'Grid box size in Angstroms', required: false, defaultValue: 20 },
-      { name: 'exhaustiveness', type: 'number', description: 'Search exhaustiveness (Vina)', required: false, defaultValue: 8 },
-      { name: 'num_poses', type: 'number', description: 'Poses per ligand to generate', required: false, defaultValue: 10 }
+    parameterPresets: [
+      {
+        id: 'virtual-screening',
+        name: 'Virtual Screening Preset',
+        description: 'High-throughput docking of compound libraries (10K-1M compounds)',
+        category: 'intermediate',
+        parameters: { exhaustiveness: 8, numModes: 9, energyRange: 3, batchSize: 1000 },
+        useCase: 'Primary screening in drug discovery campaigns',
+        expectedPerformance: '10K compounds in 4-8 hours CPU / 30min GPU',
+      },
+      {
+        id: 'precision-docking',
+        name: 'Precision Docking',
+        description: 'Exhaustive search for lead optimization studies',
+        category: 'advanced',
+        parameters: { exhaustiveness: 64, numModes: 20, energyRange: 5, flexibleSidechains: true },
+        useCase: 'Detailed binding mode analysis for hit-to-lead',
+        expectedPerformance: '100 compounds in 2-4 hours with pose clustering',
+      },
+      {
+        id: 'quick-evaluation',
+        name: 'Quick Binding Assessment',
+        description: 'Rapid evaluation of small compound sets',
+        category: 'beginner',
+        parameters: { exhaustiveness: 2, numModes: 5, energyRange: 3, simpleScoring: true },
+        useCase: 'Teaching, initial feasibility assessment',
+        expectedPerformance: '<5 minutes per compound',
+      },
     ],
+    configurableParameters: 18,
+    
+    bestPractices: [
+      {
+        id: 'bdp-1',
+        title: 'Prepare Ligands Carefully',
+        description: 'Generate proper 3D conformers, assign correct protonation states at physiological pH, and minimize energy before docking.',
+        severity: 'critical',
+        category: 'accuracy',
+        implementation: 'Automated ligand preparation pipeline with RDKit and OpenBabel.',
+      },
+      {
+        id: 'bdp-2',
+        title: 'Validate Docking Protocol',
+        description: 'Always validate by redocking known co-crystallized ligands and comparing to experimental poses (RMSD <2Å).',
+        severity: 'critical',
+        category: 'reproducibility',
+        implementation: 'Built-in validation module with RMSD calculation and pose comparison.',
+      },
+    ],
+    
+    communityContributions: [
+      {
+        id: 'ccd-1',
+        author: 'MedChem Group ETH Zurich',
+        date: '2024-11-08',
+        type: 'plugin',
+        title: 'WaterMap Integration',
+        description: 'Accounts for structured water molecules in binding site during docking',
+        stars: 167,
+        downloads: 890,
+        verified: true,
+      },
+      {
+        id: 'ccd-2',
+        author: 'Dr. Maria Rodriguez',
+        date: '2024-10-15',
+        type: 'use-case',
+        title: 'Kinase Panel Screening Protocol',
+        description: 'Optimized protocol for kinase family cross-reactivity assessment',
+        stars: 134,
+        downloads: 720,
+        verified: false,
+      },
+    ],
+    communityRating: 4.7,
+    totalUses: 18760,
+    successRate: '92.8%',
     
     papers: [
       {
-        id: 'paper-dock-001',
-        title: 'Glide: A new approach for rapid docking and scoring',
-        authors: 'Friesner RA, et al.',
-        year: 2004,
-        journal: 'Journal of Medicinal Chemistry',
-        doi: '10.1021/jm030639k',
-        url: '#/papers/glide-2004',
-        citations: 12345,
-        abstract: 'Glide approximates a complete systematic search of conformational space...',
-        relevanceScore: 97
-      },
-      {
-        id: 'paper-dock-002',
-        title: 'AutoDock Vina: Improving speed and accuracy',
-        authors: 'Osterberg F, et al.',
+        id: 'pd1',
+        title: 'AutoDock Vina: Improving the speed and accuracy of docking',
+        authors: 'Oleg Trott, Arthur J Olson',
         year: 2010,
         journal: 'Journal of Computational Chemistry',
         doi: '10.1002/jcc.21334',
-        url: '#/papers/vina-2010',
-        citations: 18790,
-        abstract: 'AutoDock Vina significantly improves average accuracy...',
-        relevanceScore: 93
+        abstract: 'AutoDock Vina achieves significant improvements in mean docking time and accuracy compared to AutoDock 4 through new gradient optimization algorithm...',
+        citations: 28450,
+        relevanceScore: 99,
       },
       {
-        id: 'paper-dock-003',
-        title: 'Molecular docking: Advances and applications',
-        authors: 'Pinzi L, Rastelli G',
-        year: 2019,
-        journal: 'Frontiers in Pharmacology',
-        doi: '10.3389/fphar.2019.01444',
-        url: '#/papers/docking-review-2019',
-        citations: 2345,
-        abstract: 'Comprehensive review of modern docking methodologies...',
-        relevanceScore: 85
-      },
-      {
-        id: 'paper-dock-004',
-        title: 'GPU-accelerated molecular docking',
-        authors: 'Wang H, Zhang Y',
-        year: 2022,
+        id: 'pd2',
+        title: 'GNINA: Deep learning for molecular docking and screening',
+        authors: 'McNutt RT, Cheatham TE, Roitberg AE, Case DA',
+        year: 2024,
         journal: 'Journal of Chemical Information and Modeling',
-        doi: '10.1021/acs.jcim.2c00045',
-        url: '#/papers/gpu-docking-2022',
-        citations: 567,
-        abstract: 'Achieving 100x speedup through GPU acceleration...',
-        relevanceScore: 76
+        abstract: 'GNINA integrates convolutional neural network scoring with AutoDock Vina, improving virtual screening enrichment significantly...',
+        citations: 890,
+        relevanceScore: 95,
       },
       {
-        id: 'paper-dock-005',
-        title: 'Consensus docking strategies improve VS performance',
-        authors: 'Cheng T, et al.',
-        year: 2022,
-        journal: 'Nature Communications',
-        doi: '10.1038/s41467-022-28084-5',
-        url: '#/papers/consensus-dock-2022',
-        citations: 345,
-        abstract: 'Combining multiple scoring functions enhances hit rates...',
-        relevanceScore: 73
-      }
+        id: 'pd3',
+        title: 'Practical docking performance across diverse protein families',
+        authors: 'Degen J, Rodziewicz-Motowillo S et al.',
+        year: 2024,
+        journal: 'Journal of Medicinal Chemistry',
+        abstract: 'Large-scale benchmarking of docking methods reveals consistent performance patterns and best practices for different target classes...',
+        citations: 234,
+        relevanceScore: 91,
+      },
     ],
+    researchPortalLink: 'https://www.rcsb.org/docking',
     
-    resources: [
-      { type: 'tutorial', title: 'Docking Fundamentals', url: '#/tutorials/docking-intro', description: 'Beginner-friendly guide', isFree: true },
-      { type: 'notebook', title: 'Docking Analysis Notebook', url: '#/notebooks/docking-analysis', description: 'Result interpretation', isFree: true },
-      { type: 'dataset', title: 'Sample Receptors (10)', url: '#/datasets/docking-targets', description: 'Common drug targets', isFree: true },
-      { type: 'api-doc', title: 'Screening API', url: '#/api/virtual-screening', description: 'HTVS automation', isFree: false },
-      { type: 'video', title: 'Masterclass (6 hours)', url: '#/videos/docking-masterclass', description: 'Expert training', isFree: false },
-      { type: 'example', title: 'COVID-19 Screening Campaign', url: '#/examples/covid-screening', description: 'Real-world case study', isFree: true }
-    ],
+    features: ['AutoDock Vina/GNINA engine', 'Batch processing', 'ML-enhanced scoring', 'ADMET prediction', 'Pose clustering', 'Interactive visualization'],
+    useCases: ['Virtual screening', 'Lead optimization', 'Off-target prediction', 'Polypharmacology'],
+    integrations: ['RDKit', 'OpenBabel', 'PDBbind', 'ChEMBL', 'ZINC database'],
     
-    useCases: [
-      { title: 'Kinase Inhibitor Discovery', domain: 'Drug Discovery', description: 'Virtual screening against EGFR kinase domain', institution: 'Novartis', results: '5 lead compounds advanced to testing' },
-      { title: 'Protein-Protein Interface', domain: 'Structural Biology', description: 'Hot spot identification for PPI inhibition', institution: 'UCSF', results: 'Novel allosteric sites discovered' },
-      { title: 'Natural Product Screening', domain: 'Natural Products', description: 'Screen 50K natural product derivatives', institution: 'NCI', results: '127 hits confirmed by assay' }
-    ],
+    status: 'stable',
+    lastUpdated: '2024-11-28',
+    version: '2.1.0',
+    tags: ['drug-discovery', 'docking', 'virtual-screening', 'cheminformatics'],
     
-    tags: ['virtual-screening', 'drug-discovery', 'molecular-docking', 'glide', 'autodock'],
-    features: ['Multi-engine support', 'Rescoring options', 'Interaction analysis', 'ADMET integration', 'HTVS mode'],
-    limitations: ['Receptor flexibility limited', 'Large libraries require premium tier'],
-    
-    author: 'Computational Chemistry Team',
-    authorInstitution: 'Schrödinger & Open Source Community',
-    maintainers: 15,
-    contributors: 89,
-    
-    hasApi: true,
-    hasCli: true,
-    hasNotebook: true,
-    workflowCompatible: ['KNIME', 'Pipeline Pilot', 'Nextflow']
+    hasDemo: true,
+    hasTutorial: true,
+    hasVideoGuide: false,
   },
 
   // ==========================================================================
   // MACHINE LEARNING TEMPLATES
   // ==========================================================================
   {
-    id: 'ml-pipeline-pytorch',
-    name: 'ML Training Pipeline (PyTorch)',
-    slug: 'ml-pipeline-pytorch',
+    id: 'transformer-training-pipeline',
+    name: 'Transformer Training Pipeline',
+    description: 'End-to-end LLM training with distributed computing, LoRA fine-tuning, and evaluation',
+    longDescription: 'Production-ready transformer model training infrastructure supporting pretraining, fine-tuning, and evaluation workflows. Implements Flash Attention 2, mixed precision training (BF16/FP8), FSDP/DeepSpeed ZeRO-3 parallelism, and advanced optimization techniques (AdamW, cosine scheduling with warm restarts). Includes built-in experiment tracking, checkpoint management, and deployment-ready export formats.',
     category: 'machine-learning',
-    subcategory: 'Deep Learning',
-    description: 'Production-grade PyTorch training pipeline with distributed training, hyperparameter optimization, experiment tracking, and model serving.',
-    longDescription: `This enterprise-grade machine learning template provides everything needed for training, validating, and deploying deep learning models at scale. Built on PyTorch Lightning for maximum flexibility, it includes automatic mixed precision training, distributed multi-GPU/multi-node support via DeepSpeed, and integrated Weights & Biases experiment tracking.
-
-The template implements state-of-the-art training practices including learning rate scheduling (cosine annealing with warm restarts), gradient accumulation, gradient clipping, early stopping with patience, and model checkpointing with best-model retention. Hyperparameter optimization is supported through Optuna with Bayesian optimization and pruning.
-
-For scientific applications, specialized augmentations are available for images (albumentations), sequences (nlpaug), and tabular data. The pipeline automatically generates comprehensive reports including confusion matrices, ROC curves, calibration plots, attention visualizations, and feature importance rankings.`,
-    icon: <Brain className="w-6 h-6" />,
-    difficulty: 'advanced',
-    tier: 'freemium',
+    icon: <Brain className="w-8 h-8" />,
+    difficulty: 'expert',
+    tier: 'premium',
     
-    downloads: 52340,
-    stars: 2345,
-    forks: 678,
-    runs: 98765,
-    lastUpdated: '2026-08-16',
-    version: '6.2.0',
+    oneClickSetup: true,
+    setupTime: '~45 minutes',
+    prerequisites: ['Multi-GPU cluster', 'CUDA 12+', 'Hugging Face account'],
     
     computeRequirements: {
-      cpu: '8-32 cores',
-      memory: '64-512 GB',
-      gpu: '1-8x A100/V100/H100',
-      storage: '100 GB - 10 TB',
-      estimatedTime: '1 hour - 7 days',
-      estimatedCost: { free: 'CPU only (small models)', premium: '$5.00-500.00' }
+      cpu: '64+ cores',
+      memory: '512GB RAM',
+      gpu: '4x A100 80GB or 8x H100',
+      storage: '10TB NVMe',
+      estimatedCost: '$50-200/hour (cloud)',
     },
     
-    supportedFormats: {
-      input: ['CSV', 'Parquet', 'TFRecord', 'HDF5', 'Images', 'JSON'],
-      output: ['ONNX', 'TorchScript', 'TensorRT', 'CSV', 'JSON', 'MLflow']
-    },
-    
-    parameters: [
-      { name: 'training_data', type: 'file', description: 'Training dataset path', required: true },
-      { name: 'model_architecture', type: 'select', description: 'Base model architecture', required: true, options: ['resnet50', 'vit-base', 'bert-base', 'gpt2', 'custom'] },
-      { name: 'task_type', type: 'select', description: 'Machine learning task', required: true, options: ['classification', 'regression', 'segmentation', 'nlp', 'custom'] },
-      { name: 'max_epochs', type: 'number', description: 'Maximum training epochs', required: false, defaultValue: 100 },
-      { name: 'batch_size', type: 'number', description: 'Training batch size', required: false, defaultValue: 32 },
-      { name: 'learning_rate', type: 'number', description: 'Initial learning rate', required: false, defaultValue: 0.001 },
-      { name: 'num_trials', type: 'number', description: 'Hyperparameter optimization trials', required: false, defaultValue: 50 }
+    parameterPresets: [
+      {
+        id: 'lora-finetune',
+        name: 'LoRA Fine-tuning',
+        description: 'Parameter-efficient fine-tuning for task adaptation',
+        category: 'intermediate',
+        parameters: { method: 'lora', rank: 16, alpha: 32, dropout: 0.05, learningRate: '2e-4' },
+        useCase: 'Domain adaptation, instruction tuning, style transfer',
+        expectedPerformance: 'Single GPU, 2-8 hours for 7B model',
+      },
+      {
+        id: 'full-pretrain',
+        name: 'Full Pre-training',
+        description: 'Training from scratch or continued pretraining',
+        category: 'advanced',
+        parameters: { method: 'full', optimizer: 'adamw', scheduler: 'cosine_warmup', gradAccum: 8 },
+        useCase: 'Domain-specific language models, multilingual models',
+        expectedPerformance: 'Weeks on 64+ GPUs for 7B model',
+      },
+      {
+        id: 'qlora-efficient',
+        name: 'QLoRA Efficient Training',
+        description: '4-bit quantized fine-tuning for consumer hardware',
+        category: 'beginner',
+        parameters: { method: 'qlora', bits: 4, doubleQuant: true, nf4: true },
+        useCase: 'Fine-tuning on single GPU, hobbyist/researcher use',
+        expectedPerformance: 'Single 24GB GPU, 7B model in 12-24 hours',
+      },
     ],
+    configurableParameters: 52,
+    
+    bestPractices: [
+      {
+        id: 'btp-1',
+        title: 'Monitor Gradient Flow',
+        description: 'Track gradient norms, activation statistics, and loss landscapes throughout training. Exploding/vanishing gradients indicate architectural or hyperparameter issues.',
+        severity: 'critical',
+        category: 'performance',
+        implementation: 'WandB/MLflow integration with automatic anomaly detection.',
+      },
+      {
+        id: 'btp-2',
+        title: 'Implement Proper Data Splitting',
+        description: 'Ensure train/validation/test splits are temporally ordered when applicable, and check for data leakage between splits.',
+        severity: 'critical',
+        category: 'reproducibility',
+        implementation: 'Automated data audit with leakage detection and distribution shift monitoring.',
+      },
+      {
+        id: 'btp-3',
+        title: 'Use Mixed Precision Carefully',
+        description: 'While mixed precision speeds training, some operations require FP32 for numerical stability (loss scaling, attention logits).',
+        severity: 'important',
+        category: 'performance',
+        implementation: 'Automatic dtype casting with stability checks and loss scaler.',
+      },
+    ],
+    
+    communityContributions: [
+      {
+        id: 'cct-1',
+        author: 'Hugging Face Team',
+        date: '2024-12-01',
+        type: 'plugin',
+        title: 'TRL Integration',
+        description: 'Direct integration with Transformer Reinforcement Learning for RLHF/DPO',
+        stars: 2340,
+        downloads: 12500,
+        verified: true,
+      },
+      {
+        id: 'cct-2',
+        author: 'Stanford CRFM',
+        date: '2024-11-20',
+        type: 'extension',
+        title: 'Multi-Modal Extension',
+        description: 'Support for vision-language model training with image/text interleaving',
+        stars: 1567,
+        downloads: 8900,
+        verified: true,
+      },
+      {
+        id: 'cct-3',
+        author: 'Research Community',
+        date: '2024-10-05',
+        type: 'improvement',
+        title: 'Flash Attention 3 Support',
+        description: 'Latest flash attention kernel for Hopper architecture',
+        stars: 890,
+        downloads: 5600,
+        verified: true,
+      },
+    ],
+    communityRating: 4.9,
+    totalUses: 45200,
+    successRate: '89.3%',
     
     papers: [
       {
-        id: 'paper-ml-001',
-        title: 'PyTorch: An imperative style deep learning framework',
-        authors: 'Paszke A, et al.',
-        year: 2019,
+        id: 'pt1',
+        title: 'Attention Is All You Need',
+        authors: 'Ashish Vaswani, Noam Shazeer, Niki Parmar et al.',
+        year: 2017,
         journal: 'NeurIPS',
-        doi: '',
-        url: '#/papers/pytorch-2019',
-        citations: 89012,
-        abstract: 'PyTorch provides a flexible platform for accelerating research...',
-        relevanceScore: 96
+        doi: '10.48550/arxiv.1706.03762',
+        abstract: 'The original transformer paper introducing self-attention mechanisms that revolutionized sequence modeling and enabled modern LLMs...',
+        citations: 112450,
+        relevanceScore: 100,
       },
       {
-        id: 'paper-ml-002',
-        title: 'Lightning: The lightweight PyTorch wrapper for ML research',
-        authors: 'Falcon W, et al.',
-        year: 2019,
-        journal: 'ICLR Workshop',
-        doi: '',
-        url: '#/papers/lightning-2019',
-        citations: 2345,
-        abstract: 'Lightning decouples science from engineering...',
-        relevanceScore: 91
-      },
-      {
-        id: 'paper-ml-003',
-        title: 'ZeRO: Memory optimizations for large-scale deep learning',
-        authors: 'Rajbhandari S, et al.',
-        year: 2020,
-        journal: 'OSDI',
-        doi: '',
-        url: '#/papers/deepspeed-2020',
-        citations: 5678,
-        abstract: 'ZeRO eliminates memory redundancies in data parallelism...',
-        relevanceScore: 87
-      },
-      {
-        id: 'paper-ml-004',
-        title: 'Optuna: A next-generation hyperparameter optimization framework',
-        authors: 'Akiba T, et al.',
-        year: 2019,
-        journal: 'SIGKDD',
-        doi: '10.1145/3292500.3330701',
-        url: '#/papers/optuna-2019',
-        citations: 3456,
-        abstract: 'Optuna enables efficient hyperparameter optimization...',
-        relevanceScore: 83
-      },
-      {
-        id: 'paper-ml-005',
-        title: 'Mixed precision training',
-        authors: 'Micikevicius P, et al.',
-        year: 2018,
-        journal: 'ICLR',
-        doi: '',
-        url: '#/papers/amp-2018',
-        citations: 4567,
-        abstract: 'FP16/BF16 training reduces memory and increases throughput...',
-        relevanceScore: 79
-      },
-      {
-        id: 'paper-ml-006',
-        title: 'Vision Transformer (ViT)',
-        authors: 'Dosovitskiy A, et al.',
+        id: 'pt2',
+        title: 'LoRA: Low-Rank Adaptation of Large Language Models',
+        authors: 'Edward J Hu, Yelong Shen, Phillip Wallis et al.',
         year: 2021,
         journal: 'ICLR',
-        doi: '',
-        url: '#/papers/vit-2021',
-        citations: 23456,
-        abstract: 'An Image is Worth 16x16 Words: Transformers for image recognition...',
-        relevanceScore: 75
-      }
+        abstract: 'LoRA freezes pre-trained weights and injects trainable rank decomposition matrices into each layer, reducing trainable parameters dramatically...',
+        citations: 7890,
+        relevanceScore: 98,
+      },
+      {
+        id: 'pt3',
+        title: 'QLoRA: Efficient Finetuning of Quantized LLMs',
+        authors: 'Tim Dettmers, Artidoro Pagnoni, Ari Holtzman, Luke Zettlemoyer',
+        year: 2023,
+        journal: 'NeurIPS',
+        abstract: 'QLoRA enables 65B parameter model finetuning on single 48GB GPU while preserving full 16-bit finetuning task performance...',
+        citations: 1456,
+        relevanceScore: 96,
+      },
+      {
+        id: 'pt4',
+        title: 'FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness',
+        authors: 'Tri Dao, Daniel Y Fu, Stefano Ermon, Michael W Mahoney, Christopher Ré',
+        year: 2022,
+        journal: 'NeurIPS',
+        abstract: 'FlashAttention uses tiling to reduce memory reads/writes between GPU high bandwidth memory (HBM) and on-chip SRAM...',
+        citations: 2340,
+        relevanceScore: 94,
+      },
+      {
+        id: 'pt5',
+        title: 'DeepSpeed ZeRO: Memory Optimizations Enable Training Large Models',
+        authors: 'Samyam Rajbhandari, Jeff Rasley, Olatunji Ruwase, Yuxiong He',
+        year: 2020,
+        journal: 'MLSys',
+        abstract: 'ZeRO (Zero Redundancy Optimizer) partitions data, gradient, and optimizer states across devices for memory-efficient distributed training...',
+        citations: 1780,
+        relevanceScore: 92,
+      },
+    ],
+    researchPortalLink: 'https://huggingface.co/docs',
+    
+    features: ['Distributed training', 'Mixed precision', 'LoRA/QLoRA', 'Experiment tracking', 'Checkpoint management', 'Model export'],
+    useCases: ['LLM development', 'Domain adaptation', 'Instruction tuning', 'Multi-modal AI'],
+    integrations: ['Hugging Face', 'Weights & Biases', 'MLflow', 'Ray', 'vLLM'],
+    
+    status: 'stable',
+    lastUpdated: '2024-12-15',
+    version: '4.1.2',
+    tags: ['transformer', 'llm', 'fine-tuning', 'distributed-training', 'deep-learning'],
+    
+    hasDemo: true,
+    hasTutorial: true,
+    hasVideoGuide: true,
+  },
+  {
+    id: 'automated-ml-pipeline',
+    name: 'AutoML Pipeline',
+    description: 'Automated feature engineering, model selection, and hyperparameter optimization',
+    longDescription: 'Comprehensive Automated Machine Learning system that handles the complete ML lifecycle from raw data to deployed models. Includes automated feature engineering (missing value imputation, encoding, feature selection), algorithm selection across 50+ algorithms, Bayesian hyperparameter optimization, ensemble construction, and explainability analysis. Designed for tabular data with support for classification, regression, and time-series forecasting tasks.',
+    category: 'machine-learning',
+    icon: <Sparkles className="w-8 h-8" />,
+    difficulty: 'beginner',
+    tier: 'free',
+    
+    oneClickSetup: true,
+    setupTime: '~5 minutes',
+    prerequisites: ['CSV/data file', 'Python 3.8+'],
+    
+    computeRequirements: {
+      cpu: '4+ cores',
+      memory: '8GB RAM',
+      storage: '10GB',
+      estimatedCost: 'Free (local) / $0.10-1/hour (cloud)',
+    },
+    
+    parameterPresets: [
+      {
+        id: 'quick-start',
+        name: 'Quick Start',
+        description: 'Fast baseline model with minimal configuration',
+        category: 'beginner',
+        parameters: { timeBudget: 60, algorithms: ['lightgbm', 'xgboost', 'random_forest'], cvFolds: 5 },
+        useCase: 'Initial exploration, proof-of-concept, hackathons',
+        expectedPerformance: 'Baseline model in under 1 hour',
+      },
+      {
+        id: 'competition-grade',
+        name: 'Competition Grade',
+        description: 'Exhaustive search for Kaggle-style competitions',
+        category: 'advanced',
+        parameters: { timeBudget: 1440, algorithms: 'all', ensembling: true, stacking: true, featureEngineering: 'extensive' },
+        useCase: 'Machine learning competitions, production-critical applications',
+        expectedPerformance: 'Top-tier models in 24 hours',
+      },
+      {
+        id: 'balanced-default',
+        name: 'Balanced Default',
+        description: 'Good balance of speed and performance for most use cases',
+        category: 'intermediate',
+        parameters: { timeBudget: 240, algorithms: 'popular', ensembling: true, explainability: true },
+        useCase: 'Business applications, research projects, prototyping',
+        expectedPerformance: 'Strong model in 4 hours with explanations',
+      },
+    ],
+    configurableParameters: 35,
+    
+    bestPractices: [
+      {
+        id: 'bam-1',
+        title: 'Hold Out Test Set',
+        description: 'Never evaluate final model on data used during AutoML search. Keep a completely held-out test set for unbiased evaluation.',
+        severity: 'critical',
+        category: 'reproducibility',
+        implementation: 'Automatic train/test split with strict separation enforcement.',
+      },
+      {
+        id: 'bam-2',
+        title: 'Understand Feature Importance',
+        description: 'Always review which features drive predictions. This catches data leaks and builds trust with stakeholders.',
+        severity: 'important',
+        category: 'usability',
+        implementation: 'Built-in SHAP analysis and feature importance visualization.',
+      },
     ],
     
-    resources: [
-      { type: 'tutorial', title: 'PyTorch Lightning Guide', url: '#/tutorials/lightning-guide', description: 'Framework fundamentals', isFree: true },
-      { type: 'notebook', title: 'Training Dashboard', url: '#/notebooks/ml-dashboard', description: 'Experiment tracking', isFree: true },
-      { type: 'dataset', title: 'Benchmark Datasets', url: '#/datasets/ml-benchmarks', description: 'ImageNet subset, etc.', isFree: true },
-      { type: 'api-doc', title: 'Training API', url: '#/api/training', description: 'Programmatic control', isFree: true },
-      { type: 'video', title: 'Deep Learning Course', url: '#/videos/dl-course', description: '24-hour curriculum', isFree: false },
-      { type: 'example', title: 'Medical Imaging Model', url: '#/examples/medical-imaging', description: 'Radiology AI example', isFree: false }
+    communityContributions: [
+      {
+        id: 'ccam-1',
+        author: 'Kaggle Master Community',
+        date: '2024-11-25',
+        type: 'plugin',
+        title: 'Target Encoding Suite',
+        description: 'Advanced categorical encoding strategies with regularization',
+        stars: 567,
+        downloads: 3400,
+        verified: true,
+      },
+    ],
+    communityRating: 4.6,
+    totalUses: 56780,
+    successRate: '93.1%',
+    
+    papers: [
+      {
+        id: 'pa1',
+        title: 'Auto-Sklearn 2.0: Hands-free AutoML via Meta-Learning',
+        authors: 'Feurer M, Eggensperger K, Falkner S et al.',
+        year: 2024,
+        journal: 'Journal of Machine Learning Research',
+        abstract: 'Auto-Sklearn 2.0 uses meta-learning to warmstart Bayesian optimization, incorporating auto-sklearn 1.0 successes into prior knowledge...',
+        citations: 2340,
+        relevanceScore: 97,
+      },
+      {
+        id: 'pa2',
+        title: 'TPOT: A tool for optimizing machine learning pipelines',
+        authors: 'Olson RS, La Cava W, Orzechowski P et al.',
+        year: 2023,
+        journal: 'Journal of Machine Learning Research',
+        abstract: 'TPOT uses genetic programming to optimize ML pipelines, automatically exploring feature preprocessors, selectors, and estimators...',
+        citations: 1890,
+        relevanceScore: 94,
+      },
     ],
     
-    useCases: [
-      { title: 'Medical Image Classification', domain: 'Healthcare AI', description: 'Train CNN for chest X-ray diagnosis', institution: 'Stanford ML Group', results: '94% AUC on CheXpert' },
-      { title: 'Drug Property Prediction', domain: 'Pharmaceuticals', description: 'Graph neural network for solubility prediction', institution: 'MIT CSAIL', results: 'RMSE improved by 23%' },
-      { title: 'Protein Structure Prediction', domain: 'Structural Biology', description: 'Fine-tune AlphaFold2 for specific families', institution: 'DeepMind', results: 'GDT-TS +5 points on CASP15' }
-    ],
+    features: ['50+ algorithms', 'Auto feature engineering', 'Bayesian optimization', 'Ensemble building', 'SHAP explanations', 'Cross-validation'],
+    useCases: ['Predictive analytics', 'Classification', 'Regression', 'Time series forecasting'],
+    integrations: ['scikit-learn', 'LightGBM', 'XGBoost', 'SHAP', 'Matplotlib'],
     
-    tags: ['deep-learning', 'pytorch', 'distributed-training', 'hyperparameter-optimization', 'mlops'],
-    features: ['Distributed training', 'Mixed precision', 'Auto-augmentation', 'Experiment tracking', 'Model serving'],
-    limitations: ['GPU required for practical use', 'Large models need premium tier'],
+    status: 'stable',
+    lastUpdated: '2024-12-05',
+    version: '3.0.1',
+    tags: ['automl', 'feature-engineering', 'hyperparameter-optimization', 'no-code'],
     
-    author: 'PyTorch Team',
-    authorInstitution: 'Meta AI / Linux Foundation',
-    maintainers: 25,
-    contributors: 267,
-    
-    hasApi: true,
-    hasCli: true,
-    hasNotebook: true,
-    workflowCompatible: ['MLflow', 'Kubeflow', 'Airflow', 'Prefect']
+    hasDemo: true,
+    hasTutorial: true,
+    hasVideoGuide: true,
   },
 
   // ==========================================================================
   // STATISTICS TEMPLATES
   // ==========================================================================
   {
-    id: 'bayesian-inference-stan',
-    name: 'Bayesian Analysis Suite (Stan/R)',
-    slug: 'bayesian-inference-stan',
+    id: 'bayesian-inference-framework',
+    name: 'Bayesian Inference Framework',
+    description: 'Probabilistic programming with MCMC sampling, variational inference, and posterior analysis',
+    longDescription: 'Modern Bayesian inference framework supporting multiple sampling algorithms (HMC, NUTS, variational inference), hierarchical model specification, prior sensitivity analysis, and comprehensive posterior diagnostics. Includes automatic differentiation, GPU-accelerated sampling, convergence diagnostics (R-hat, ESS), and publication-quality visualization of results. Suitable for researchers and practitioners alike.',
     category: 'statistics',
-    subcategory: 'Bayesian Statistics',
-    description: 'Comprehensive Bayesian inference toolkit with Stan backend supporting hierarchical models, MCMC diagnostics, and posterior predictive checks.',
-    longDescription: `This template provides a complete Bayesian analysis environment built on Stan probabilistic programming language with interfaces for R (brms/rstanarm) and Python (CmdStanPy/PyMC). It covers the full Bayesian workflow from prior specification through posterior inference, model checking, and decision-making under uncertainty.
-
-Included are pre-built models for common scientific applications: linear/hierarchical regression, survival analysis, time series (ARIMA/state-space), spatial models (CAR/Gaussian processes), and item response theory. Advanced users can specify custom Stan models with automatic differentiation and HMC/NUTS sampling.
-
-The template emphasizes reproducibility with automatic seed management, convergence diagnostics (R-hat, ESS, divergences), sensitivity analysis tools, and publication-quality posterior visualization including trace plots, pairwise densities, forest plots, and posterior predictive checks.`,
-    icon: <Calculator className="w-6 h-6" />,
-    difficulty: 'advanced',
+    icon: <Calculator className="w-8 h-8" />,
+    difficulty: 'intermediate',
     tier: 'free',
     
-    downloads: 19870,
-    stars: 1456,
-    forks: 389,
-    runs: 34567,
-    lastUpdated: '2026-08-12',
-    version: '3.5.1',
+    oneClickSetup: true,
+    setupTime: '~10 minutes',
+    prerequisites: ['Python 3.9+', 'Basic probability knowledge'],
     
     computeRequirements: {
-      cpu: '2-16 cores',
-      memory: '8-64 GB',
-      storage: '1-50 GB',
-      estimatedTime: '10 min - 48 hours',
-      estimatedCost: { free: '$0', premium: '$0.50-5.00' }
+      cpu: '4+ cores',
+      memory: '16GB RAM',
+      gpu: 'Optional (accelerated sampling)',
+      storage: '5GB',
+      estimatedCost: 'Free (local) / $0.50-2/hour (GPU)',
     },
     
-    supportedFormats: {
-      input: ['CSV', 'TSV', 'RDS', 'Feather', 'JSON'],
-      output: ['PDF', 'HTML', 'RDS', 'CSV', 'PNG', 'Stanfit']
-    },
-    
-    parameters: [
-      { name: 'data_file', type: 'file', description: 'Dataset for analysis', required: true },
-      { name: 'model_type', type: 'select', description: 'Pre-built model type', required: true, options: ['linear-regression', 'logistic', 'hierarchical', 'survival', 'timeseries', 'spatial', 'custom'] },
-      { name: 'outcome_variable', type: 'string', description: 'Dependent variable name', required: true },
-      { name: 'predictors', type: 'array', description: 'Independent variable names', required: true },
-      { name: 'chains', type: 'number', description: 'Number of MCMC chains', required: false, defaultValue: 4 },
-      { name: 'iterations', type: 'number', description: 'Samples per chain', required: false, defaultValue: 2000 },
-      { name: 'priors', type: 'file', description: 'Custom priors specification (optional)', required: false }
+    parameterPresets: [
+      {
+        id: 'standard-bayes',
+        name: 'Standard Bayesian Analysis',
+        description: 'General-purpose MCMC with default priors and diagnostics',
+        category: 'beginner',
+        parameters: { sampler: 'nuts', chains: 4, draws: 2000, tune: 1000, priorScale: 'weakly_informative' },
+        useCase: 'Standard regression, A/B testing, parameter estimation',
+        expectedPerformance: 'Converged samples in 5-30 minutes',
+      },
+      {
+        id: 'hierarchical-model',
+        name: 'Hierarchical Model',
+        description: 'Multi-level models with partial pooling',
+        category: 'advanced',
+        parameters: { sampler: 'nuts', nonCentered: true, adaptDelta: 0.95, maxTreeDepth: 12 },
+        useCase: 'Meta-analysis, grouped data, random effects models',
+        expectedPerformance: 'Complex hierarchies in 30min-2hours',
+      },
+      {
+        id: 'variational-fast',
+        name: 'Variational Inference (Fast)',
+        description: 'Approximate inference for large datasets',
+        category: 'intermediate',
+        parameters: { sampler: 'vi', method: 'advi', iterations: 10000, elboSamples: 100 },
+        useCase: 'Exploratory analysis, large-scale problems, real-time updates',
+        expectedPerformance: 'Approximate posterior in seconds-minutes',
+      },
     ],
+    configurableParameters: 28,
+    
+    bestPractices: [
+      {
+        id: 'bbi-1',
+        title: 'Check Convergence Diagnostics',
+        description: 'Always verify R-hat < 1.01 and effective sample size > 400 per chain before interpreting posteriors.',
+        severity: 'critical',
+        category: 'reproducibility',
+        implementation: 'Automatic diagnostic reporting with visualizations and warnings.',
+      },
+      {
+        id: 'bbi-2',
+        title: 'Perform Prior Predictive Checks',
+        description: 'Simulate data from priors alone to ensure they encode reasonable assumptions about data scale and shape.',
+        severity: 'important',
+        category: 'accuracy',
+        implementation: 'Built-in prior predictive simulation with visualization.',
+      },
+    ],
+    
+    communityContributions: [
+      {
+        id: 'ccb-1',
+        author: 'PyMC Labs',
+        date: '2024-11-10',
+        type: 'extension',
+        title: 'Time Series Components',
+        description: 'State-space models and Gaussian processes for temporal data',
+        stars: 445,
+        downloads: 2300,
+        verified: true,
+      },
+    ],
+    communityRating: 4.7,
+    totalUses: 23450,
+    successRate: '91.8%',
     
     papers: [
       {
-        id: 'paper-stat-001',
-        title: 'Stan: A probabilistic programming language',
-        authors: 'Carpenter B, et al.',
-        year: 2017,
-        journal: 'Journal of Statistical Software',
-        doi: '10.18637/jss.v076.i01',
-        url: '#/papers/stan-2017',
-        citations: 15678,
-        abstract: 'Stan implements full Bayesian statistical inference with MCMC sampling...',
-        relevanceScore: 99
-      },
-      {
-        id: 'paper-stat-002',
-        title: 'The No-U-Turn Sampler',
+        id: 'pb1',
+        title: 'No-U-Turn Sampler: Adaptively Setting Path Lengths in Hamiltonian Monte Carlo',
         authors: 'Hoffman MD, Gelman A',
         year: 2014,
-        journal: 'JMLR',
-        doi: '',
-        url: '#/papers/nuts-2014',
-        citations: 8901,
-        abstract: 'NUTS efficiently explores complex posteriors without manual tuning...',
-        relevanceScore: 95
+        journal: 'Journal of Machine Learning Research',
+        abstract: 'NUTS automatically tunes the number of leapfrog steps in HMC, eliminating the need for manual path length configuration while maintaining efficiency...',
+        citations: 12450,
+        relevanceScore: 99,
       },
       {
-        id: 'paper-stat-003',
-        title: 'brms: An R package for Bayesian multilevel models',
-        authors: 'Bürkner PC',
-        year: 2017,
+        id: 'pb2',
+        title: 'PyMC: A Probabilistic Programming Language',
+        authors: 'Salvatier J, Wiecki TV, Fonnesbeck C',
+        year: 2023,
         journal: 'Journal of Statistical Software',
-        doi: '10.18637/jss.v080.i01',
-        url: '#/papers/brms-2017',
-        citations: 5678,
-        abstract: 'brms makes specifying complex Bayesian models straightforward...',
-        relevanceScore: 89
+        abstract: 'PyMC provides intuitive syntax for specifying Bayesian models, supports gradient-based sampling, and includes extensive diagnostic tools...',
+        citations: 3450,
+        relevanceScore: 96,
       },
-      {
-        id: 'paper-stat-004',
-        title: 'Prior choice recommendations',
-        authors: 'Gelman A, et al.',
-        year: 2020,
-        journal: 'Statistical Science',
-        doi: '10.1214/20-SS131',
-        url: '#/papers/prior-recs-2020',
-        citations: 2345,
-        abstract: 'Practical guidance for prior specification in applied settings...',
-        relevanceScore: 84
-      }
     ],
     
-    resources: [
-      { type: 'tutorial', title: 'Bayesian Thinking Primer', url: '#/tutorials/bayesian-intro', description: 'Conceptual foundations', isFree: true },
-      { type: 'notebook', title: 'Model Comparison Notebook', url: '#/notebooks/bayesian-model-comp', description: 'LOO-CV, WAIC examples', isFree: true },
-      { type: 'dataset', title: 'Example Datasets', url: '#/datasets/bayesian-examples', description: 'Radon, Schools, etc.', isFree: true },
-      { type: 'api-doc', title: 'Stan Language Reference', url: '#/docs/stan-language', description: 'Complete syntax guide', isFree: true },
-      { type: 'video', title: 'Bayesian Workflow Course', url: '#/videos/bayesian-course', description: '12-hour masterclass', isFree: false },
-      { type: 'example', title: 'Clinical Trial Analysis', url: '#/examples/bayesian-trial', description: 'Real trial reanalysis', isFree: true }
-    ],
+    features: ['MCMC sampling', 'Variational inference', 'Hierarchical models', 'Prior predictive checks', 'Convergence diagnostics', 'GPU acceleration'],
+    useCases: ['A/B testing', 'Meta-analysis', 'Causal inference', 'Uncertainty quantification'],
+    integrations: ['ArviZ', 'PyMC', 'Stan', 'TensorFlow Probability'],
     
-    useCases: [
-      { title: 'Clinical Trial Analysis', domain: 'Pharmaceuticals', description: 'Hierarchical model for multi-site efficacy study', institution: 'Pfizer Statistics', results: 'Regulatory submission approved' },
-      { title: 'Ecological Modeling', domain: 'Environmental Science', description: 'Spatial abundance model for species distribution', institution: 'USGS', results: 'Published in Ecology Letters' },
-      { title: 'A/B Testing Framework', domain: 'Technology', description: 'Bayesian A/B test with heterogeneous treatment effects', institution: 'Netflix', results: 'Adopted company-wide' }
-    ],
+    status: 'stable',
+    lastUpdated: '2024-11-30',
+    version: '2.5.0',
+    tags: ['bayesian', 'mcmc', 'probabilistic-programming', 'inference', 'uncertainty'],
     
-    tags: ['bayesian', 'stan', 'mcmc', 'hierarchical-models', 'uncertainty-quantification'],
-    features: ['Automatic diagnostics', 'Prior sensitivity analysis', 'Posterior prediction', 'Model comparison', 'Reproducible seeds'],
-    limitations: ['Computationally intensive', 'Requires statistical expertise'],
-    
-    author: 'Stan Development Team',
-    authorInstitution: 'Columbia University',
-    maintainers: 14,
-    contributors: 156,
-    
-    hasApi: true,
-    hasCli: true,
-    hasNotebook: true,
-    workflowCompatible: ['RMarkdown', 'Quarto', 'Jupyter', 'Nextflow']
+    hasDemo: true,
+    hasTutorial: true,
+    hasVideoGuide: false,
   },
 
   // ==========================================================================
   // VISUALIZATION TEMPLATES
   // ==========================================================================
   {
-    id: 'publication-figures-matplotlib',
-    name: 'Publication-Quality Figures',
-    slug: 'publication-figures-matplotlib',
+    id: 'scientific-dashboard-kit',
+    name: 'Scientific Dashboard Kit',
+    description: 'Publication-quality interactive dashboards with real-time data streaming',
+    longDescription: 'Professional dashboard framework specifically designed for scientific data presentation and exploration. Features responsive layouts optimized for both desktop presentations and mobile viewing, interactive Plotly charts with export options, real-time data streaming via WebSocket, customizable themes matching journal styles (Nature, Science, Cell), and collaborative annotation features. Built with accessibility compliance and keyboard navigation support.',
     category: 'visualization',
-    subcategory: 'Scientific Visualization',
-    description: 'Generate publication-ready figures compliant with Nature, Science, Cell, and journal-specific formatting guidelines.',
-    longDescription: `This template automates the creation of professional scientific figures that meet the strict requirements of high-impact journals. It provides a comprehensive library of plot types commonly used in scientific publications: scatter plots with error bars, heatmaps with annotations, volcano plots, PCA biplots, Kaplan-Meier curves, forest plots, Sankey diagrams, and more.
-
-Each figure type is optimized for clarity, accessibility (colorblind-safe palettes), and reproducibility. The template handles font sizing, DPI settings, color spaces (RGB vs CMYK), and aspect ratios according to target journal specifications. Batch processing allows generating consistent figures across an entire manuscript.
-
-Advanced features include automatic statistical annotations (p-values, significance stars), multi-panel figure assembly with shared axes, vector graphics export (SVG, PDF, EPS), and supplementary material generation. Integration with seaborn, plotly (for interactive web figures), and ggplot2 (via R bridge) ensures compatibility with existing workflows.`,
-    icon: <BarChart3 className="w-6 h-6" />,
+    icon: <BarChart3 className="w-8 h-8" />,
     difficulty: 'beginner',
     tier: 'free',
     
-    downloads: 67890,
-    stars: 3456,
-    forks: 890,
-    runs: 123456,
-    lastUpdated: '2026-08-15',
-    version: '4.0.0',
+    oneClickSetup: true,
+    setupTime: '~5 minutes',
+    prerequisites: ['Web browser', 'Data source (API/CSV/database)'],
     
     computeRequirements: {
-      cpu: '1-4 cores',
-      memory: '2-8 GB',
-      storage: '< 1 GB',
-      estimatedTime: '30 seconds - 10 minutes',
-      estimatedCost: { free: '$0', premium: '$0' }
+      cpu: '2+ cores',
+      memory: '4GB RAM',
+      storage: '1GB',
+      estimatedCost: 'Free (self-hosted) / $5-20/month (managed)',
     },
     
-    supportedFormats: {
-      input: ['CSV', 'TSV', 'Excel', 'JSON', 'Parquet'],
-      output: ['PNG', 'PDF', 'SVG', 'EPS', 'TIFF', 'HTML']
-    },
-    
-    parameters: [
-      { name: 'data_file', type: 'file', description: 'Data to visualize', required: true },
-      { name: 'figure_type', type: 'select', description: 'Type of figure to create', required: true, options: ['scatter', 'bar', 'heatmap', 'volcano', 'boxplot', 'violin', 'survival', 'forest', 'pca', 'sankey', 'manhattan', 'qq'] },
-      { name: 'target_journal', type: 'select', description: 'Target journal for formatting', required: false, options: ['nature', 'science', 'cell', 'lancet', 'nejm', 'plos-one', 'generic', 'custom'] },
-      { name: 'width', type: 'number', description: 'Figure width in inches', required: false, defaultValue: 8 },
-      { name: 'dpi', type: 'number', description: 'Resolution (dots per inch)', required: false, defaultValue: 300 },
-      { name: 'color_palette', type: 'select', description: 'Color scheme', required: false, defaultValue: 'colorblind-safe', options: ['colorblind-safe', 'viridis', 'nature', 'lancet', 'custom'] }
+    parameterPresets: [
+      {
+        id: 'publication-ready',
+        name: 'Publication Ready',
+        description: 'Journal-style dashboard with high-resolution exports',
+        category: 'beginner',
+        parameters: { theme: 'nature', dpi: 300, format: 'vector', fontSize: 12, colorScheme: 'colorblind-safe' },
+        useCase: 'Paper figures, conference presentations, thesis visuals',
+        expectedPerformance: 'Export-ready figures in minutes',
+      },
+      {
+        id: 'monitoring-live',
+        name: 'Live Monitoring Dashboard',
+        description: 'Real-time data streaming with alerts',
+        category: 'intermediate',
+        parameters: { refreshRate: 5, alertThresholds: true, historicalWindow: '24h', annotations: true },
+        useCase: 'Experiment monitoring, sensor data, server metrics',
+        expectedPerformance: 'Sub-second latency, auto-scaling',
+      },
+      {
+        id: 'exploratory-analysis',
+        name: 'Exploratory Analysis',
+        description: 'Feature-rich interface for data exploration',
+        category: 'intermediate',
+        parameters: { interactivity: 'full', linkedBrushing: true, drillDown: true, filters: 'dynamic' },
+        useCase: 'Data discovery, hypothesis generation, EDA',
+        expectedPerformance: 'Millions of points rendered smoothly',
+      },
     ],
+    configurableParameters: 42,
+    
+    bestPractices: [
+      {
+        id: 'bvd-1',
+        title: 'Choose Colorblind-Safe Palettes',
+        description: 'Approximately 8% of men have color vision deficiency. Use viridis, plasma, or Okabe-Ito palettes by default.',
+        severity: 'important',
+        category: 'usability',
+        implementation: 'Built-in accessible color palette selection with preview.',
+      },
+      {
+        id: 'bvd-2',
+        title: 'Label Axes Clearly',
+        description: 'Every axis must have units specified. Include uncertainty indicators where appropriate. Never rely on color alone.',
+        severity: 'critical',
+        category: 'usability',
+        implementation: 'Automatic unit detection and labeling suggestions.',
+      },
+    ],
+    
+    communityContributions: [
+      {
+        id: 'ccv-1',
+        author: 'DataVis Lab MIT',
+        date: '2024-12-02',
+        type: 'plugin',
+        title: '3D Molecular Viewer',
+        description: 'Interactive 3D molecular structure visualization widget',
+        stars: 789,
+        downloads: 4200,
+        verified: true,
+      },
+      {
+        id: 'ccv-2',
+        author: 'Open Source Community',
+        date: '2024-11-18',
+        type: 'improvement',
+        title: 'Dark Mode Enhancement',
+        description: 'Improved dark theme with better contrast ratios',
+        stars: 234,
+        downloads: 1800,
+        verified: true,
+      },
+    ],
+    communityRating: 4.8,
+    totalUses: 67890,
+    successRate: '96.2%',
     
     papers: [
       {
-        id: 'paper-viz-001',
-        title: 'Ten simple rules for better figures',
-        authors: 'Rougier NP, Droettboom M, Bourne PE',
-        year: 2014,
-        journal: 'PLoS Computational Biology',
-        doi: '10.1371/journal.pcbi.1003833',
-        url: '#/papers/ten-rules-figures',
-        citations: 3456,
-        abstract: 'Scientific visualization principles for effective communication...',
-        relevanceScore: 97
+        id: 'pv1',
+        title: 'Plotly.js: High-level declarative charting library',
+        authors: 'Plotly Technologies Inc',
+        year: 2024,
+        journal: 'Journal of Open Source Software',
+        abstract: 'Plotly.js provides high-level interfaces for creating interactive web-based visualizations with support for over 40 chart types...',
+        citations: 3450,
+        relevanceScore: 95,
       },
       {
-        id: 'paper-viz-002',
-        title: 'Perception in data visualization',
-        authors: 'Heer J, Bostock M, Ogievetsky V',
-        year: 2010,
-        journal: 'CG&A',
-        doi: '10.1109/MCG.2010.58',
-        url: '#/papers/perception-viz',
-        citations: 2345,
-        abstract: 'Cognitive foundations for effective visualization design...',
-        relevanceScore: 88
+        id: 'pv2',
+        title: 'Grammar of Graphics for Scientific Visualization',
+        authors: 'Wilke CO',
+        year: 2024,
+        journal: 'Annual Review of Statistics',
+        abstract: 'Systematic approach to building statistical graphics through layered grammatical components, enabling reproducible scientific figures...',
+        citations: 890,
+        relevanceScore: 92,
       },
-      {
-        id: 'paper-viz-003',
-        title: 'Color maps for scientific data',
-        authors: 'Crameri F, Shephard GS, Heron PJ',
-        year: 2020,
-        journal: 'Nature Communications',
-        doi: '10.1038/s41467-020-19170-7',
-        url: '#/papers/colormaps-2020',
-        citations: 1234,
-        abstract: 'Scientifically derived colormaps for accurate data representation...',
-        relevanceScore: 82
-      }
     ],
     
-    resources: [
-      { type: 'tutorial', title: 'Figure Design Principles', url: '#/tutorials/fig-design', description: 'Visual communication basics', isFree: true },
-      { type: 'notebook', title: 'Gallery Notebook', url: '#/notebooks/figure-gallery', description: 'All plot types demonstrated', isFree: true },
-      { type: 'dataset', title: 'Sample Datasets', url: '#/datasets/viz-samples', description: 'Practice data included', isFree: true },
-      { type: 'api-doc', title: 'Plotting API Reference', url: '#/api/plotting', description: 'All options documented', isFree: true },
-      { type: 'video', title: 'Data Viz Masterclass', url: '#/videos/viz-masterclass', description: '8-hour course', isFree: true },
-      { type: 'example', title: 'Nature Figure Templates', url: '#/examples/nature-templates', description: 'Ready-to-use templates', isFree: true }
-    ],
+    features: ['Interactive charts', 'Real-time streaming', 'Journal themes', 'Vector export', 'Collaboration tools', 'Accessibility'],
+    useCases: ['Publications', 'Presentations', 'Monitoring', 'Exploratory analysis', 'Teaching'],
+    integrations: ['Plotly', 'D3.js', 'Observable', 'Streamlit', 'Dash'],
     
-    useCases: [
-      { title: 'Manuscript Figures', domain: 'Academic Publishing', description: 'Generate all figures for Cell paper', institution: 'Harvard Medical School', results: 'Accepted first submission' },
-      { title: 'Conference Poster', domain: 'Scientific Communication', description: 'Create compelling poster visuals', institution: 'MIT', results: 'Best poster award, ASCB 2025' },
-      { title: 'Grant Application', domain: 'Funding', description: 'Professional figures for NIH R01', institution: 'Johns Hopkins', results: 'Funded (percentile 8)' }
-    ],
+    status: 'stable',
+    lastUpdated: '2024-12-08',
+    version: '4.2.0',
+    tags: ['visualization', 'dashboard', 'plotting', 'interactive', 'publication'],
     
-    tags: ['visualization', 'publication', 'matplotlib', 'scientific-figures', 'data-viz'],
-    features: ['Journal presets', 'Colorblind-safe', 'Vector export', 'Batch processing', 'Statistical annotations'],
-    limitations: ['Complex custom layouts need manual adjustment'],
-    
-    author: 'SciViz Team',
-    authorInstitution: 'Open Source Community',
-    maintainers: 8,
-    contributors: 45,
-    
-    hasApi: true,
-    hasCli: false,
-    hasNotebook: true,
-    workflowCompatible: ['Jupyter', 'RMarkdown', 'Quarto', 'Airflow']
+    hasDemo: true,
+    hasTutorial: true,
+    hasVideoGuide: true,
   },
 
   // ==========================================================================
   // QUANTUM COMPUTING TEMPLATES
   // ==========================================================================
   {
-    id: 'quantum-circuit-simulator',
-    name: 'Quantum Circuit Simulator (Qiskit)',
-    slug: 'quantum-circuit-simulator',
+    id: 'quantum-algorithm-simulator',
+    name: 'Quantum Algorithm Simulator',
+    description: 'Hybrid quantum-classical algorithms with Qiskit, PennyLane, and error mitigation',
+    longDescription: 'Comprehensive quantum computing toolkit bridging classical simulation and real quantum hardware access. Implements variational quantum algorithms (VQA, QAOA, VQE), quantum machine learning circuits, quantum Fourier transform, Grover search, and quantum chemistry simulations. Includes noise modeling, error mitigation techniques (zero-noise extrapolation, probabilistic error cancellation), and seamless cloud quantum device integration via IBM Quantum, Amazon Braket, and Google Quantum AI.',
     category: 'quantum-computing',
-    subcategory: 'Quantum Simulation',
-    description: 'Design, simulate, and analyze quantum circuits up to 30 qubits with Qiskit Aer and visualization tools.',
-    longDescription: `This quantum computing template provides a complete environment for developing and testing quantum algorithms before deploying to real hardware. Built on IBM's Qiskit ecosystem, it supports circuit construction, noise simulation, error mitigation, and result analysis for algorithms including Grover search, QAOA, VQE, QFT, and quantum machine learning circuits.
-
-The simulator supports multiple backends: statevector simulation (exact, up to 30 qubits), shot-based simulation (with configurable noise models matching real devices), and stabilizer simulation for Clifford circuits. Advanced features include transpiler optimization passes, pulse-level control simulation, and tensor network methods for larger systems.
-
-Integration with real quantum hardware (IBM Quantum, Rigetti, IonQ) is available for premium users, with job queuing, result caching, and error mitigation post-processing. The template includes educational content covering quantum computing fundamentals through advanced algorithm implementation.`,
-    icon: <Atom className="w-6 h-6" />,
-    difficulty: 'expert',
+    icon: <Atom className="w-8 h-8" />,
+    difficulty: 'advanced',
     tier: 'freemium',
     
-    downloads: 12340,
-    stars: 2345,
-    forks: 567,
-    runs: 23456,
-    lastUpdated: '2026-08-14',
-    version: '2.1.0',
+    oneClickSetup: true,
+    setupTime: '~20 minutes',
+    prerequisites: ['Python 3.10+', 'Basic linear algebra', 'IBM Quantum account (optional)'],
     
     computeRequirements: {
-      cpu: '4-16 cores',
-      memory: '16-128 GB',
-      storage: '5-50 GB',
-      estimatedTime: '1 minute - 24 hours',
-      estimatedCost: { free: 'Up to 10 qubits', premium: '$1.00-20.00' }
+      cpu: '8+ cores',
+      memory: '32GB RAM',
+      gpu: 'Optional (accelerated simulation)',
+      storage: '20GB',
+      estimatedCost: 'Free (simulator) / $1-100/run (real hardware)',
     },
     
-    supportedFormats: {
-      input: ['QASM', 'Python', 'JSON', 'OpenQASM3'],
-      output: ['JSON', 'CSV', 'PNG', 'PDF', 'QASM']
-    },
-    
-    parameters: [
-      { name: 'circuit_definition', type: 'file', description: 'Quantum circuit (QASM or Python)', required: true },
-      { name: 'algorithm', type: 'select', description: 'Pre-built algorithm template', required: false, options: ['grover', 'qaoa', 'vqe', 'qft', 'qpe', 'qml', 'custom'] },
-      { name: 'num_qubits', type: 'number', description: 'Number of qubits (max varies by tier)', required: true },
-      { name: 'backend', type: 'select', description: 'Simulation backend', required: false, defaultValue: 'aer_simulator', options: ['aer_simulator', 'statevector', 'unitary', 'stabilizer'] },
-      { name: 'shots', type: 'number', description: 'Measurement shots', required: false, defaultValue: 1024 },
-      { name: 'noise_model', type: 'select', description: 'Noise model for realistic simulation', required: false, options: ['none', 'ibmq_montreal', 'ibmq_toronto', 'fake_guadalupe', 'custom'] }
+    parameterPresets: [
+      {
+        id: 'vqe-ground-state',
+        name: 'VQE Ground State Finder',
+        description: 'Variational Quantum Eigensolver for molecular ground states',
+        category: 'intermediate',
+        parameters: { ansatz: 'UCCSD', optimizer: 'COBYLA', shots: 8192, errorMitigation: 'zne' },
+        useCase: 'Quantum chemistry, molecular simulation, materials science',
+        expectedPerformance: 'Chemical accuracy (±1 kcal/mol) on simulators',
+      },
+      {
+        id: 'qaoa-optimization',
+        name: 'QAOA Optimization',
+        description: 'Quantum Approximate Optimization Algorithm for combinatorial problems',
+        category: 'advanced',
+        parameters: { layers: 3, mixer: 'x_mixer', initialParams: 'random', penalty: 10 },
+        useCase: 'MaxCut, portfolio optimization, scheduling problems',
+        expectedPerformance: 'Approximation ratio improvement over classical heuristics',
+      },
+      {
+        id: 'grover-search',
+        name: 'Grover Search Tutorial',
+        description: 'Unstructured search algorithm demonstration',
+        category: 'beginner',
+        parameters: { qubits: 4, oracle: 'marked_item', iterations: 'optimal', visualization: true },
+        useCase: 'Learning quantum algorithms, database search concepts',
+        expectedPerformance: 'Quadratic speedup demonstration',
+      },
     ],
+    configurableParameters: 31,
+    
+    bestPractices: [
+      {
+        id: 'bqc-1',
+        title: 'Start with Simulators',
+        description: 'Develop and debug algorithms on noise-free simulators before running on real quantum hardware. Real devices have limited coherence times and high error rates.',
+        severity: 'critical',
+        category: 'performance',
+        implementation: 'Progressive testing workflow: ideal → noisy → real hardware.',
+      },
+      {
+        id: 'bqc-2',
+        title: 'Apply Error Mitigation',
+        description: 'Raw quantum hardware results contain significant errors. Always apply error mitigation techniques (ZNE, PEC, readout error mitigation).',
+        severity: 'critical',
+        category: 'accuracy',
+        implementation: 'Built-in error mitigation suite with automatic technique selection.',
+      },
+    ],
+    
+    communityContributions: [
+      {
+        id: 'ccq-1',
+        author: 'IBM Quantum Community',
+        date: '2024-11-28',
+        type: 'plugin',
+        title: 'Error Mitigation Library',
+        description: 'Comprehensive collection of advanced error mitigation techniques',
+        stars: 1234,
+        downloads: 6700,
+        verified: true,
+      },
+      {
+        id: 'ccq-2',
+        author: 'Pennylane Developers',
+        date: '2024-10-30',
+        type: 'extension',
+        title: 'Quantum Chemistry Extensions',
+        description: 'Additional ansätze and Hamiltonian constructions for complex molecules',
+        stars: 567,
+        downloads: 3200,
+        verified: true,
+      },
+    ],
+    communityRating: 4.6,
+    totalUses: 12340,
+    successRate: '87.5%',
     
     papers: [
       {
-        id: 'paper-qc-001',
-        title: 'Qiskit: An open-source framework for quantum computing',
-        authors: 'Aleksandrowicz G, et al.',
-        year: 2019,
-        journal: 'PhysRevA',
-        doi: '10.1103/PhysRevA.101.032308',
-        url: '#/papers/qiskit-2019',
-        citations: 4567,
-        abstract: 'Qiskit enables programmatic quantum computation...',
-        relevanceScore: 98
+        id: 'pq1',
+        title: 'Quantum Computing in the NISQ era and beyond',
+        authors: 'John Preskill',
+        year: 2018,
+        journal: 'Quantum',
+        doi: '10.22331/q-2018-08-06-79',
+        abstract: 'Analysis of near-term quantum devices (NISQ) and strategies for achieving quantum advantage despite hardware limitations...',
+        citations: 8920,
+        relevanceScore: 99,
       },
       {
-        id: 'paper-qc-002',
-        title: 'Quantum supremacy using a programmable processor',
-        authors: 'Arute F, et al.',
-        year: 2019,
-        journal: 'Nature',
-        doi: '10.1038/s41586-019-1666-5',
-        url: '#/papers/quantum-supremacy',
-        citations: 6789,
-        abstract: 'Demonstration of quantum computational advantage...',
-        relevanceScore: 92
-      },
-      {
-        id: 'paper-qc-003',
-        title: 'Variational quantum eigensolver',
-        authors: 'Peruzzo A, et al.',
+        id: 'pq2',
+        title: 'Variational Quantum Eigensolver: Application to molecular systems',
+        authors: 'Alberto Peruzzo, Jeremy McClean, Peter Shadbolt et al.',
         year: 2014,
         journal: 'Nature Communications',
-        doi: '10.1038/ncomms5213',
-        url: '#/papers/vqe-2014',
-        citations: 3456,
-        abstract: 'Hybrid quantum-classical algorithm for chemistry...',
-        relevanceScore: 87
+        abstract: 'Introduction of VQE algorithm combining quantum and classical computing for finding molecular ground state energies...',
+        citations: 5670,
+        relevanceScore: 97,
       },
       {
-        id: 'paper-qc-004',
-        title: 'Error mitigation extends quantum computability',
-        authors: 'Temme K, Bravyi S, Gambetta JM',
-        year: 2017,
-        journal: 'PRX',
-        doi: '10.1103/PhysRevX.7.021015',
-        url: '#/papers/error-mitigation',
-        citations: 2345,
-        abstract: 'Probabilistic error cancellation techniques...',
-        relevanceScore: 81
-      }
+        id: 'pq3',
+        title: 'Qiskit: An open-source framework for quantum computing',
+        authors: 'Carste Hell, Aleksander Krawiec, Miguel Navias',
+        year: 2024,
+        journal: 'IEEE Transactions on Quantum Engineering',
+        abstract: 'Qiskit provides tools for creating and manipulating quantum programs and running them on prototype quantum devices...',
+        citations: 3450,
+        relevanceScore: 94,
+      },
+    ],
+    researchPortalLink: 'https://quantum-computing.ibm.com',
+    
+    features: ['Multiple backends', 'Noise simulation', 'Error mitigation', 'VQA/QAOA', 'Cloud integration', 'Visualization'],
+    useCases: ['Quantum chemistry', 'Optimization', 'Machine learning', 'Cryptography research'],
+    integrations: ['Qiskit', 'PennyLane', 'Cirq', 'IBM Quantum', 'Amazon Braket'],
+    
+    status: 'beta',
+    lastUpdated: '2024-12-12',
+    version: '1.8.0',
+    tags: ['quantum', 'qiskit', 'vqa', 'nisq', 'hybrid-quantum'],
+    
+    hasDemo: true,
+    hasTutorial: true,
+    hasVideoGuide: true,
+  },
+
+  // ==========================================================================
+  // IMAGE ANALYSIS TEMPLATES
+  // ==========================================================================
+  {
+    id: 'medical-image-segmentation',
+    name: 'Medical Image Segmentation',
+    description: 'Deep learning pipelines for CT/MRI/X-ray analysis with DICOM support',
+    longDescription: 'Production-grade medical image segmentation system supporting multiple modalities (CT, MRI, PET, X-ray, ultrasound). Implements state-of-the-art architectures (nnU-Net, TransUNet, SegFormer) with DICOM/NIFFTI I/O, 3D volumetric processing, multi-organ segmentation, lesion detection, and quantitative analysis. Includes FDA/CE compliance considerations, uncertainty quantification, and radiologist-in-the-loop annotation refinement.',
+    category: 'image-analysis',
+    icon: <ScanLine className="w-8 h-8" />,
+    difficulty: 'advanced',
+    tier: 'premium',
+    
+    oneClickSetup: true,
+    setupTime: '~30 minutes',
+    prerequisites: ['NVIDIA GPU (24GB+)', 'DICOM viewer', 'Medical dataset'],
+    
+    computeRequirements: {
+      cpu: '16+ cores',
+      memory: '64GB RAM',
+      gpu: 'RTX 4090/A100 (24GB+)',
+      storage: '500GB NVMe',
+      estimatedCost: '$10-50/study',
+    },
+    
+    parameterPresets: [
+      {
+        id: 'organ-segmentation',
+        name: 'Multi-Organ Segmentation',
+        description: 'Segment liver, kidneys, spleen, pancreas from abdominal CT',
+        category: 'intermediate',
+        parameters: { architecture: 'nnunet', modality: 'ct', organs: ['liver', 'kidney', 'spleen'], resolution: '1x1x1mm' },
+        useCase: 'Surgical planning, organ volume measurement, radiotherapy',
+        expectedPerformance: 'Dice >0.95 for major organs',
+      },
+      {
+        id: 'tumor-detection',
+        name: 'Tumor Detection & Segmentation',
+        description: 'Detect and segment tumors with malignancy assessment',
+        category: 'advanced',
+        parameters: { architecture: 'transunet', task: 'detection_segmentation', uncertainty: true, ensemble: true },
+        useCase: 'Oncology, cancer screening, treatment response monitoring',
+        expectedPerformance: 'Sensitivity >90%, False positive rate <2/film',
+      },
+      {
+        id: 'quick-triage',
+        name: 'Quick Triage Tool',
+        description: 'Rapid abnormality detection for emergency settings',
+        category: 'beginner',
+        parameters: { architecture: 'efficientnet', task: 'classification', inference: 'optimized', threshold: 'high_sensitivity' },
+        useCase: 'Emergency radiology, resource-limited settings, screening',
+        expectedPerformance: '<2 seconds per scan, sensitivity >95%',
+      },
+    ],
+    configurableParameters: 45,
+    
+    bestPractices: [
+      {
+        id: 'bmi-1',
+        title: 'Maintain Data Privacy Compliance',
+        description: 'Medical images contain PHI. Ensure HIPAA/GDPR compliance with encryption, access logging, and de-identification.',
+        severity: 'critical',
+        category: 'security',
+        implementation: 'Built-in DICOM anonymization and encrypted storage.',
+      },
+      {
+        id: 'bmi-2',
+        title: 'Validate Against Expert Annotations',
+        description: 'Model outputs should be validated by board-certified radiologists before clinical use. Include inter-rater reliability metrics.',
+        severity: 'critical',
+        category: 'accuracy',
+        implementation: 'Annotation review workflow with disagreement flagging.',
+      },
+      {
+        id: 'bmi-3',
+        title: 'Report Uncertainty',
+        description: 'Medical AI should communicate prediction uncertainty. Low-confidence regions need human review.',
+        severity: 'important',
+        category: 'usability',
+        implementation: 'Monte Carlo dropout uncertainty maps with threshold alerts.',
+      },
     ],
     
-    resources: [
-      { type: 'tutorial', title: 'Quantum Computing 101', url: '#/tutorials/qc-intro', description: 'From qubits to algorithms', isFree: true },
-      { type: 'notebook', title: 'Algorithm Implementations', url: '#/notebooks/quantum-algos', description: 'Grover, Shor, QAOA...', isFree: true },
-      { type: 'dataset', title: 'Test Circuits', url: '#/datasets/quantum-tests', description: 'Benchmark circuits', isFree: true },
-      { type: 'api-doc', title: 'Qiskit API Reference', url: '#/docs/qiskit-api', description: 'Full documentation', isFree: true },
-      { type: 'video', title: 'IBM Quantum Course', url: '#/videos/ibm-quantum-course', description: '20-hour certification', isFree: false },
-      { type: 'example', title: 'Chemistry Simulation', url: '#/examples/quantum-chemistry', description: 'VQE for H2 molecule', isFree: true }
+    communityContributions: [
+      {
+        id: 'ccm-1',
+        author: 'Radiology AI Lab Cambridge',
+        date: '2024-11-22',
+        type: 'plugin',
+        title: 'Radiology Report Generator',
+        description: 'Automated finding description and report drafting assistance',
+        stars: 1456,
+        downloads: 7800,
+        verified: true,
+      },
+      {
+        id: 'ccm-2',
+        author: 'Open Health Imaging',
+        date: '2024-10-18',
+        type: 'extension',
+        title: 'Longitudinal Analysis Module',
+        description: 'Track changes across multiple timepoints for treatment monitoring',
+        stars: 678,
+        downloads: 3400,
+        verified: true,
+      },
+    ],
+    communityRating: 4.8,
+    totalUses: 18900,
+    successRate: '90.2%',
+    
+    papers: [
+      {
+        id: 'pm1',
+        title: 'nnU-Net: A self-configuring method for deep learning-based biomedical image segmentation',
+        authors: 'Fabian Isensee, Paul F Jaeger, Simon AA Kohl et al.',
+        year: 2023,
+        journal: 'Nature Methods',
+        doi: '10.1038/s41592-020-01008-z',
+        abstract: 'nnU-Net automatically configures preprocessing, architecture, and training process for any biomedical segmentation task without manual tuning...',
+        citations: 12340,
+        relevanceScore: 99,
+      },
+      {
+        id: 'pm2',
+        title: 'TransUNet: Transformers Make Strong Encoders for Medical Image Segmentation',
+        authors: 'Jieneng Chen, Yongjie Lu, Qihang Yu et al.',
+        year: 2021,
+        journal: 'arXiv preprint',
+        abstract: 'TransUNet leverages both CNN and Transformer advantages for medical image segmentation, achieving state-of-the-art on multiple benchmarks...',
+        citations: 3450,
+        relevanceScore: 96,
+      },
+    ],
+    researchPortalLink: 'https://www.cancer.gov/research/infrastructure',
+    
+    features: ['DICOM/NIFFTI support', '3D segmentation', 'Multi-organ', 'Uncertainty quantification', 'FDA considerations', 'Radiologist workflow'],
+    useCases: ['Diagnostic aid', 'Treatment planning', 'Clinical trials', 'Research'],
+    integrations: ['OHIF Viewer', '3D Slicer', 'DICOMweb', 'PACS'],
+    
+    status: 'stable',
+    lastUpdated: '2024-12-14',
+    version: '3.1.0',
+    tags: ['medical-imaging', 'segmentation', 'deep-learning', 'dicom', 'healthcare-ai'],
+    
+    hasDemo: true,
+    hasTutorial: true,
+    hasVideoGuide: true,
+  },
+
+  // ==========================================================================
+  // NLP TEMPLATES
+  // ==========================================================================
+  {
+    id: 'scientific-document-processor',
+    name: 'Scientific Document Processor',
+    description: 'PDF parsing, entity extraction, summarization, and literature analysis pipeline',
+    longDescription: 'Intelligent document understanding system tailored for scientific literature. Handles PDF extraction with equation preservation, named entity recognition (genes, diseases, chemicals, drugs), relationship extraction, automatic summarization, citation network analysis, and systematic review assistance. Supports bulk processing of entire paper collections with deduplication, topic modeling, and evidence synthesis capabilities.',
+    category: 'nlp',
+    icon: <FileText className="w-8 h-8" />,
+    difficulty: 'intermediate',
+    tier: 'free',
+    
+    oneClickSetup: true,
+    setupTime: '~10 minutes',
+    prerequisites: ['PDF documents', 'Python 3.9+'],
+    
+    computeRequirements: {
+      cpu: '8+ cores',
+      memory: '16GB RAM',
+      gpu: 'Optional (GPU acceleration)',
+      storage: '50GB',
+      estimatedCost: 'Free (local) / $2-10/1000 docs (cloud)',
+    },
+    
+    parameterPresets: [
+      {
+        id: 'literature-review',
+        name: 'Literature Review Assistant',
+        description: 'Extract key findings, methods, and relationships from paper collections',
+        category: 'intermediate',
+        parameters: { extractEntities: true, summarize: true, buildNetwork: true, outputFormat: 'structured_json' },
+        useCase: 'Systematic reviews, meta-analyses, grant writing background',
+        expectedPerformance: 'Process 100 papers/hour with structured output',
+      },
+      {
+        id: 'clinical-extraction',
+        name: 'Clinical Text Extraction',
+        description: 'HIPAA-aware extraction from clinical notes and EHR data',
+        category: 'advanced',
+        parameters: { entities: ['medication', 'diagnosis', 'procedure', 'dosage'], deidentify: true, snomedMapping: true },
+        useCase: 'Clinical research, pharmacovigilance, outcomes research',
+        expectedPerformance: 'F1 >0.85 on clinical NER tasks',
+      },
+      {
+        id: 'quick-summarize',
+        name: 'Quick Summarizer',
+        description: 'Generate concise summaries of individual papers',
+        category: 'beginner',
+        parameters: { summaryLength: 'abstract', extractKeyPoints: true, highlightNovelty: true },
+        useCase: 'Keeping up with literature, paper triage, reading groups',
+        expectedPerformance: 'Summarize paper in <10 seconds',
+      },
+    ],
+    configurableParameters: 32,
+    
+    bestPractices: [
+      {
+        id: 'bnlp-1',
+        title: 'Verify Extracted Entities',
+        description: 'NER models make errors. Always spot-check extracted entities, especially for critical applications like clinical decision support.',
+        severity: 'critical',
+        category: 'accuracy',
+        implementation: 'Confidence score filtering with low-confidence highlighting.',
+      },
+      {
+        id: 'bnlp-2',
+        title: 'Handle PDF Extraction Errors',
+        description: 'Scientific PDFs often have complex layouts, two-column formats, and embedded equations. Use specialized parsers and verify extraction quality.',
+        severity: 'important',
+        category: 'performance',
+        implementation: 'Multi-parser fallback strategy with quality scoring.',
+      },
     ],
     
-    useCases: [
-      { title: 'Algorithm Prototyping', domain: 'Quantum Research', description: 'Develop new variational algorithms', institution: 'MIT IQC', results: 'Published in PRX Quantum' },
-      { title: 'Education Platform', domain: 'Teaching', description: 'Hands-on quantum lab for students', institution: 'UC Berkeley', results: '500+ students trained' },
-      { title: 'Hybrid Algorithm Testing', domain: 'Industry', description: 'QAOA for portfolio optimization', institution: 'Goldman Sachs', results: 'Proof-of-concept successful' }
+    communityContributions: [
+      {
+        id: 'ccn-1',
+        author: 'Allen Institute for AI',
+        date: '2024-11-15',
+        type: 'plugin',
+        title: 'Semantic Scholar Integration',
+        description: 'Direct link to Semantic Scholar API for enhanced metadata and citations',
+        stars: 890,
+        downloads: 5600,
+        verified: true,
+      },
+      {
+        id: 'ccn-2',
+        author: 'Open Research Community',
+        date: '2024-10-25',
+        type: 'use-case',
+        title: 'Citation Graph Builder',
+        description: 'Build and visualize citation networks from paper collections',
+        stars: 456,
+        downloads: 2800,
+        verified: false,
+      },
+    ],
+    communityRating: 4.7,
+    totalUses: 34560,
+    successRate: '92.4%',
+    
+    papers: [
+      {
+        id: 'pn1',
+        title: 'BioBERT: Pre-trained biomedical language representation model for biomedical text mining',
+        authors: 'Jinhyuk Lee, Wonjin Yoon, Sungdong Kim et al.',
+        year: 2023,
+        journal: 'Bioinformatics',
+        abstract: 'BioBERT is a domain-specific BERT pre-trained on PubMed abstracts and PMC articles, achieving state-of-the-art on biomedical NER and RE tasks...',
+        citations: 6780,
+        relevanceScore: 98,
+      },
+      {
+        id: 'pn2',
+        title: 'LayoutLM: Pre-training of text and layout for document understanding',
+        authors: 'Yihuan Xu, Minghao Li, Lei Cui et al.',
+        year: 2024,
+        journal: 'IEEE TPAMI',
+        abstract: 'LayoutLM incorporates 2D layout information into pre-training, enabling understanding of document structure for form and receipt understanding...',
+        citations: 3450,
+        relevanceScore: 94,
+      },
+    ],
+    researchPortalLink: 'https://www.semanticscholar.org',
+    
+    features: ['PDF parsing', 'Entity extraction', 'Summarization', 'Citation analysis', 'Topic modeling', 'Bulk processing'],
+    useCases: ['Literature reviews', 'Clinical NLP', 'Patent analysis', 'Grant writing'],
+    integrations: ['PubMed', 'Semantic Scholar', 'Zotero', 'Overleaf'],
+    
+    status: 'stable',
+    lastUpdated: '2024-12-06',
+    version: '2.3.0',
+    tags: ['nlp', 'document-understanding', 'scientific-literature', 'entity-recognition', 'summarization'],
+    
+    hasDemo: true,
+    hasTutorial: true,
+    hasVideoGuide: false,
+  },
+
+  // ==========================================================================
+  // SIGNAL PROCESSING TEMPLATES
+  // ==========================================================================
+  {
+    id: 'time-series-analyzer',
+    name: 'Time Series Analyzer',
+    description: 'Spectral analysis, filtering, forecasting, and anomaly detection for sequential data',
+    longDescription: 'Comprehensive time series analysis toolbox covering the complete signal processing pipeline. Features spectral analysis (FFT, wavelet, Hilbert-Huang transform), digital filtering (Butterworth, Kalman, Savitzky-Golay), forecasting (ARIMA, Prophet, Neural Prophet, Temporal Fusion Transformer), change point detection, anomaly detection, and signal classification. Designed for both stationary and non-stationary signals with missing data imputation and irregular sampling support.',
+    category: 'signal-processing',
+    icon: <Activity className="w-8 h-8" />,
+    difficulty: 'intermediate',
+    tier: 'free',
+    
+    oneClickSetup: true,
+    setupTime: '~8 minutes',
+    prerequisites: ['Time series data', 'Python 3.8+'],
+    
+    computeRequirements: {
+      cpu: '4+ cores',
+      memory: '8GB RAM',
+      gpu: 'Optional (neural forecasting)',
+      storage: '10GB',
+      estimatedCost: 'Free (local) / $1-5/hour (cloud)',
+    },
+    
+    parameterPresets: [
+      {
+        id: 'forecasting-basic',
+        name: 'Forecasting Starter',
+        description: 'Quick forecasting with automatic model selection',
+        category: 'beginner',
+        parameters: { horizon: 30, frequency: 'auto', seasonality: 'auto', model: 'auto' },
+        useCase: 'Sales forecasting, demand planning, resource allocation',
+        expectedPerformance: 'Baseline forecast in <5 minutes',
+      },
+      {
+        id: 'anomaly-detection',
+        name: 'Anomaly Detection System',
+        description: 'Identify outliers, change points, and unusual patterns',
+        category: 'intermediate',
+        parameters: { methods: ['isolation_forest', 'statistical', 'ml_based'], sensitivity: 0.95, windowSize: 'adaptive' },
+        useCase: 'IoT monitoring, fraud detection, equipment failure prediction',
+        expectedPerformance: 'F1 >0.9 on labeled anomalies',
+      },
+      {
+        id: 'spectral-analysis',
+        name: 'Spectral Analysis Suite',
+        description: 'Frequency-domain analysis with advanced decompositions',
+        category: 'advanced',
+        parameters: { methods: ['fft', 'wavelet', 'stft'], detrend: true, window: 'kaiser', overlap: 0.75 },
+        useCase: 'Vibration analysis, EEG/ECG processing, audio analysis',
+        expectedPerformance: 'Publication-ready spectrograms and spectra',
+      },
+    ],
+    configurableParameters: 38,
+    
+    bestPractices: [
+      {
+        id: 'bsp-1',
+        title: 'Check Stationarity Assumptions',
+        description: 'Many time series methods assume stationarity. Test with ADF/KPSS tests and apply differencing or transformations if needed.',
+        severity: 'critical',
+        category: 'accuracy',
+        implementation: 'Automatic stationarity testing with recommended transformations.',
+      },
+      {
+        id: 'bsp-2',
+        title: 'Avoid Data Leakage',
+        description: 'When forecasting, never use future information. Use proper train/test splits respecting temporal order.',
+        severity: 'critical',
+        category: 'reproducibility',
+        implementation: 'Temporal cross-validation with forward chaining.',
+      },
     ],
     
-    tags: ['quantum-computing', 'qiskit', 'quantum-algorithms', 'simulation', 'variational'],
-    features: ['Multiple backends', 'Noise simulation', 'Error mitigation', 'Hardware integration', 'Visualization'],
-    limitations: ['Classical exponential scaling', 'Real hardware requires queue time'],
+    communityContributions: [
+      {
+        id: 'ccs-1',
+        author: 'Signal Processing Community',
+        date: '2024-11-20',
+        type: 'plugin',
+        title: 'EEG Analysis Toolkit',
+        description: 'Specialized tools for brain signal processing and ERP analysis',
+        stars: 678,
+        downloads: 3500,
+        verified: true,
+      },
+    ],
+    communityRating: 4.6,
+    totalUses: 28900,
+    successRate: '91.7%',
     
-    author: 'IBM Quantum Team',
-    authorInstitution: 'IBM Research',
-    maintainers: 20,
-    contributors: 178,
+    papers: [
+      {
+        id: 'ps1',
+        title: 'Forecasting at Scale',
+        authors: 'Sean J Taylor, Benjamin Letham',
+        year: 2023,
+        journal: 'The American Statistician',
+        abstract: 'Prophet is a procedure for forecasting time series data based on additive model where trends fit with piecewise linear/logistic growth...',
+        citations: 5670,
+        relevanceScore: 96,
+      },
+      {
+        id: 'ps2',
+        title: 'Temporal Fusion Transformers for interpretable multi-horizon time series forecasting',
+        authors: 'Bryan Lim, Sercan Ö Arık, Nicolas Loeff et al.',
+        year: 2024,
+        journal: 'International Journal of Forecasting',
+        abstract: 'TFT is an attention-based architecture providing high performance for multi-horizon forecasts with interpretable insights into temporal dynamics...',
+        citations: 2340,
+        relevanceScore: 94,
+      },
+    ],
     
-    hasApi: true,
-    hasCli: true,
-    hasNotebook: true,
-    workflowCompatible: ['Qiskit Patterns', 'Pennington', 'Braket SDK']
-  }
+    features: ['Spectral analysis', 'Digital filtering', 'Forecasting', 'Anomaly detection', 'Change point detection', 'Decomposition'],
+    useCases: ['Finance', 'IoT', 'Healthcare monitoring', 'Manufacturing', 'Climate science'],
+    integrations: ['statsmodels', 'Prophet', 'PyWavelets', 'scikit-learn'],
+    
+    status: 'stable',
+    lastUpdated: '2024-12-03',
+    version: '2.8.0',
+    tags: ['time-series', 'signal-processing', 'forecasting', 'anomaly-detection', 'spectral'],
+    
+    hasDemo: true,
+    hasTutorial: true,
+    hasVideoGuide: false,
+  },
 ];
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+
+export default function TemplateGalleryPage() {
+  // State Management
+  const [selectedCategory, setSelectedCategory] = useState<TemplateCategory | 'all'>('all');
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateData | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showPapers, setShowPapers] = useState<string | null>(null);
+  const [showPresets, setShowPresets] = useState<string | null>(null);
+  const [showBestPractices, setShowBestPractices] = useState<string | null>(null);
+  const [showCommunity, setShowCommunity] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [activeTab, setActiveTab] = useState<'overview' | 'papers' | 'presets' | 'community' | 'practices'>('overview');
+  const [filterTier, setFilterTier] = useState<'all' | 'free' | 'freemium' | 'premium'>('all');
+  const [filterDifficulty, setFilterDifficulty] = useState<'all' | TemplateData['difficulty']>('all');
+
+  // Scroll handler - uses SCROLL_THRESHOLD_PX constant for consistency
+  const handleScroll = useCallback(() => {
+    setShowScrollTop(window.scrollY > SCROLL_THRESHOLD_PX);
+  }, []);
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('scroll', handleScroll);
+  }
+
+  // Filter templates
+  const filteredTemplates = useMemo(() => {
+    return templates.filter(template => {
+      const matchesCategory = selectedCategory === 'all' || template.category === selectedCategory;
+      const matchesSearch = searchQuery === '' || 
+        template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        template.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        template.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+      const matchesTier = filterTier === 'all' || template.tier === filterTier;
+      const matchesDifficulty = filterDifficulty === 'all' || template.difficulty === filterDifficulty;
+      
+      return matchesCategory && matchesSearch && matchesTier && matchesDifficulty;
+    });
+  }, [selectedCategory, searchQuery, filterTier, filterDifficulty]);
+
+  // Stats calculations
+  const stats = useMemo(() => ({
+    total: templates.length,
+    free: templates.filter(t => t.tier === 'free').length,
+    premium: templates.filter(t => t.tier === 'premium').length,
+    totalUses: templates.reduce((acc, t) => acc + t.totalUses, 0),
+    avgRating: (templates.reduce((acc, t) => acc + t.communityRating, 0) / templates.length).toFixed(1),
+  }), []);
+
+  // Copy to clipboard handler
+  const copyToClipboard = async (text: string, id: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  // Scroll to top
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Navigate to home/dashboard (these would be props in real app)
+  const navigateToHome = () => {
+    window.location.hash = '#landing';
+    };
+    
+  const navigateToDashboard = () => {
+    window.location.hash = '#dashboard';
+  };
+
+  // Get category color classes
+  const getCategoryColor = (category: TemplateCategory) => {
+    const cat = categories.find(c => c.id === category);
+    return cat?.gradient || 'from-gray-500 to-gray-600';
+  };
+
+  // Get tier badge
+  const TierBadge = ({ tier }: { tier: TemplateData['tier'] }) => {
+    switch (tier) {
+      case 'free':
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+            <Gift className="w-3 h-3" />
+            Free
+          </span>
+        );
+      case 'freemium':
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-500 border border-blue-500/20">
+            <Unlock className="w-3 h-3" />
+            Freemium
+          </span>
+        );
+      case 'premium':
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-500 border border-amber-500/20">
+            <Crown className="w-3 h-3" />
+            Premium
+          </span>
+        );
+    }
+  };
+
+  // Get difficulty badge
+  const DifficultyBadge = ({ difficulty }: { difficulty: TemplateData['difficulty'] }) => {
+    const colors = {
+      beginner: 'bg-green-500/10 text-green-500 border-green-500/20',
+      intermediate: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
+      advanced: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
+      expert: 'bg-red-500/10 text-red-500 border-red-500/20',
+    };
+    
+    return (
+      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${colors[difficulty]}`}>
+        {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+      </span>
+    );
+  };
+
+  // Get status badge
+  const StatusBadge = ({ status }: { status: TemplateData['status'] }) => {
+    switch (status) {
+      case 'stable':
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-500">
+            <CheckCircle2 className="w-3 h-3" />
+            Stable
+          </span>
+        );
+      case 'beta':
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-500">
+            <RadioIcon className="w-3 h-3" />
+            Beta
+          </span>
+        );
+      case 'experimental':
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-purple-500/10 text-purple-500">
+            <FlaskConical className="w-3 h-3" />
+            Experimental
+          </span>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* ================================================================== */}
+      {/* HERO SECTION */}
+      {/* ================================================================== */}
+      <section className="relative overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-primary/5" />
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse delay-1000" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-primary/5 to-transparent rounded-full blur-3xl" />
+        </div>
+
+        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20">
+          {/* Navigation Buttons */}
+          <div className="flex flex-wrap items-center justify-between mb-8 gap-4">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={navigateToHome}
+                className="gap-2 hover:bg-primary/10"
+              >
+                <Home className="w-4 h-4" />
+                Home
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={navigateToDashboard}
+                className="gap-2 hover:bg-primary/10"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                Dashboard
+              </Button>
+            </div>
+            
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Layers className="w-4 h-4" />
+              <span>Template Gallery</span>
+              <ChevronRight className="w-4 h-4" />
+              <span className="text-foreground font-medium">Common Analysis</span>
+            </div>
+          </div>
+
+          {/* Hero Content */}
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-primary">Community Curated Templates</span>
+              <BadgeCheck className="w-4 h-4 text-primary" />
+            </div>
+            
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
+              Template Gallery for<br />Common Analysis
+            </h1>
+            
+            <p className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
+              Production-ready computational templates with 
+              <span className="text-primary font-semibold"> one-click setup</span>, 
+              <span className="text-primary font-semibold"> parameter presets</span>, and 
+              <span className="text-primary font-semibold"> embedded best practices</span>. 
+              Curated by researchers, for researchers.
+            </p>
+
+            {/* Key Highlights */}
+            <div className="flex flex-wrap items-center justify-center gap-4 mb-10">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-card border shadow-sm">
+                <Zap className="w-5 h-5 text-yellow-500" />
+                <span className="font-semibold">{stats.total}</span>
+                <span className="text-sm text-muted-foreground">Templates</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-card border shadow-sm">
+                <Gift className="w-5 h-5 text-emerald-500" />
+                <span className="font-semibold">{stats.free}</span>
+                <span className="text-sm text-muted-foreground">Free</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-card border shadow-sm">
+                <Users className="w-5 h-5 text-blue-500" />
+                <span className="font-semibold">{(parseInt(stats.totalUses) / 1000).toFixed(0)}K+</span>
+                <span className="text-sm text-muted-foreground">Uses</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-card border shadow-sm">
+                <Star className="w-5 h-5 text-amber-500" />
+                <span className="font-semibold">{stats.avgRating}</span>
+                <span className="text-sm text-muted-foreground">Avg Rating</span>
+              </div>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <Button size="lg" className="gap-2 gradient-bg text-white border-0 px-8" onClick={() => document.getElementById('templates-grid')?.scrollIntoView({ behavior: 'smooth' })}>
+                <Grid3X3 className="w-5 h-5" />
+                Browse Templates
+              </Button>
+              <Button size="lg" variant="outline" className="gap-2 px-8">
+                <BookOpen className="w-5 h-5" />
+                View Documentation
+              </Button>
+              <Button size="lg" variant="ghost" className="gap-2 text-primary">
+                <Puzzle className="w-5 h-5" />
+                Submit Plugin
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================== */}
+      {/* CATEGORY SHOWCASE */}
+      {/* ================================================================== */}
+      <section className="py-16 border-y bg-card/50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Analysis Categories</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Explore templates across diverse computational domains, from bioinformatics to quantum computing
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {categories.map((category) => (
+              <button
+                key={category.id}
+                onClick={() => {
+                  setSelectedCategory(category.id);
+                  document.getElementById('templates-grid')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className={`group relative p-6 rounded-2xl border transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
+                  selectedCategory === category.id
+                    ? 'border-primary bg-primary/5 shadow-md'
+                    : 'border-border bg-card hover:border-primary/50'
+                }`}
+              >
+                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${category.gradient} flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform`}>
+                  {category.icon}
+                </div>
+                <h3 className="font-semibold text-sm mb-1">{category.name}</h3>
+                <p className="text-xs text-muted-foreground">{category.templateCount} templates</p>
+                
+                {selectedCategory === category.id && (
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                    <CheckCircle2 className="w-4 h-4 text-primary-foreground" />
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================== */}
+      {/* SEARCH & FILTER BAR */}
+      {/* ================================================================== */}
+      <section id="templates-grid" className="py-8 sticky top-16 z-40 bg-background/95 backdrop-blur border-b">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4">
+            {/* Search */}
+            <div className="relative flex-1 w-full lg:max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search templates, tags, use cases..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border bg-card focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+              />
+            </div>
+
+            {/* Filters */}
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Tier Filter */}
+              <select
+                value={filterTier}
+                onChange={(e) => setFilterTier(e.target.value as typeof filterTier)}
+                className="px-3 py-2 rounded-lg border bg-card text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+              >
+                <option value="all">All Tiers</option>
+                <option value="free">🎁 Free</option>
+                <option value="freemium">🔓 Freemium</option>
+                <option value="premium">👑 Premium</option>
+              </select>
+
+              {/* Difficulty Filter */}
+              <select
+                value={filterDifficulty}
+                onChange={(e) => setFilterDifficulty(e.target.value as typeof filterDifficulty)}
+                className="px-3 py-2 rounded-lg border bg-card text-sm focus:ring-2 focus:ring-primary/20 outline-none"
+              >
+                <option value="all">All Levels</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+                <option value="expert">Expert</option>
+              </select>
+
+              {/* View Toggle */}
+              <div className="flex items-center border rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-2 ${viewMode === 'grid' ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'}`}
+                >
+                  <Grid3X3 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-2 ${viewMode === 'list' ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'}`}
+                >
+                  <List className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Results Count */}
+              <span className="text-sm text-muted-foreground">
+                {filteredTemplates.length} templates found
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================== */}
+      {/* TEMPLATES GRID/LIST */}
+      {/* ================================================================== */}
+      <section className="py-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          {filteredTemplates.length === 0 ? (
+            <div className="text-center py-20">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-muted flex items-center justify-center">
+                <Search className="w-10 h-10 text-muted-foreground" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">No templates found</h3>
+              <p className="text-muted-foreground mb-4">Try adjusting your search or filter criteria</p>
+              <Button variant="outline" onClick={() => { setSearchQuery(''); setSelectedCategory('all'); setFilterTier('all'); setFilterDifficulty('all'); }}>
+                Clear all filters
+              </Button>
+            </div>
+          ) : viewMode === 'grid' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {filteredTemplates.map((template) => (
+                <TemplateCard
+                  key={template.id}
+                  template={template}
+                  onSelect={() => setSelectedTemplate(template)}
+                  getCategoryColor={getCategoryColor}
+                  TierBadge={TierBadge}
+                  DifficultyBadge={DifficultyBadge}
+                  StatusBadge={StatusBadge}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredTemplates.map((template) => (
+                <TemplateListItem
+                  key={template.id}
+                  template={template}
+                  onSelect={() => setSelectedTemplate(template)}
+                  getCategoryColor={getCategoryColor}
+                  TierBadge={TierBadge}
+                  DifficultyBadge={DifficultyBadge}
+                  StatusBadge={StatusBadge}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ================================================================== */}
+      {/* TEMPLATE DETAIL MODAL */}
+      {/* ================================================================== */}
+      {selectedTemplate && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSelectedTemplate(null)} />
+          
+          <div className="relative min-h-screen flex items-start justify-center p-4 pt-20">
+            <div className="relative w-full max-w-5xl bg-card rounded-2xl border shadow-2xl overflow-hidden">
+              {/* Modal Header */}
+              <div className={`bg-gradient-to-r ${getCategoryColor(selectedTemplate.category)} p-8 text-white relative`}>
+                <button
+                  onClick={() => setSelectedTemplate(null)}
+                  className="absolute top-4 right-4 p-2 rounded-lg bg-black/20 hover:bg-black/30 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                
+                <button
+                  onClick={() => {
+                    /* Maximize functionality */
+                  }}
+                  className="absolute top-4 right-14 p-2 rounded-lg bg-black/20 hover:bg-black/30 transition-colors"
+                >
+                  <Maximize2 className="w-5 h-5" />
+                </button>
+
+                <div className="flex items-start gap-6">
+                  <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
+                    {selectedTemplate.icon}
+                  </div>
+                  
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <TierBadge tier={selectedTemplate.tier} />
+                      <DifficultyBadge difficulty={selectedTemplate.difficulty} />
+                      <StatusBadge status={selectedTemplate.status} />
+                    </div>
+                    
+                    <h2 className="text-2xl font-bold mb-2">{selectedTemplate.name}</h2>
+                    <p className="text-white/90 leading-relaxed">{selectedTemplate.description}</p>
+                    
+                    <div className="flex items-center gap-6 mt-4 text-sm text-white/80">
+                      <div className="flex items-center gap-1">
+                        <Star className="w-4 h-4 fill-current text-yellow-300" />
+                        <span>{selectedTemplate.communityRating}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Users className="w-4 h-4" />
+                        <span>{(selectedTemplate.totalUses / 1000).toFixed(1)}K uses</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>{selectedTemplate.successRate} success rate</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-4 h-4" />
+                        <span>Setup: {selectedTemplate.setupTime}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tab Navigation */}
+              <div className="border-b">
+                <nav className="flex overflow-x-auto">
+                  {[
+                    { id: 'overview', label: 'Overview', icon: <Eye className="w-4 h-4" /> },
+                    { id: 'papers', label: `Papers (${selectedTemplate.papers.length})`, icon: <BookOpen className="w-4 h-4" /> },
+                    { id: 'presets', label: `Presets (${selectedTemplate.parameterPresets.length})`, icon: <Settings className="w-4 h-4" /> },
+                    { id: 'community', label: `Community (${selectedTemplate.communityContributions.length})`, icon: <Users className="w-4 h-4" /> },
+                    { id: 'practices', label: `Best Practices (${selectedTemplate.bestPractices.length})`, icon: <Shield className="w-4 h-4" /> },
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                      className={`flex items-center gap-2 px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
+                        activeTab === tab.id
+                          ? 'border-primary text-primary'
+                          : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+                      }`}
+                    >
+                      {tab.icon}
+                      {tab.label}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+
+              {/* Tab Content */}
+              <div className="p-8 max-h-[60vh] overflow-y-auto">
+                {activeTab === 'overview' && (
+                  <div className="space-y-8">
+                    {/* One-Click Setup Banner */}
+                    {selectedTemplate.oneClickSetup && (
+                      <div className="p-6 rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20">
+                        <div className="flex items-start gap-4">
+                          <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+                            <Rocket className="w-6 h-6 text-primary" />
+                          </div>
+                          
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
+                              One-Click Setup Available
+                              <BadgeCheck className="w-5 h-5 text-primary" />
+                            </h3>
+                            <p className="text-muted-foreground mb-4">
+                              Get started in {selectedTemplate.setupTime} with automated environment setup, dependency installation, and example data loading.
+                            </p>
+                            
+                            <div className="flex flex-wrap gap-3">
+                              <Button className="gap-2 gradient-bg text-white border-0">
+                                <Play className="w-4 h-4" />
+                                Launch Template
+                              </Button>
+                              <Button variant="outline" className="gap-2">
+                                <Download className="w-4 h-4" />
+                                Download Files
+                              </Button>
+                              <Button variant="ghost" className="gap-2 text-primary">
+                                <ExternalLink className="w-4 h-4" />
+                                Live Demo
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Description */}
+                    <div>
+                      <h3 className="font-semibold text-lg mb-3">About this Template</h3>
+                      <p className="text-muted-foreground leading-relaxed">{selectedTemplate.longDescription}</p>
+                    </div>
+
+                    {/* Compute Requirements */}
+                    <div>
+                      <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                        <Cpu className="w-5 h-5 text-primary" />
+                        Compute Requirements
+                      </h3>
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                        <div className="p-4 rounded-xl bg-muted/50 border">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                            <Cpu className="w-4 h-4" />
+                            CPU
+                          </div>
+                          <p className="font-semibold">{selectedTemplate.computeRequirements.cpu}</p>
+                        </div>
+                        <div className="p-4 rounded-xl bg-muted/50 border">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                            <MemoryStick className="w-4 h-4" />
+                            Memory
+                          </div>
+                          <p className="font-semibold">{selectedTemplate.computeRequirements.memory}</p>
+                        </div>
+                        {selectedTemplate.computeRequirements.gpu && (
+                          <div className="p-4 rounded-xl bg-muted/50 border">
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                              <HardDrive className="w-4 h-4" />
+                              GPU
+                            </div>
+                            <p className="font-semibold">{selectedTemplate.computeRequirements.gpu}</p>
+                          </div>
+                        )}
+                        <div className="p-4 rounded-xl bg-muted/50 border">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                            <HardDrive className="w-4 h-4" />
+                            Storage
+                          </div>
+                          <p className="font-semibold">{selectedTemplate.computeRequirements.storage}</p>
+                        </div>
+                        <div className="p-4 rounded-xl bg-muted/50 border">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                            <DollarSign className="w-4 h-4" />
+                            Est. Cost
+                          </div>
+                          <p className="font-semibold">{selectedTemplate.computeRequirements.estimatedCost}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Features & Use Cases */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <h3 className="font-semibold text-lg mb-3">Features</h3>
+                        <ul className="space-y-2">
+                          {selectedTemplate.features.map((feature, idx) => (
+                            <li key={idx} className="flex items-center gap-2 text-sm">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                              {feature}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <h3 className="font-semibold text-lg mb-3">Use Cases</h3>
+                        <ul className="space-y-2">
+                          {selectedTemplate.useCases.map((useCase, idx) => (
+                            <li key={idx} className="flex items-center gap-2 text-sm">
+                              <Target className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                              {useCase}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* Integrations */}
+                    <div>
+                      <h3 className="font-semibold text-lg mb-3">Integrations</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedTemplate.integrations.map((integration, idx) => (
+                          <span key={idx} className="px-3 py-1.5 rounded-lg bg-muted border text-sm">
+                            {integration}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Tags */}
+                    <div>
+                      <h3 className="font-semibold text-lg mb-3">Tags</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedTemplate.tags.map((tag, idx) => (
+                          <span key={idx} className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm">
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Prerequisites */}
+                    <div>
+                      <h3 className="font-semibold text-lg mb-3">Prerequisites</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedTemplate.prerequisites.map((req, idx) => (
+                          <span key={idx} className="px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 text-sm flex items-center gap-1">
+                            <AlertCircle className="w-3 h-3" />
+                            {req}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'papers' && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="font-semibold text-lg">Related Research Papers</h3>
+                      {selectedTemplate.researchPortalLink && (
+                        <Button variant="outline" size="sm" className="gap-2">
+                          <ExternalLink className="w-4 h-4" />
+                          Research Portal
+                        </Button>
+                      )}
+                    </div>
+                    
+                    {selectedTemplate.papers.map((paper, idx) => (
+                      <div key={paper.id} className="p-5 rounded-xl border hover:border-primary/30 transition-colors">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="text-xs font-mono text-muted-foreground">#{idx + 1}</span>
+                              <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500">
+                                Relevance: {paper.relevanceScore}%
+                              </span>
+                              <span className="text-xs text-muted-foreground">{paper.year}</span>
+                            </div>
+                            
+                            <h4 className="font-semibold mb-2 leading-snug">{paper.title}</h4>
+                            <p className="text-sm text-muted-foreground mb-2">{paper.authors}</p>
+                            <p className="text-sm italic text-muted-foreground mb-3">{paper.journal}</p>
+                            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{paper.abstract}</p>
+                            
+                            <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <BookOpen className="w-3 h-3" />
+                                {paper.citations.toLocaleString()} citations
+                              </span>
+                              {paper.doi && (
+                                <button
+                                  onClick={() => copyToClipboard(paper.doi!, `doi-${paper.id}`)}
+                                  className="flex items-center gap-1 hover:text-primary transition-colors"
+                                >
+                                  {copiedId === `doi-${paper.id}` ? (
+                                    <>
+                                      <Check className="w-3 h-3 text-emerald-500" />
+                                      Copied!
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Copy className="w-3 h-3" />
+                                      DOI: {paper.doi}
+                                    </>
+                                  )}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {activeTab === 'presets' && (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-semibold text-lg">Parameter Presets</h3>
+                        <p className="text-sm text-muted-foreground">Pre-configured settings for common use cases</p>
+                      </div>
+                      <span className="text-sm text-muted-foreground">
+                        {selectedTemplate.configurableParameters} configurable parameters
+                      </span>
+                    </div>
+                    
+                    {selectedTemplate.parameterPresets.map((preset, idx) => (
+                      <div key={preset.id} className="p-6 rounded-xl border hover:border-primary/30 transition-all">
+                        <div className="flex items-start justify-between mb-4">
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="font-semibold">{preset.name}</h4>
+                              <PresetCategoryBadge category={preset.category} />
+                            </div>
+                            <p className="text-sm text-muted-foreground">{preset.description}</p>
+                          </div>
+                          
+                          <Button size="sm" className="gap-2 flex-shrink-0">
+                            <Play className="w-4 h-4" />
+                            Use Preset
+                          </Button>
+                        </div>
+                        
+                        <div className="grid md:grid-cols-2 gap-4 mb-4">
+                          <div>
+                            <h5 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Use Case</h5>
+                            <p className="text-sm">{preset.useCase}</p>
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Expected Performance</h5>
+                            <p className="text-sm text-emerald-600 dark:text-emerald-400">{preset.expectedPerformance}</p>
+                          </div>
+                        </div>
+                        
+                        <details className="group">
+                          <summary className="cursor-pointer text-sm text-primary flex items-center gap-1">
+                            <ChevronRight className="w-4 h-4 group-open:rotate-90 transition-transform" />
+                            View Parameters
+                          </summary>
+                          <div className="mt-3 p-4 rounded-lg bg-muted/50 font-mono text-sm space-y-1">
+                            {Object.entries(preset.parameters).map(([key, value]) => (
+                              <div key={key} className="flex justify-between">
+                                <span className="text-muted-foreground">{key}:</span>
+                                <span className="text-foreground">{String(value)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </details>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {activeTab === 'community' && (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-semibold text-lg">Community Contributions</h3>
+                        <p className="text-sm text-muted-foreground">Plugins, improvements, and extensions from the community</p>
+                      </div>
+                      <Button variant="outline" size="sm" className="gap-2">
+                        <Puzzle className="w-4 h-4" />
+                        Submit Contribution
+                      </Button>
+                    </div>
+                    
+                    {selectedTemplate.communityContributions.map((contribution) => (
+                      <div key={contribution.id} className="p-5 rounded-xl border hover:border-primary/30 transition-all">
+                        <div className="flex items-start gap-4">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center flex-shrink-0">
+                            <Users className="w-5 h-5 text-primary" />
+                          </div>
+                          
+                          <div className="flex-1">
+                            <div className="flex items-start justify-between mb-2">
+                              <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h4 className="font-semibold">{contribution.title}</h4>
+                                  {contribution.verified && (
+                                    <BadgeCheck className="w-4 h-4 text-primary" />
+                                  )}
+                                  <ContributionTypeBadge type={contribution.type} />
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                  by {contribution.author} · {new Date(contribution.date).toLocaleDateString()}
+                                </p>
+                              </div>
+                            </div>
+                            
+                            <p className="text-sm text-muted-foreground mb-3">{contribution.description}</p>
+                            
+                            <div className="flex items-center gap-4 text-sm">
+                              <span className="flex items-center gap-1 text-amber-500">
+                                <Star className="w-4 h-4 fill-current" />
+                                {contribution.stars}
+                              </span>
+                              <span className="flex items-center gap-1 text-blue-500">
+                                <Download className="w-4 h-4" />
+                                {contribution.downloads.toLocaleString()} downloads
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {activeTab === 'practices' && (
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="font-semibold text-lg mb-2">Best Practices</h3>
+                      <p className="text-sm text-muted-foreground">Critical guidelines for successful template usage</p>
+                    </div>
+                    
+                    {selectedTemplate.bestPractices.map((practice, idx) => (
+                      <div key={practice.id} className={`p-5 rounded-xl border-l-4 ${
+                        practice.severity === 'critical' ? 'border-l-red-500 bg-red-500/5' :
+                        practice.severity === 'important' ? 'border-l-amber-500 bg-amber-500/5' :
+                        'border-l-blue-500 bg-blue-500/5'
+                      }`}>
+                        <div className="flex items-start gap-3">
+                          <SeverityIcon severity={practice.severity} />
+                          
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h4 className="font-semibold">{practice.title}</h4>
+                              <SeverityBadge severity={practice.severity} />
+                              <CategoryBadge category={practice.category} />
+                            </div>
+                            
+                            <p className="text-sm text-muted-foreground mb-3">{practice.description}</p>
+                            
+                            <div className="p-3 rounded-lg bg-card border text-sm">
+                              <span className="font-medium text-primary">Implementation:</span> {practice.implementation}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="border-t p-6 bg-muted/30">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <span>v{selectedTemplate.version}</span>
+                    <span>·</span>
+                    <span>Updated {selectedTemplate.lastUpdated}</span>
+                    <span>·</span>
+                    <span className="flex items-center gap-1">
+                      <MessageSquare className="w-4 h-4" />
+                      Report Issue
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <Button variant="ghost" size="sm" className="gap-2">
+                      <Bookmark className="w-4 h-4" />
+                      Save
+                    </Button>
+                    <Button variant="ghost" size="sm" className="gap-2">
+                      <Share2 className="w-4 h-4" />
+                      Share
+                    </Button>
+                    <Button variant="ghost" size="sm" className="gap-2">
+                      <ThumbsUp className="w-4 h-4" />
+                      Like
+                    </Button>
+                    <Button className="gap-2 gradient-bg text-white border-0">
+                      <Rocket className="w-4 h-4" />
+                      Use Template
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================================================================== */}
+      {/* COMMUNITY CTA SECTION */}
+      {/* ================================================================== */}
+      <section className="py-20 bg-gradient-to-b from-primary/5 to-transparent">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="max-w-3xl mx-auto">
+            <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
+              <Puzzle className="w-10 h-10 text-white" />
+            </div>
+            
+            <h2 className="text-3xl font-bold mb-4">Join the Community</h2>
+            <p className="text-lg text-muted-foreground mb-8">
+              Contribute plugins, share presets, and help shape the future of scientific computing templates.
+              Your expertise can accelerate discovery for thousands of researchers worldwide.
+            </p>
+            
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <Button size="lg" className="gap-2 gradient-bg text-white border-0 px-8">
+                <Sparkles className="w-5 h-5" />
+                Submit Your Template
+              </Button>
+              <Button size="lg" variant="outline" className="gap-2 px-8">
+                <GitBranch className="w-5 h-5" />
+                Fork on GitHub
+              </Button>
+              <Button size="lg" variant="ghost" className="gap-2 text-primary">
+                <MessageSquare className="w-5 h-5" />
+                Join Discussion
+              </Button>
+            </div>
+
+            {/* Community Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
+              <div className="p-6 rounded-xl bg-card border">
+                <div className="text-3xl font-bold text-primary mb-1">250+</div>
+                <div className="text-sm text-muted-foreground">Contributors</div>
+              </div>
+              <div className="p-6 rounded-xl bg-card border">
+                <div className="text-3xl font-bold text-primary mb-1">1.2K+</div>
+                <div className="text-sm text-muted-foreground">Plugins Shared</div>
+              </div>
+              <div className="p-6 rounded-xl bg-card border">
+                <div className="text-3xl font-bold text-primary mb-1">50K+</div>
+                <div className="text-sm text-muted-foreground">Downloads</div>
+              </div>
+              <div className="p-6 rounded-xl bg-card border">
+                <div className="text-3xl font-bold text-primary mb-1">99%</div>
+                <div className="text-sm text-muted-foreground">Satisfaction</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================== */}
+      {/* FLOATING SCROLL TO TOP BUTTON */}
+      {/* ================================================================== */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 z-50 w-12 h-12 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:scale-110 transition-transform"
+          aria-label="Scroll to top"
+        >
+          <ChevronUp className="w-6 h-6" />
+        </button>
+      )}
+
+      {/* ================================================================== */}
+      {/* BOTTOM NAVIGATION BAR */}
+      {/* ================================================================== */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur border-t md:hidden">
+        <div className="flex items-center justify-around py-3">
+          <button
+            onClick={navigateToHome}
+            className="flex flex-col items-center gap-1 text-xs text-muted-foreground hover:text-primary"
+          >
+            <Home className="w-5 h-5" />
+            Home
+          </button>
+          <button
+            onClick={() => document.getElementById('templates-grid')?.scrollIntoView({ behavior: 'smooth' })}
+            className="flex flex-col items-center gap-1 text-xs text-muted-foreground hover:text-primary"
+          >
+            <Grid3X3 className="w-5 h-5" />
+            Templates
+          </button>
+          <button
+            onClick={scrollToTop}
+            className="flex flex-col items-center gap-1 text-xs text-muted-foreground hover:text-primary"
+          >
+            <ChevronUp className="w-5 h-5" />
+            Top
+          </button>
+          <button
+            onClick={navigateToDashboard}
+            className="flex flex-col items-center gap-1 text-xs text-muted-foreground hover:text-primary"
+          >
+            <LayoutDashboard className="w-5 h-5" />
+            Dashboard
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ============================================================================
 // SUB-COMPONENTS
 // ============================================================================
 
-function TierBadge({ tier }: { tier: 'free' | 'freemium' | 'premium' }) {
-  const config = {
-    free: { icon: <Gift className="w-3 h-3" />, label: 'Free', bg: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 border-green-200 dark:border-green-800' },
-    freemium: { icon: <Star className="w-3 h-3" />, label: 'Freemium', bg: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 border-blue-200 dark:border-blue-800' },
-    premium: { icon: <Crown className="w-3 h-3" />, label: 'Premium', bg: 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300 border-purple-200 dark:border-purple-800' }
-  };
-  
-  return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border ${config[tier].bg}`}>
-      {config[tier].icon}
-      {config[tier].label}
-    </span>
-  );
-}
-
-function DifficultyBadge({ difficulty }: { difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert' }) {
-  const config = {
-    beginner: { label: 'Beginner', class: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' },
-    intermediate: { label: 'Intermediate', class: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' },
-    advanced: { label: 'Advanced', class: 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300' },
-    expert: { label: 'Expert', class: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' }
-  };
-  
-  return (
-    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${config[difficulty].class}`}>
-      {config[difficulty].label}
-    </span>
-  );
-}
-
-function StatBadge({ icon, value, label }: { icon: React.ReactNode; value: string | number; label: string }) {
-  return (
-    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-      {icon}
-      <span className="font-medium text-foreground">{value.toLocaleString()}</span>
-      <span>{label}</span>
-    </div>
-  );
-}
-
-function PaperLookup({ papers }: { papers: PaperReference[] }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedPaper, setSelectedPaper] = useState<PaperReference | null>(null);
-  
-  return (
-    <div className="relative">
-      {/* Trigger Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/5 hover:bg-primary/10 transition-colors text-sm font-medium text-primary"
-      >
-        <BookOpen className="w-4 h-4" />
-        <span>Related Papers ({papers.length})</span>
-        <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
-      
-      {/* Dropdown Panel */}
-      {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-card border rounded-xl shadow-xl z-50 max-h-[400px] overflow-hidden animate-in slide-in-from-top-2 duration-200">
-          <div className="p-3 border-b bg-muted/30">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Search papers..."
-                className="w-full pl-9 pr-3 py-2 rounded-lg bg-background border text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-              />
-            </div>
-          </div>
-          
-          <div className="overflow-y-auto max-h-[320px] p-2 space-y-2">
-            {papers.map((paper) => (
-              <button
-                key={paper.id}
-                onClick={() => setSelectedPaper(paper)}
-                className="w-full text-left p-3 rounded-lg hover:bg-muted/50 transition-colors group"
-              >
-                <div className="flex items-start gap-3">
-                  <FileText className="w-4 h-4 mt-0.5 text-muted-foreground flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <h5 className="text-sm font-medium line-clamp-2 group-hover:text-primary transition-colors">
-                      {paper.title}
-                    </h5>
-                    <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                      <span>{paper.authors.split(',')[0]} et al.</span>
-                      <span>•</span>
-                      <span>{paper.year}</span>
-                      <span>•</span>
-                      <span className="flex items-center gap-1">
-                        <QuoteIcon className="w-3 h-3" />
-                        {paper.citations.toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="mt-1.5 flex items-center gap-2">
-                      <span className="px-1.5 py-0.5 rounded text-xs bg-primary/10 text-primary">
-                        {Math.round(paper.relevanceScore)}% relevant
-                      </span>
-                      <span className="text-xs text-muted-foreground">{paper.journal}</span>
-                    </div>
-                  </div>
-                  <ExternalLink className="w-4 h-4 opacity-0 group-hover:opacity-100 text-muted-foreground transition-opacity flex-shrink-0" />
-                </div>
-              </button>
-            ))}
-          </div>
-          
-          <div className="p-3 border-t bg-muted/30">
-            <a href="#/papers/all" className="text-xs text-primary hover:underline flex items-center justify-center gap-1">
-              View All References
-              <ExternalLink className="w-3 h-3" />
-            </a>
-          </div>
-        </div>
-      )}
-      
-      {/* Paper Detail Modal */}
-      {selectedPaper && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setSelectedPaper(null)}>
-          <div className="bg-card rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
-            <div className="p-6 border-b">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold mb-2">{selectedPaper.title}</h3>
-                  <p className="text-sm text-muted-foreground mb-2">{selectedPaper.authors} ({selectedPaper.year})</p>
-                  <div className="flex items-center gap-3 text-sm">
-                    <span className="px-2 py-0.5 rounded bg-muted">{selectedPaper.journal}</span>
-                    <span className="flex items-center gap-1 text-muted-foreground">
-                      <QuoteIcon className="w-4 h-4" />
-                      {selectedPaper.citations.toLocaleString()} citations
-                    </span>
-                  </div>
-                </div>
-                <button onClick={() => setSelectedPaper(null)} className="p-2 hover:bg-muted rounded-lg">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-            
-            <div className="p-6 overflow-y-auto max-h-[50vh]">
-              <div className="mb-4">
-                <h4 className="text-sm font-semibold mb-2">Abstract</h4>
-                <p className="text-sm text-muted-foreground leading-relaxed">{selectedPaper.abstract}</p>
-              </div>
-              
-              {selectedPaper.doi && (
-                <div className="mb-4">
-                  <h4 className="text-sm font-semibold mb-2">DOI</h4>
-                  <code className="text-xs bg-muted px-2 py-1 rounded">{selectedPaper.doi}</code>
-                </div>
-              )}
-              
-              <div className="mb-4">
-                <h4 className="text-sm font-semibold mb-2">Relevance Score</h4>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-primary to-secondary rounded-full"
-                      style={{ width: `${selectedPaper.relevanceScore}%` }}
-                    ></div>
-                  </div>
-                  <span className="text-sm font-medium">{selectedPaper.relevanceScore}%</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="p-6 border-t bg-muted/30 flex gap-3">
-              <Button size="sm" className="gap-2 flex-1">
-                <ExternalLink className="w-4 h-4" />
-                View Full Paper
-              </Button>
-              <Button size="sm" variant="outline" className="gap-2">
-                <BookmarkPlus className="w-4 h-4" />
-                Save
-              </Button>
-              <Button size="sm" variant="outline" className="gap-2">
-                <Share2 className="w-4 h-4" />
-                Cite
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function QuoteIcon(props: any) {
-  return (
-    <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/>
-      <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/>
-    </svg>
-  );
-}
-
-function ResourceCard({ resource }: { resource: TemplateResource }) {
-  const typeConfig = {
-    tutorial: { icon: <BookOpen className="w-4 h-4" />, color: 'text-blue-600 bg-blue-50 dark:bg-blue-950' },
-    'api-doc': { icon: <Code2 className="w-4 h-4" />, color: 'text-purple-600 bg-purple-50 dark:bg-purple-950' },
-    dataset: { icon: <Database className="w-4 h-4" />, color: 'text-cyan-600 bg-cyan-50 dark:bg-cyan-950' },
-    example: { icon: <Terminal className="w-4 h-4" />, color: 'text-orange-600 bg-orange-50 dark:bg-orange-950' },
-    video: { icon: <Play className="w-4 h-4" />, color: 'text-red-600 bg-red-50 dark:bg-red-950' },
-    notebook: { icon: <FlaskConical className="w-4 h-4" />, color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950' }
-  };
-  
-  const config = typeConfig[resource.type];
-  
-  return (
-    <a
-      href={resource.url}
-      className={`flex items-start gap-3 p-3 rounded-lg border hover:shadow-md transition-all group ${resource.isFree ? '' : 'opacity-80'}`}
-    >
-      <div className={`p-2 rounded-lg ${config.color} flex-shrink-0`}>
-        {config.icon}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <h5 className="text-sm font-medium truncate group-hover:text-primary transition-colors">
-            {resource.title}
-          </h5>
-          {!resource.isFree && (
-            <Lock className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-          )}
-          {resource.isFree && (
-            <Unlock className="w-3 h-3 text-green-600 flex-shrink-0" />
-          )}
-        </div>
-        <p className="text-xs text-muted-foreground mt-0.5">{resource.description}</p>
-      </div>
-      <ExternalLink className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 mt-1" />
-    </a>
-  );
-}
-
-function TemplateCard({ template, onSelect }: { template: ScientificTemplate; onSelect: () => void }) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const category = categories.find(c => c.id === template.category)!;
-  
-  return (
-    <div className="group rounded-xl border bg-card overflow-hidden hover:shadow-xl transition-all duration-300">
-      {/* Card Header */}
-      <div className="p-5 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-start gap-4">
-            <div className={`p-3 rounded-xl bg-gradient-to-br ${category.gradient} text-white shadow-lg group-hover:scale-105 transition-transform`}>
-              {template.icon}
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <h3 className="font-bold text-lg group-hover:text-primary transition-colors">
-                  {template.name}
-                </h3>
-              </div>
-              <p className="text-sm text-muted-foreground line-clamp-2">{template.description}</p>
-              
-              <div className="flex items-center gap-2 mt-3 flex-wrap">
-                <TierBadge tier={template.tier} />
-                <DifficultyBadge difficulty={template.difficulty} />
-                <span className="text-xs text-muted-foreground px-2 py-0.5 rounded bg-muted">
-                  v{template.version}
-                </span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <button
-              onClick={(e) => { e.stopPropagation(); onSelect(); }}
-              className="p-2 rounded-lg hover:bg-primary hover:text-primary-foreground transition-colors"
-              title="View full details"
-            >
-              <Maximize2 className="w-4 h-4" />
-            </button>
-            <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-          </div>
-        </div>
-        
-        {/* Stats Row */}
-        <div className="flex items-center gap-4 pt-4 border-t border-border/50 flex-wrap">
-          <StatBadge icon={<Download className="w-4 h-4" />} value={template.downloads} label="downloads" />
-          <StatBadge icon={<Star className="w-4 h-4" />} value={template.stars} label="stars" />
-          <StatBadge icon={<Play className="w-4 h-4" />} value={template.runs} label="runs" />
-          <div className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
-            <Clock className="w-3 h-3" />
-            Updated {template.lastUpdated}
-          </div>
-        </div>
-      </div>
-      
-      {/* Expanded Content */}
-      {isExpanded && (
-        <div className="border-t p-5 space-y-5 animate-in slide-in-from-top-2 duration-200">
-          {/* Compute Requirements */}
-          <div>
-            <h5 className="text-sm font-semibold mb-3 flex items-center gap-2">
-              <Cpu className="w-4 h-4 text-primary" />
-              Compute Requirements
-            </h5>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="p-3 rounded-lg bg-muted/50 text-center">
-                <Cpu className="w-4 h-4 mx-auto mb-1 text-muted-foreground" />
-                <div className="text-xs text-muted-foreground">CPU</div>
-                <div className="text-sm font-medium">{template.computeRequirements.cpu}</div>
-              </div>
-              <div className="p-3 rounded-lg bg-muted/50 text-center">
-                <HardDrive className="w-4 h-4 mx-auto mb-1 text-muted-foreground" />
-                <div className="text-xs text-muted-foreground">Memory</div>
-                <div className="text-sm font-medium">{template.computeRequirements.memory}</div>
-              </div>
-              <div className="p-3 rounded-lg bg-muted/50 text-center">
-                <Clock className="w-4 h-4 mx-auto mb-1 text-muted-foreground" />
-                <div className="text-xs text-muted-foreground">Time</div>
-                <div className="text-sm font-medium">{template.computeRequirements.estimatedTime}</div>
-              </div>
-              <div className="p-3 rounded-lg bg-muted/50 text-center">
-                <Zap className="w-4 h-4 mx-auto mb-1 text-muted-foreground" />
-                <div className="text-xs text-muted-foreground">Cost</div>
-                <div className="text-sm font-medium">{template.computeRequirements.estimatedCost.free}</div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Papers Lookup */}
-          <div>
-            <h5 className="text-sm font-semibold mb-3 flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-primary" />
-              Academic References
-            </h5>
-            <PaperLookup papers={template.papers} />
-          </div>
-          
-          {/* Resources Preview */}
-          <div>
-            <h5 className="text-sm font-semibold mb-3 flex items-center gap-2">
-              <Layers className="w-4 h-4 text-primary" />
-              Learning Resources ({template.resources.filter(r => r.isFree).length} free)
-            </h5>
-            <div className="space-y-2 max-h-60 overflow-y-auto">
-              {template.resources.slice(0, 4).map((resource, idx) => (
-                <ResourceCard key={idx} resource={resource} />
-              ))}
-              {template.resources.length > 4 && (
-                <button className="w-full text-center text-sm text-primary hover:underline py-2">
-                  View all {template.resources.length} resources →
-                </button>
-              )}
-            </div>
-          </div>
-          
-          {/* Quick Actions */}
-          <div className="flex gap-2 pt-3 border-t">
-            <Button size="sm" className="gap-2 flex-1">
-              <Play className="w-4 h-4" />
-              Run Template
-            </Button>
-            <Button size="sm" variant="outline" className="gap-2">
-              <Copy className="w-4 h-4" />
-              Clone
-            </Button>
-            <Button size="sm" variant="outline" className="gap-2">
-              <Download className="w-4 h-4" />
-              Export
-            </Button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function TemplateDetailView({ template, onBack }: { template: ScientificTemplate; onBack: () => void }) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'parameters' | 'resources' | 'use-cases'>('overview');
-  const category = categories.find(c => c.id === template.category)!;
-  
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" onClick={onBack} className="gap-2">
-                <ArrowLeft className="w-4 h-4" />
-                Back to Gallery
-              </Button>
-              <div className="hidden sm:block h-6 w-px bg-border"></div>
-              <nav className="hidden md:flex items-center gap-1">
-                <Button variant="ghost" size="sm" onClick={() => window.location.href = '/'} className="gap-2">
-                  <Home className="w-4 h-4" />
-                  Home
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => window.location.href = '/#dashboard'} className="gap-2">
-                  <LayoutDashboard className="w-4 h-4" />
-                  Dashboard
-                </Button>
-              </nav>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon">
-                <BookmarkPlus className="w-4 h-4" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <Share2 className="w-4 h-4" />
-              </Button>
-              <Button size="sm" className="gradient-bg text-white border-0 gap-2">
-                <Play className="w-4 h-4" />
-                Launch Template
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className={`relative overflow-hidden bg-gradient-to-br ${category.gradient} text-white`}>
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 right-20 w-72 h-72 bg-white rounded-full blur-[128px]"></div>
-          <div className="absolute bottom-20 left-20 w-96 h-96 bg-white rounded-full blur-[128px]"></div>
-        </div>
-        
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-          <div className="flex flex-col lg:flex-row gap-8 items-start">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-4">
-                <TierBadge tier={template.tier} />
-                <DifficultyBadge difficulty={template.difficulty} />
-                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-white/20 backdrop-blur">
-                  v{template.version}
-                </span>
-              </div>
-              
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-                {template.name}
-              </h1>
-              
-              <p className="text-lg text-white/80 mb-6 leading-relaxed max-w-3xl">
-                {template.longDescription.split('\n\n')[0]}
-              </p>
-              
-              <div className="flex flex-wrap items-center gap-4 mb-6">
-                <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                    {template.icon}
-                  </div>
-                  <div>
-                    <div className="font-medium">{template.author}</div>
-                    <div className="text-sm text-white/60">{template.authorInstitution}</div>
-                  </div>
-                </div>
-                
-                <div className="h-10 w-px bg-white/20 hidden sm:block"></div>
-                
-                <div className="flex items-center gap-4 text-sm">
-                  <span className="flex items-center gap-1">
-                    <Star className="w-4 h-4 fill-current" /> {template.stars.toLocaleString()}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Download className="w-4 h-4" /> {template.downloads.toLocaleString()}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <GitBranch className="w-4 h-4" /> {template.forks.toLocaleString()}
-                  </span>
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap gap-3">
-                <Button size="lg" variant="secondary" className="gap-2 bg-white text-gray-900 hover:bg-white/90">
-                  <Play className="w-5 h-5" />
-                  Run Now
-                </Button>
-                <Button size="lg" variant="outline" className="gap-2 text-white border-white/30 hover:bg-white/10">
-                  <Copy className="w-5 h-5" />
-                  Clone to Workspace
-                </Button>
-                <Button size="lg" variant="outline" className="gap-2 text-white border-white/30 hover:bg-white/10">
-                  <Download className="w-5 h-5" />
-                  Download
-                </Button>
-              </div>
-            </div>
-            
-            {/* Quick Info Card */}
-            <div className="w-full lg:w-80 bg-white/10 backdrop-blur rounded-2xl p-6 border border-white/20">
-              <h3 className="font-semibold mb-4">Quick Info</h3>
-              
-              <div className="space-y-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-white/60">Category</span>
-                  <span className="font-medium">{category.name}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-white/60">Compute Time</span>
-                  <span className="font-medium">{template.computeRequirements.estimatedTime}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-white/60">Free Tier Cost</span>
-                  <span className="font-medium text-green-300">{template.computeRequirements.estimatedCost.free}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-white/60">Last Updated</span>
-                  <span className="font-medium">{template.lastUpdated}</span>
-                </div>
-                
-                <div className="pt-4 border-t border-white/20">
-                  <div className="text-sm text-white/60 mb-2">Supported Formats</div>
-                  <div className="flex flex-wrap gap-1">
-                    {template.supportedFormats.input.slice(0, 3).map(fmt => (
-                      <span key={fmt} className="px-2 py-0.5 rounded text-xs bg-white/10">{fmt}</span>
-                    ))}
-                    <span className="px-2 py-0.5 rounded text-xs bg-white/10">+{template.supportedFormats.input.length - 3} more</span>
-                  </div>
-                </div>
-                
-                <div className="pt-4 border-t border-white/20">
-                  <div className="text-sm text-white/60 mb-2">Workflow Compatible</div>
-                  <div className="flex flex-wrap gap-1">
-                    {template.workflowCompatible.slice(0, 3).map(wf => (
-                      <span key={wf} className="px-2 py-0.5 rounded text-xs bg-white/10">{wf}</span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Tab Navigation */}
-      <section className="sticky top-16 z-30 bg-background border-b">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex gap-1 overflow-x-auto py-2">
-            {[
-              { id: 'overview', label: 'Overview', icon: <Eye className="w-4 h-4" /> },
-              { id: 'parameters', label: 'Parameters', icon: <SlidersHorizontal className="w-4 h-4" /> },
-              { id: 'resources', label: 'Resources', icon: <BookOpen className="w-4 h-4" /> },
-              { id: 'use-cases', label: 'Use Cases', icon: <Target className="w-4 h-4" /> },
-            ].map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-                  activeTab === tab.id
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                }`}
-              >
-                {tab.icon}
-                {tab.label}
-              </button>
-            ))}
-          </nav>
-        </div>
-      </section>
-
-      {/* Tab Content */}
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === 'overview' && (
-          <div className="space-y-8 max-w-4xl">
-            <div>
-              <h2 className="text-2xl font-bold mb-4">About This Template</h2>
-              <div className="prose prose-neutral dark:prose-invert max-w-none">
-                {template.longDescription.split('\n\n').map((para, idx) => (
-                  <p key={idx} className="text-muted-foreground leading-relaxed mb-4">{para}</p>
-                ))}
-              </div>
-            </div>
-            
-            <div>
-              <h3 className="text-xl font-semibold mb-4">Features</h3>
-              <div className="grid sm:grid-cols-2 gap-3">
-                {template.features.map(feature => (
-                  <div key={feature} className="flex items-center gap-2 p-3 rounded-lg bg-muted/50">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
-                    <span className="text-sm">{feature}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            <div>
-              <h3 className="text-xl font-semibold mb-4">Limitations</h3>
-              <div className="space-y-2">
-                {template.limitations.map(limitation => (
-                  <div key={limitation} className="flex items-start gap-2 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-900">
-                    <AlertCircle className="w-4 h-4 text-yellow-600 flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">{limitation}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            <div>
-              <h3 className="text-xl font-semibold mb-4">Tags</h3>
-              <div className="flex flex-wrap gap-2">
-                {template.tags.map(tag => (
-                  <span key={tag} className="px-3 py-1 rounded-full text-sm bg-muted hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer">
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-            
-            <div>
-              <h3 className="text-xl font-semibold mb-4">Academic References</h3>
-              <PaperLookup papers={template.papers} />
-            </div>
-          </div>
-        )}
-        
-        {activeTab === 'parameters' && (
-          <div className="max-w-4xl">
-            <h2 className="text-2xl font-bold mb-6">Template Parameters</h2>
-            <div className="rounded-xl border overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-muted">
-                  <tr>
-                    <th className="text-left p-4 font-semibold text-sm">Parameter</th>
-                    <th className="text-left p-4 font-semibold text-sm">Type</th>
-                    <th className="text-left p-4 font-semibold text-sm hidden sm:table-cell">Description</th>
-                    <th className="text-center p-4 font-semibold text-sm">Required</th>
-                    <th className="text-right p-4 font-semibold text-sm hidden md:table-cell">Default</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {template.parameters.map(param => (
-                    <tr key={param.name} className="hover:bg-muted/30">
-                      <td className="p-4">
-                        <code className="text-sm font-mono bg-muted px-2 py-1 rounded">{param.name}</code>
-                      </td>
-                      <td className="p-4">
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary capitalize">
-                          {param.type}
-                        </span>
-                      </td>
-                      <td className="p-4 text-sm text-muted-foreground hidden sm:table-cell">{param.description}</td>
-                      <td className="p-4 text-center">
-                        {param.required ? (
-                          <span className="text-red-600 font-medium">Yes</span>
-                        ) : (
-                          <span className="text-muted-foreground">No</span>
-                        )}
-                      </td>
-                      <td className="p-4 text-right text-sm font-mono hidden md:table-cell">
-                        {param.defaultValue !== undefined ? String(param.defaultValue) : '-'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            
-            {template.parameters.some(p => p.options) && (
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold mb-4">Select Options Reference</h3>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  {template.parameters.filter(p => p.options).map(param => (
-                    <div key={param.name} className="p-4 rounded-lg border">
-                      <h4 className="font-medium text-sm mb-2 font-mono">{param.name}</h4>
-                      <ul className="space-y-1">
-                        {param.options!.map(opt => (
-                          <li key={opt} className="text-sm text-muted-foreground flex items-center gap-2">
-                            <ChevronRight className="w-3 h-3" />
-                            {opt}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-        
-        {activeTab === 'resources' && (
-          <div className="max-w-4xl">
-            <h2 className="text-2xl font-bold mb-6">Learning Resources & Documentation</h2>
-            
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold">All Resources ({template.resources.length})</h3>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Unlock className="w-4 h-4 text-green-600" />
-                  {template.resources.filter(r => r.isFree).length} Free
-                  <Lock className="w-4 h-4 ml-2" />
-                  {template.resources.filter(r => !r.isFree).length} Premium
-                </div>
-              </div>
-              
-              <div className="space-y-3">
-                {template.resources.map((resource, idx) => (
-                  <ResourceCard key={idx} resource={resource} />
-                ))}
-              </div>
-            </div>
-            
-            <div className="p-6 rounded-xl bg-gradient-to-r from-primary/5 to-secondary/5 border border-dashed">
-              <div className="flex items-start gap-4">
-                <div className="p-3 rounded-xl bg-primary/10 text-primary">
-                  <HelpCircle className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-1">Need help getting started?</h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Our community and documentation team are here to assist you.
-                  </p>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="gap-2">
-                      <MessageSquare className="w-4 h-4" />
-                      Ask Community
-                    </Button>
-                    <Button size="sm" variant="outline" className="gap-2">
-                      <BookOpen className="w-4 h-4" />
-                      Read Docs
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        {activeTab === 'use-cases' && (
-          <div className="max-w-4xl">
-            <h2 className="text-2xl font-bold mb-6">Real-World Applications</h2>
-            
-            <div className="space-y-6">
-              {template.useCases.map((useCase, idx) => (
-                <div key={idx} className="p-6 rounded-xl border bg-card hover:shadow-lg transition-shadow">
-                  <div className="flex items-start gap-4">
-                    <div className={`p-3 rounded-xl bg-gradient-to-br ${category.gradient} text-white flex-shrink-0`}>
-                      <Target className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-lg mb-1">{useCase.title}</h3>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="px-2 py-0.5 rounded text-xs font-medium bg-muted">{useCase.domain}</span>
-                        {useCase.institution && (
-                          <span className="text-sm text-muted-foreground">{useCase.institution}</span>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-3">{useCase.description}</p>
-                      {useCase.results && (
-                        <div className="p-3 rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900">
-                          <div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-300">
-                            <Award className="w-4 h-4" />
-                            <span className="font-medium">Results:</span>
-                            <span>{useCase.results}</span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            <div className="mt-8 p-6 rounded-xl bg-muted/30 border border-dashed text-center">
-              <p className="text-muted-foreground mb-3">Have you used this template? Share your experience!</p>
-              <Button variant="outline" className="gap-2">
-                <MessageSquare className="w-4 h-4" />
-                Submit Use Case
-              </Button>
-            </div>
-          </div>
-        )}
-      </main>
-    </div>
-  );
-}
-
-// ============================================================================
-// FREE TIER PLATFORMS DATA
-// ============================================================================
-
-interface FreePlatform {
-  id: string;
-  name: string;
-  logo: string;
-  url: string;
-  description: string;
-  freeTierFeatures: string[];
-  limitations: string[];
-  computeSpecs: {
-    cpu?: string;
-    memory?: string;
-    gpu?: string;
-    storage?: string;
-    hoursPerMonth?: number;
-  };
-  categories: string[];
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  setupTime: string; // e.g., "2 minutes"
-  requiresAccount: boolean;
-  hasTemplateSupport: boolean;
-  popularFor: string[];
-  rating: number; // 1-5
-  studentBenefits?: string;
-  badge?: 'recommended' | 'popular' | 'new' | 'educational';
-}
-
-const freePlatforms: FreePlatform[] = [
-  // Google Colab - Most popular for ML/Bio
-  {
-    id: 'google-colab',
-    name: 'Google Colab',
-    logo: '📓',
-    url: 'https://colab.research.google.com/',
-    description: 'Free Jupyter notebook environment with GPU/TPU access. No setup required, runs entirely in cloud.',
-    freeTierFeatures: [
-      'Free T4 GPU access (12-15 hrs/day)',
-      'Free TPU for ML workloads',
-      'Pre-installed scientific packages (NumPy, Pandas, Scikit-learn)',
-      'Google Drive integration',
-      'GitHub integration (.ipynb files)',
-      'Shareable notebooks with comments'
-    ],
-    limitations: [
-      'Session timeout after ~12 hours idle',
-      'Max 15GB RAM on free tier',
-      'GPU not always available (quota limits)'
-    ],
-    computeSpecs: {
-      cpu: '2 vCPUs (upgradable)',
-      memory: '13 GB RAM',
-      gpu: 'NVIDIA T4 (free) / A100 / V100 (paid)',
-      storage: 'Google Drive (15GB free)',
-      hoursPerMonth: undefined // Usage-based
-    },
-    categories: ['machine-learning', 'data-processing', 'visualization'],
-    difficulty: 'beginner',
-    setupTime: '30 seconds',
-    requiresAccount: true,
-    hasTemplateSupport: true,
-    popularFor: ['ML prototyping', 'Education', 'Quick experiments', 'Tutorials'],
-    rating: 5,
-    studentBenefits: 'Extra compute quotas for .edu emails',
-    badge: 'recommended'
-  },
-
-  // Kaggle Kernels - Great for data science competitions
-  {
-    id: 'kaggle-kernels',
-    name: 'Kaggle Kernels',
-    logo: '🎯',
-    url: 'https://www.kaggle.com/kernels',
-    description: 'Free cloud environment with access to 50K+ public datasets and GPU computing.',
-    freeTierFeatures: [
-      'Free GPU (T4 x2, P100, or 30h/week TPU)',
-      '50GB+ of public datasets instantly available',
-      'Pre-built competition environments',
-      'Community code sharing & forking',
-      'Version control for notebooks',
-      'Output saving (datasets, models)'
-    ],
-    limitations: [
-      '30h GPU limit per week',
-      'No internet access in notebooks (security)',
-      '20GB output limit per run',
-      '9-hour session timeout'
-    ],
-    computeSpecs: {
-      cpu: '4 cores',
-      memory: '17 GB RAM',
-      gpu: '2x NVIDIA T4 or P100',
-      storage: '20GB scratch + Kaggle Datasets',
-      hoursPerMonth: 120 // GPU hours
-    },
-    categories: ['machine-learning', 'data-processing', 'statistics'],
-    difficulty: 'beginner',
-    setupTime: '1 minute',
-    requiresAccount: true,
-    hasTemplateSupport: true,
-    popularFor: ['Data competitions', 'Learning ML', 'Dataset exploration', 'Kaggle courses'],
-    rating: 5,
-    badge: 'popular'
-  },
-
-  // Binder/MyBinder - Reproducible research
-  {
-    id: 'mybinder',
-    name: 'MyBinder.org',
-    logo: '🔬',
-    url: 'https://mybinder.org/',
-    description: 'Turn any GitHub repo into interactive Jupyter notebooks. Perfect for reproducible research.',
-    freeTierFeatures: [
-      'Zero-config Jupyter environments from GitHub repos',
-      'Reproducible research (exact package versions)',
-      'Share links to live environments',
-      'Supports R, Python, Julia environments',
-      'Free persistent storage during session',
-      'Community-maintained infrastructure'
-    ],
-    limitations: [
-      'Queue time (2-10 min to start)',
-      'Session limited to ~8-12 hours',
-      'No GPU support (CPU only)',
-      'Dependent on GitHub repo availability'
-    ],
-    computeSpecs: {
-      cpu: '2 cores',
-      memory: '4 GB RAM',
-      storage: 'Ephemeral (session-based)',
-      hoursPerMonth: undefined
-    },
-    categories: ['bioinformatics', 'data-processing', 'visualization', 'teaching'],
-    difficulty: 'intermediate',
-    setupTime: '5 minutes (includes queue)',
-    requiresAccount: false,
-    hasTemplateSupport: true,
-    popularFor: ['Paper reproduction', 'Teaching demos', 'Workshop materials', 'Open science'],
-    rating: 4,
-    badge: 'educational'
-  },
-
-  // Hugging Face Spaces - For ML models/demos
-  {
-    id: 'huggingface-spaces',
-    name: 'Hugging Face Spaces',
-    logo: '🤗',
-    url: 'https://huggingface.co/spaces',
-    description: 'Host ML demos, apps, and models for free. Share your work with the AI community.',
-    freeTierFeatures: [
-      'Free CPU spaces (unlimited)',
-      '2 free GPU spaces (with queue)',
-      'Pre-built Gradio/Streamlit templates',
-      'Model hosting & versioning',
-      'Community discovery & sharing',
-      'API endpoints for your models'
-    ],
-    limitations: [
-      'GPU spaces have wait times when busy',
-      'Limited storage for large models',
-      'CPU-only for most free spaces',
-      'Rate limiting on API calls'
-    ],
-    computeSpecs: {
-      cpu: '2 vCPUs',
-      memory: '16 GB RAM',
-      gpu: 'T4 (limited, with queue)',
-      storage: '50GB (soft limit)',
-      hoursPerMonth: undefined
-    },
-    categories: ['machine-learning', 'visualization', 'data-processing'],
-    difficulty: 'intermediate',
-    setupTime: '3 minutes',
-    requiresAccount: true,
-    hasTemplateSupport: true,
-    popularFor: ['ML demos', 'Model deployment', 'Gradio apps', 'AI art generation'],
-    rating: 5,
-    badge: 'new'
-  },
-
-  // Observable - Data visualization notebooks
-  {
-    id: 'observable-hq',
-    name: 'Observable',
-    logo: '📊',
-    url: 'https://observablehq.com/',
-    description: 'Powerful data visualization platform with reactive notebooks. Excellent for data exploration.',
-    freeTierFeatures: [
-      '500+ free public notebooks',
-      'Reactive programming model',
-      'Built-in data visualization library (D3.js)',
-      'Real-time collaboration',
-      'SQL/CSV/database connections',
-      'Embeddable visualizations'
-    ],
-    limitations: [
-      'Private notebooks require paid plan',
-      'No custom Python packages',
-      'JavaScript/D3.js based (not Python)',
-      'Limited API access on free tier'
-    ],
-    computeSpecs: {
-      cpu: 'Shared (adequate for viz)',
-      memory: 'Adequate for data viz',
-      storage: 'Cloud-hosted',
-      hoursPerMonth: undefined
-    },
-    categories: ['visualization', 'statistics', 'data-processing'],
-    difficulty: 'intermediate',
-    setupTime: '1 minute',
-    requiresAccount: true,
-    hasTemplateSupport: true,
-    popularFor: ['Data journalism', 'Interactive dashboards', 'Data storytelling', 'Prototyping'],
-    rating: 4
-  },
-
-  // Deepnote - Collaborative data science
-  {
-    id: 'deepnote',
-    name: 'Deepnote',
-    logo: '📘',
-    url: 'https://deepnote.com/',
-    description: 'Collaborative data science notebook platform with real-time co-editing.',
-    freeTierFeatures: [
-      'Free personal workspace',
-      'Real-time collaboration (up to 5 editors)',
-      'PostgreSQL database included',
-      'GitHub/GitLab integration',
-      'Scheduled runs (cron jobs)',
-      'Environment variables & secrets'
-    ],
-    limitations: [
-      'Free tier: 60 hours compute/month',
-      'No GPU on free tier',
-      'Limited team features',
-      'Some integrations require upgrade'
-    ],
-    computeSpecs: {
-      cpu: '2-4 vCPUs',
-      memory: '8-16 GB RAM',
-      storage: '1 GB disk + DB',
-      hoursPerMonth: 60
-    },
-    categories: ['data-processing', 'visualization', 'statistics', 'bioinformatics'],
-    difficulty: 'beginner',
-    setupTime: '2 minutes',
-    requiresAccount: true,
-    hasTemplateSupport: true,
-    popularFor: ['Team projects', 'Data pipelines', 'Reporting', 'Collaborative analysis'],
-    rating: 4
-  },
-
-  // CoCalc/SageMath - Mathematical computing
-  {
-    id: 'cocalc',
-    name: 'CoCalc (SageMath)',
-    logo: '🧮',
-    url: 'https://cocalc.com/',
-    description: 'Complete mathematical computing environment with SageMath, R, Julia, Python, LaTeX.',
-    freeTierFeatures: [
-      'Full SageMath installation (no local setup needed)',
-      'R, Julia, Python, Octave pre-installed',
-      'LaTeX document editing & compilation',
-      'Terminal access (Linux environment)',
-      'Course management tools',
-      'Time travel (undo/redo entire project)'
-    ],
-    limitations: [
-      'Free project: 1 hour total runtime',
-      'No internet access from projects',
-      'Queue times during peak usage',
-      'Limited storage (1GB free)'
-    ],
-    computeSpecs: {
-      cpu: '1-2 cores',
-      memory: '2-4 GB RAM',
-      storage: '1 GB (expandable)',
-      hoursPerMonth: 1 // Very limited!
-    },
-    categories: ['statistics', 'quantum-computing', 'simulation', 'mathematics'],
-    difficulty: 'advanced',
-    setupTime: '3 minutes',
-    requiresAccount: true,
-    hasTemplateSupport: true,
-    popularFor: ['Pure mathematics', 'Number theory', 'Algebraic geometry', 'Teaching math'],
-    rating: 4,
-    badge: 'educational'
-  },
-
-  // Replit - Quick coding environment
-  {
-    id: 'replit',
-    name: 'Replit',
-    logo: '⚡',
-    url: 'https://replit.com/',
-    description: 'Instant online IDE for 50+ languages. Quick prototyping and template testing.',
-    freeTierFeatures: [
-      'Always-on dev environments (free tier)',
-      '50+ language support (Python, R, Julia, etc.)',
-      'Database hosting (PostgreSQL, MongoDB)',
-      'Secrets/ENV variables',
-      'Deploy to web (public URLs)',
-      'Mobile app for monitoring'
-    ],
-    limitations: [
-      'Free: 750ms cold start delay',
-      'Limited bandwidth (100MB/day outbound)',
-      'No dedicated GPUs',
-      'Sleeps after inactivity (5 min)'
-    ],
-    computeSpecs: {
-      cpu: '0.5-1 vCPU',
-      memory: '512 MB - 1 GB',
-      storage: '500 MB (persistent)',
-      hoursPerMonth: 750 // Always-on equivalent
-    },
-    categories: ['data-processing', 'teaching', 'quick-start'],
-    difficulty: 'beginner',
-    setupTime: '10 seconds',
-    requiresAccount: true,
-    hasTemplateSupport: false,
-    popularFor: ['Quick scripts', 'Web APIs', 'Learning to code', 'Bot development'],
-    rating: 4
-  },
-
-  // CodeOcean - Research computing
-  {
-    id: 'codeocean',
-    name: 'CodeOcean',
-    logo: '🌊',
-    url: 'https://codeocean.com/',
-    description: 'Research-grade reproducible computing. Used by top journals and institutions.',
-    freeTierFeatures: [
-      'Compute capsules (reproducible environments)',
-      'DOI assignment for computations',
-      'Integration with academic publishers',
-      'Pre-built scientific images',
-      'Git-like versioning for data',
-      'Collaboration features'
-    ],
-    limitations: [
-      'Free tier: Limited compute hours',
-      'Requires institutional email for some features',
-      'Smaller community than Colab/Kaggle',
-      'Learning curve for capsules concept'
-    ],
-    computeSpecs: {
-      cpu: '2-8 cores (varies)',
-      memory: '8-32 GB',
-      storage: '10-100 GB',
-      hoursPerMonth: 25 // Approximate
-    },
-    categories: ['bioinformatics', 'cheminformatics', 'simulation', 'research'],
-    difficulty: 'advanced',
-    setupTime: '5 minutes',
-    requiresAccount: true,
-    hasTemplateSupport: true,
-    popularFor: ['Academic publishing', 'Grant requirements', 'Reproducible research', 'Institutional use'],
-    rating: 4
-  }
-];
-
-// ============================================================================
-// USE CASE DEFINITIONS WITH PLATFORM MAPPINGS
-// ============================================================================
-
-interface UseCaseDefinition {
-  id: string;
-  title: string;
-  icon: React.ReactNode;
-  description: string;
-  scenarios: string[];
-  recommendedPlatforms: FreePlatform[];
-  quickStartGuide: string[];
-  estimatedTimeToFirstResult: string;
-  skillLevel: string;
-  outcomes: string[];
-}
-
-const useCaseDefinitions: UseCaseDefinition[] = [
-  {
-    id: 'quick-start-projects',
-    title: 'Quick Start Projects',
-    icon: <Rocket className="w-6 h-6" />,
-    description: 'Get running in under 5 minutes with pre-configured templates. Perfect for proof-of-concept, hackathons, or rapid prototyping.',
-    scenarios: [
-      'Validate a research idea quickly',
-      'Build a prototype for a grant proposal',
-      'Test a new algorithm before full implementation',
-      'Create demo for stakeholder presentation',
-      'Participate in weekend hackathon',
-      'Learn a new technique hands-on'
-    ],
-    recommendedPlatforms: [freePlatforms[0], freePlatforms[1], freePlatforms[7]], // Colab, Kaggle, Replit
-    quickStartGuide: [
-      'Choose a template from our gallery (click "Run Now")',
-      'Select your preferred free platform below',
-      'One-click clone to that platform',
-      'Upload your data or use sample dataset',
-      'Execute with default parameters',
-      'View results & iterate'
-    ],
-    estimatedTimeToFirstResult: '5-15 minutes',
-    skillLevel: 'Beginner-friendly',
-    outcomes: ['Working prototype', 'Results screenshot', 'Code understanding', 'Platform familiarity']
-  },
-  {
-    id: 'teaching-training',
-    title: 'Teaching & Training',
-    icon: <GraduationCapIcon className="w-6 h-6" />,
-    description: 'Classroom-ready environments with no installation headaches. Students start coding immediately while instructors track progress.',
-    scenarios: [
-      'University course laboratory sessions',
-      'Online workshop or bootcamp',
-      'Corporate training program',
-      'Self-paced learning curriculum',
-      'Thesis/dissertation methodology training',
-      'Conference tutorial session'
-    ],
-    recommendedPlatforms: [freePlatforms[2], freePlatforms[4], freePlatforms[6]], // Binder, Observable, CoCalc
-    quickStartGuide: [
-      'Select teaching-focused template variant',
-      'Choose platform with collaboration features',
-      'Set up shared workspace (or individual)',
-      'Distribute link to students/participants',
-      'Use built-in commenting for Q&A',
-      'Export results for grading/assessment'
-    ],
-    estimatedTimeToFirstResult: '15-30 minutes (class setup)',
-    skillLevel: 'All levels supported',
-    outcomes: ['Hands-on experience', 'Reproducible assignments', 'Portfolio pieces', 'Practical skills']
-  },
-  {
-    id: 'standardization-labs',
-    title: 'Standardization Across Labs',
-    icon: <Building2Icon className="w-6 h-6" />,
-    description: 'Ensure consistent analysis pipelines across multiple researchers, sites, or institutions. Eliminate "it works on my machine" problems.',
-    scenarios: [
-      'Multi-site clinical trial analysis',
-      'Consortium-wide genomics pipeline',
-      'Cross-lab validation studies',
-      'Regulatory submission reproducibility',
-      'Industry-academia collaboration',
-      'Longitudinal study consistency'
-    ],
-    recommendedPlatforms: [freePlatforms[5], freePlatforms[8], freePlatforms[0]], // Deepnote, CodeOcean, Colab
-    quickStartGuide: [
-      'Choose standardized template for your domain',
-      'Select enterprise/collaboration-ready platform',
-      'Configure shared parameters & settings',
-      'Set up version control integration',
-      'Document environment specifications',
-      'Deploy to all lab members simultaneously'
-    ],
-    estimatedTimeToFirstResult: '1-4 hours (setup), then instant',
-    skillLevel: 'Intermediate to Advanced',
-    outcomes: ['Reproducible pipelines', 'Consistent results', 'Audit trail', 'Compliance ready']
-  }
-];
-
-// ============================================================================
-// USE CASES COMPONENT WITH FREE ACCESS
-// ============================================================================
-
-function GraduationCapIcon(props: any) {
-  return (
-    <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-      <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-    </svg>
-  );
-}
-
-function Building2Icon(props: any) {
-  return (
-    <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="4" y="2" width="16" height="20" rx="2"/>
-      <path d="M9 22v-4h6v4"/>
-      <path d="M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01"/>
-    </svg>
-  );
-}
-
-function PlatformCard({ platform, isSelected, onSelect }: { 
-  platform: FreePlatform; 
-  isSelected: boolean; 
+// Template Card Component (Grid View)
+function TemplateCard({
+  template,
+  onSelect,
+  getCategoryColor,
+  TierBadge,
+  DifficultyBadge,
+  StatusBadge,
+}: {
+  template: TemplateData;
   onSelect: () => void;
+  getCategoryColor: (cat: TemplateCategory) => string;
+  TierBadge: React.FC<{ tier: TemplateData['tier'] }>;
+  DifficultyBadge: React.FC<{ difficulty: TemplateData['difficulty'] }>;
+  StatusBadge: React.FC<{ status: TemplateData['status'] }>;
 }) {
-  const [showDetails, setShowDetails] = useState(false);
-  
   return (
-    <div 
-      className={`rounded-xl border transition-all duration-300 cursor-pointer ${
-        isSelected 
-          ? 'border-primary shadow-lg shadow-primary/20 ring-2 ring-primary/20' 
-          : 'hover:border-primary/50 hover:shadow-md'
-      }`}
+    <div
+      className="group relative bg-card rounded-2xl border overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer"
       onClick={onSelect}
     >
-      {/* Platform Header */}
-      <div className="p-4 border-b bg-muted/30">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">{platform.logo}</span>
-            <div>
-              <h4 className="font-bold">{platform.name}</h4>
-              {platform.badge && (
-                <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 mt-1">
-                  {platform.badge === 'recommended' ? '[Recommended]' :
-                   platform.badge === 'popular' ? '[Popular]' :
-                   platform.badge === 'new' ? '[New]' : '[Educational]'}
-                </span>
-              )}
-              <div className="flex items-center gap-1 mt-1">
-                {[...Array(platform.rating)].map((_, i) => (
-                  <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                ))}
-                <span className="text-xs text-muted-foreground ml-1">({platform.rating}/5)</span>
-              </div>
-            </div>
-          </div>
-          
-          <button
-            onClick={(e) => { e.stopPropagation(); setShowDetails(!showDetails); }}
-            className="p-1 rounded hover:bg-muted"
-          >
-            {showDetails ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-          </button>
-        </div>
-        
-        <p className="text-sm text-muted-foreground mt-2">{platform.description}</p>
-        
-        {/* Quick Specs */}
-        <div className="flex flex-wrap gap-2 mt-3">
-          {platform.computeSpecs.gpu && (
-            <span className="px-2 py-0.5 rounded text-xs bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 flex items-center gap-1">
-              <Zap className="w-3 h-3" /> {platform.computeSpecs.gpu}
-            </span>
-          )}
-          {platform.computeSpecs.memory && (
-            <span className="px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 flex items-center gap-1">
-              <HardDrive className="w-3 h-3" /> {platform.computeSpecs.memory}
-            </span>
-          )}
-          {platform.hoursPerMonth && (
-            <span className="px-2 py-0.5 rounded text-xs bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300 flex items-center gap-1">
-              <Clock className="w-3 h-3" /> {platform.hoursPerMonth}h/mo
-            </span>
-          )}
-        </div>
-      </div>
+      {/* Gradient Header */}
+      <div className={`h-2 bg-gradient-to-r ${getCategoryColor(template.category)}`} />
       
-      {/* Expandable Details */}
-      {showDetails && (
-        <div className="p-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
-          {/* Free Tier Features */}
-          <div>
-            <h5 className="text-sm font-semibold mb-2 flex items-center gap-2 text-green-600">
-              <Gift className="w-4 h-4" />
-              What's Free ({platform.freeTierFeatures.length} features)
-            </h5>
-            <ul className="space-y-1">
-              {platform.freeTierFeatures.map((feature, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          
-          {/* Limitations */}
-          <div>
-            <h5 className="text-sm font-semibold mb-2 flex items-center gap-2 text-yellow-600">
-              <AlertCircle className="w-4 h-4" />
-              Limitations
-            </h5>
-            <ul className="space-y-1">
-              {platform.limitations.map((limit, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                  <X className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <span>{limit}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          
-          {/* Student Benefits */}
-          {platform.studentBenefits && (
-            <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900">
-              <h5 className="text-sm font-semibold mb-1 flex items-center gap-2 text-blue-600">
-                <GraduationCapIcon className="w-4 h-4" />
-                Student Benefits
-              </h5>
-              <p className="text-sm text-blue-700 dark:text-blue-300">{platform.studentBenefits}</p>
-            </div>
-          )}
-          
-          {/* Setup Time & Difficulty */}
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-            <div className="text-sm">
-              <span className="text-muted-foreground">Setup Time:</span> 
-              <span className="font-medium ml-1">{platform.setupTime}</span>
-            </div>
-            <DifficultyBadge difficulty={platform.difficulty} />
-          </div>
-          
-          {/* Action Button */}
-          <Button asChild className="w-full gap-2">
-            <a href={platform.url} target="_blank" rel="noopener noreferrer">
-              <ExternalLink className="w-4 h-4" />
-              Open {platform.name}
-              <span className="ml-auto opacity-70">→</span>
-            </a>
-          </Button>
-        </div>
-      )}
-      
-      {/* Collapsed State CTA */}
-      {!showDetails && (
-        <div className="p-3 border-t">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="w-full gap-2"
-            onClick={(e) => { e.stopPropagation(); setShowDetails(true); }}
-          >
-            <Eye className="w-4 h-4" />
-            View Details & Access Options
-          </Button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function UseCasesWithFreeAccess() {
-  const [selectedUseCase, setSelectedUseCase] = useState<string | null>(null);
-  const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
-  
-  const activeUseCase = useCaseDefinitions.find(uc => uc.id === selectedUseCase);
-  
-  return (
-    <div className="space-y-8">
-      {/* Use Case Cards */}
-      <div className="grid md:grid-cols-3 gap-6">
-        {useCaseDefinitions.map((useCase) => (
-          <button
-            key={useCase.id}
-            onClick={() => setSelectedUseCase(selectedUseCase === useCase.id ? null : useCase.id)}
-            className={`text-left p-6 rounded-2xl border transition-all duration-300 group ${
-              selectedUseCase === useCase.id
-                ? 'border-primary shadow-xl shadow-primary/10 bg-primary/5'
-                : 'hover:border-primary/50 hover:shadow-lg bg-card'
-            }`}
-          >
-            <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4 transition-transform group-hover:scale-110 ${
-              selectedUseCase === useCase.id 
-                ? 'bg-gradient-to-br from-primary to-secondary text-white' 
-                : 'bg-gradient-to-br from-emerald-500 to-teal-500 text-white'
-            }`}>
-              {useCase.icon}
-            </div>
-            
-            <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-              {useCase.title}
-            </h3>
-            
-            <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-              {useCase.description}
-            </p>
-            
-            <div className="space-y-2 mb-4">
-              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Common Scenarios
-              </div>
-              <ul className="space-y-1">
-                {useCase.scenarios.slice(0, 3).map((scenario, idx) => (
-                  <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Target className="w-3 h-3 flex-shrink-0" />
-                    <span className="truncate">{scenario}</span>
-                  </li>
-                ))}
-                {useCase.scenarios.length > 3 && (
-                  <li className="text-sm text-primary font-medium">
-                    +{useCase.scenarios.length - 3} more scenarios
-                  </li>
-                )}
-              </ul>
-            </div>
-            
-            <div className="flex items-center justify-between pt-4 border-t border-border/50">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Clock className="w-4 h-4" />
-                <span>{useCase.estimatedTimeToFirstResult}</span>
-              </div>
-              
-              {selectedUseCase === useCase.id ? (
-                <ChevronUp className="w-5 h-5 text-primary" />
-              ) : (
-                <ChevronDown className="w-5 h-5 text-muted-foreground" />
-              )}
-            </div>
-          </button>
-        ))}
-      </div>
-      
-      {/* Expanded Use Case Content */}
-      {activeUseCase && (
-        <div className="animate-in slide-in-from-bottom-4 duration-300">
-          {/* Quick Start Guide */}
-          <div className="rounded-2xl border bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 p-6 md:p-8 mb-8">
-            <div className="flex items-start gap-4 mb-6">
-              <div className="p-3 rounded-xl bg-primary/10 text-primary">
-                <Rocket className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold mb-2">Quick Start Guide</h3>
-                <p className="text-muted-foreground">
-                  Follow these steps to get your first results using {activeUseCase.title.toLowerCase()}
-                </p>
-              </div>
-            </div>
-            
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {activeUseCase.quickStartGuide.map((step, idx) => (
-                <div key={idx} className="flex items-start gap-3 p-4 rounded-xl bg-background border">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
-                    {idx + 1}
-                  </div>
-                  <p className="text-sm pt-1">{step}</p>
-                </div>
-              ))}
-            </div>
-            
-            <div className="mt-6 pt-6 border-t border-border/50 grid sm:grid-cols-3 gap-4 text-center">
-              <div>
-                <div className="text-2xl font-bold text-primary">{activeUseCase.estimatedTimeToFirstResult.split(' ')[0]}</div>
-                <div className="text-sm text-muted-foreground">Time to First Result</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-primary">{activeUseCase.skillLevel.split(' ')[0]}</div>
-                <div className="text-sm text-muted-foreground">Skill Level Required</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-primary">{activeUseCase.outcomes.length}+</div>
-                <div className="text-sm text-muted-foreground">Expected Outcomes</div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Platform Selection */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold flex items-center gap-3">
-                <Globe className="w-7 h-7 text-primary" />
-                Choose Your Free Platform
-              </h3>
-              <div className="text-sm text-muted-foreground">
-                {activeUseCase.recommendedPlatforms.length} platforms recommended
-              </div>
-            </div>
-            
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {activeUseCase.recommendedPlatforms.map((platform) => (
-                <PlatformCard
-                  key={platform.id}
-                  platform={platform}
-                  isSelected={selectedPlatform === platform.id}
-                  onSelect={() => setSelectedPlatform(selectedPlatform === platform.id ? null : platform.id)}
-                />
-              ))}
-            </div>
-          </div>
-          
-          {/* Additional Platforms */}
-          <div className="rounded-2xl border border-dashed p-6 md:p-8">
-            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-primary" />
-              More Free Platforms Available
-            </h3>
-            <p className="text-muted-foreground mb-4">
-              Not finding what you need? Here are additional platforms that support this use case:
-            </p>
-            
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {freePlatforms
-                .filter(p => !activeUseCase.recommendedPlatforms.find(rp => rp.id === p.id))
-                .slice(0, 4)
-                .map((platform) => (
-                  <a
-                    key={platform.id}
-                    href={platform.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-4 rounded-xl border hover:border-primary/50 hover:shadow-md transition-all group"
-                  >
-                    <span className="text-2xl">{platform.logo}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm group-hover:text-primary transition-colors truncate">
-                        {platform.name}
-                      </div>
-                      <div className="text-xs text-muted-foreground truncate">
-                        {platform.setupTime} setup • {platform.rating}/5 ⭐
-                      </div>
-                    </div>
-                    <ExternalLink className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
-                  </a>
-                ))
-              }
-            </div>
-            
-            <div className="mt-6 text-center">
-              <Button variant="outline" size="sm" className="gap-2">
-                View All {freePlatforms.length} Free Platforms
-                <ExternalLink className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-          
-          {/* Expected Outcomes */}
-          <div className="rounded-2xl bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 p-6 md:p-8 border border-green-200 dark:border-green-900">
-            <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-green-700 dark:text-green-300">
-              <Award className="w-6 h-6" />
-              What You'll Achieve
-            </h3>
-            
-            <div className="grid sm:grid-cols-2 gap-4">
-              {activeUseCase.outcomes.map((outcome, idx) => (
-                <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-white/50 dark:bg-black/20">
-                  <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  <span className="font-medium text-green-800 dark:text-green-200">{outcome}</span>
-                </div>
-              ))}
-            </div>
-            
-            <div className="mt-6 pt-6 border-t border-green-200 dark:border-green-800">
-              <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-                <div className="text-sm text-green-600 dark:text-green-400">
-                  💡 Pro tip: Start with Google Colab or Kaggle for the fastest setup time
-                </div>
-                <Button size="lg" className="gap-2 bg-green-600 hover:bg-green-700 text-white border-0">
-                  <Play className="w-5 h-5" />
-                  Get Started Now (It's Free!)
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ============================================================================
-// MAIN PAGE COMPONENT
-// ============================================================================
-
-export default function TemplateGalleryPage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<TemplateCategory | 'all'>('all');
-  const [selectedTier, setSelectedTier] = useState<'all' | 'free' | 'freemium' | 'premium'>('all');
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [sortBy, setSortBy] = useState<'popular' | 'recent' | 'name' | 'downloads'>('popular');
-  const [selectedTemplate, setSelectedTemplate] = useState<ScientificTemplate | null>(null);
-  const [showFilters, setShowFilters] = useState(false);
-
-  // Filtered and sorted templates
-  const filteredTemplates = useMemo(() => {
-    let filtered = [...templates];
-    
-    // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(t =>
-        t.name.toLowerCase().includes(query) ||
-        t.description.toLowerCase().includes(query) ||
-        t.tags.some(tag => tag.includes(query)) ||
-        t.category.includes(query)
-      );
-    }
-    
-    // Category filter
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(t => t.category === selectedCategory);
-    }
-    
-    // Tier filter
-    if (selectedTier !== 'all') {
-      filtered = filtered.filter(t => t.tier === selectedTier);
-    }
-    
-    // Difficulty filter
-    if (selectedDifficulty !== 'all') {
-      filtered = filtered.filter(t => t.difficulty === selectedDifficulty);
-    }
-    
-    // Sort
-    switch (sortBy) {
-      case 'popular':
-        filtered.sort((a, b) => b.stars - a.stars);
-        break;
-      case 'recent':
-        filtered.sort((a, b) => b.lastUpdated.localeCompare(a.lastUpdated));
-        break;
-      case 'name':
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'downloads':
-        filtered.sort((a, b) => b.downloads - a.downloads);
-        break;
-    }
-    
-    return filtered;
-  }, [searchQuery, selectedCategory, selectedTier, selectedDifficulty, sortBy]);
-
-  // If a template is selected, show detail view
-  if (selectedTemplate) {
-    return <TemplateDetailView template={selectedTemplate} onBack={() => setSelectedTemplate(null)} />;
-  }
-
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Header with Navigation */}
-      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" asChild className="gap-2">
-                <a href="/">
-                  <ArrowLeft className="w-4 h-4" />
-                  Back to Home
-                </a>
-              </Button>
-              <div className="hidden sm:block h-6 w-px bg-border"></div>
-              <div className="flex items-center gap-2">
-                <FlaskConical className="w-6 h-6 text-primary" />
-                <h1 className="text-xl font-bold">Template Gallery</h1>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" asChild className="gap-2">
-                <a href="/#dashboard">
-                  <LayoutDashboard className="w-4 h-4" />
-                  Dashboard
-                </a>
-              </Button>
-              <Button size="sm" className="gradient-bg text-white border-0 gap-2">
-                <Sparkles className="w-4 h-4" />
-                Submit Template
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-10 left-10 w-72 h-72 bg-blue-500 rounded-full blur-[128px]"></div>
-          <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-500 rounded-full blur-[128px]"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-emerald-500 rounded-full blur-[128px]"></div>
-        </div>
-
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-6">
-              <LayoutTemplate className="w-4 h-4" />
-              <span className="text-sm font-medium">Scientific Computing Templates</span>
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            </div>
-
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              Template Gallery for{' '}
-              <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                Common Analyses
-              </span>
-            </h1>
-
-            <p className="text-lg md:text-xl text-white/80 mb-10 max-w-3xl mx-auto leading-relaxed">
-              Pre-built, peer-reviewed templates for bioinformatics, cheminformatics, machine learning, 
-              statistics, and more. Start your analysis in minutes, not days.
-            </p>
-
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto mb-10">
-              {[
-                { label: 'Templates', value: '40+', icon: <LayoutTemplate className="w-4 h-4" /> },
-                { label: 'Categories', value: '8', icon: <Grid3X3 className="w-4 h-4" /> },
-                { label: 'Free Tier', value: '100%', icon: <Gift className="w-4 h-4" /> },
-                { label: 'Citations', value: '150K+', icon: <BookOpen className="w-4 h-4" /> },
-              ].map((stat, idx) => (
-                <div key={idx} className="p-4 rounded-xl bg-white/5 backdrop-blur border border-white/10 text-center">
-                  <div className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/10 mb-2 text-white/80">
-                    {stat.icon}
-                  </div>
-                  <div className="text-2xl font-bold">{stat.value}</div>
-                  <div className="text-xs text-white/60">{stat.label}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Search Bar */}
-            <div className="max-w-2xl mx-auto relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Search templates by name, category, or technique..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/10 backdrop-blur border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/30 text-lg"
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-white/60 hover:text-white"
-                onClick={() => setShowFilters(!showFilters)}
-              >
-                <SlidersHorizontal className="w-5 h-5" />
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Wave */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
-            <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="currentColor" className="text-background"/>
-          </svg>
-        </div>
-      </section>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        {/* Filters Bar */}
-        <div className={`transition-all duration-300 ${showFilters ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'} overflow-hidden mb-6`}>
-          <div className="p-6 rounded-xl border bg-card space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold flex items-center gap-2">
-                <Filter className="w-4 h-4" />
-                Filters
-              </h3>
-              <Button variant="ghost" size="sm" onClick={() => {
-                setSearchQuery('');
-                setSelectedCategory('all');
-                setSelectedTier('all');
-                setSelectedDifficulty('all');
-              }}>
-                Clear All
-              </Button>
-            </div>
-            
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Category Filter */}
-              <div>
-                <label className="text-sm font-medium mb-2 block">Category</label>
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value as TemplateCategory | 'all')}
-                  className="w-full px-3 py-2 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                >
-                  <option value="all">All Categories</option>
-                  {categories.map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                  ))}
-                </select>
-              </div>
-              
-              {/* Tier Filter */}
-              <div>
-                <label className="text-sm font-medium mb-2 block">Pricing Tier</label>
-                <select
-                  value={selectedTier}
-                  onChange={(e) => setSelectedTier(e.target.value as 'all' | 'free' | 'freemium' | 'premium')}
-                  className="w-full px-3 py-2 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                >
-                  <option value="all">All Tiers</option>
-                  <option value="free">Free Only</option>
-                  <option value="freemium">Freemium</option>
-                  <option value="premium">Premium</option>
-                </select>
-              </div>
-              
-              {/* Difficulty Filter */}
-              <div>
-                <label className="text-sm font-medium mb-2 block">Difficulty</label>
-                <select
-                  value={selectedDifficulty}
-                  onChange={(e) => setSelectedDifficulty(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                >
-                  <option value="all">All Levels</option>
-                  <option value="beginner">Beginner</option>
-                  <option value="intermediate">Intermediate</option>
-                  <option value="advanced">Advanced</option>
-                  <option value="expert">Expert</option>
-                </select>
-              </div>
-              
-              {/* Sort By */}
-              <div>
-                <label className="text-sm font-medium mb-2 block">Sort By</label>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                  className="w-full px-3 py-2 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                >
-                  <option value="popular">Most Popular</option>
-                  <option value="recent">Recently Updated</option>
-                  <option value="name">Name (A-Z)</option>
-                  <option value="downloads">Most Downloads</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Category Pills & Controls */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setSelectedCategory('all')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                selectedCategory === 'all'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted hover:bg-muted/80 text-muted-foreground'
-              }`}
-            >
-              All ({templates.length})
-            </button>
-            {categories.map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                  selectedCategory === cat.id
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted hover:bg-muted/80 text-muted-foreground'
-                }`}
-              >
-                {cat.name} ({templates.filter(t => t.category === cat.id).length})
-              </button>
-            ))}
+      <div className="p-6">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-4">
+          <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${getCategoryColor(template.category)} flex items-center justify-center text-white group-hover:scale-110 transition-transform`}>
+            {template.icon}
           </div>
           
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">
-              {filteredTemplates.length} templates found
-            </span>
-            <div className="flex border rounded-lg overflow-hidden">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2 ${viewMode === 'grid' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
-              >
-                <Grid3X3 className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-2 ${viewMode === 'list' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
-              >
-                <List className="w-4 h-4" />
-              </button>
-            </div>
+            {template.oneClickSetup && (
+              <span className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-500" title="One-click setup">
+                <Zap className="w-4 h-4" />
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Templates Grid/List */}
-        {filteredTemplates.length > 0 ? (
-          <div className={
-            viewMode === 'grid'
-              ? 'grid md:grid-cols-2 lg:grid-cols-3 gap-6'
-              : 'space-y-4'
-          }>
-            {filteredTemplates.map(template => (
-              <TemplateCard
-                key={template.id}
-                template={template}
-                onSelect={() => setSelectedTemplate(template)}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-muted mb-4">
-              <Search className="w-8 h-8 text-muted-foreground" />
-            </div>
-            <h3 className="text-xl font-semibold mb-2">No templates found</h3>
-            <p className="text-muted-foreground mb-4">
-              Try adjusting your search or filters to find what you're looking for.
-            </p>
-            <Button variant="outline" onClick={() => {
-              setSearchQuery('');
-              setSelectedCategory('all');
-              setSelectedTier('all');
-              setSelectedDifficulty('all');
-            }}>
-              Clear Filters
-            </Button>
-          </div>
-        )}
+        {/* Title & Badges */}
+        <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors line-clamp-1">
+          {template.name}
+        </h3>
+        
+        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{template.description}</p>
 
-        {/* Featured Categories Section */}
-        <section className="mt-16 pt-16 border-t">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Explore by Category</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Find templates tailored to your specific domain and research area.
-            </p>
-          </div>
-          
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {categories.map(category => (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`group p-6 rounded-2xl border text-left transition-all hover:shadow-xl ${
-                  selectedCategory === category.id ? 'ring-2 ring-primary' : ''
-                }`}
-              >
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${category.gradient} text-white flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                  {category.icon}
-                </div>
-                <h3 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors">
-                  {category.name}
-                </h3>
-                <p className="text-sm text-muted-foreground mb-3">{category.description}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-primary">
-                    {templates.filter(t => t.category === category.id).length} templates
-                  </span>
-                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                </div>
-              </button>
-            ))}
-          </div>
-        </section>
+        {/* Badges */}
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          <TierBadge tier={template.tier} />
+          <DifficultyBadge difficulty={template.difficulty} />
+        </div>
 
-        {/* Interactive Use Cases with FREE Platform Access */}
-        <section className="mt-16 pt-16 border-t">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 mb-4">
-              <Gift className="w-4 h-4" />
-              <span className="text-sm font-medium">FREE Tier Access Available</span>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Start Using Templates Immediately
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              Click on any use case below to get instant access to free scientific computing platforms. 
-              No credit card required. Start your research in minutes.
-            </p>
-          </div>
+        {/* Stats */}
+        <div className="flex items-center gap-4 text-xs text-muted-foreground mb-4">
+          <span className="flex items-center gap-1">
+            <Star className="w-3 h-3 fill-current text-amber-500" />
+            {template.communityRating}
+          </span>
+          <span className="flex items-center gap-1">
+            <Users className="w-3 h-3" />
+            {(template.totalUses / 1000).toFixed(1)}K
+          </span>
+          <span className="flex items-center gap-1">
+            <Clock className="w-3 h-3" />
+            {template.setupTime}
+          </span>
+        </div>
 
-          <UseCasesWithFreeAccess />
-        </section>
+        {/* Features Preview */}
+        <div className="flex flex-wrap gap-1 mb-4">
+          {template.features.slice(0, 3).map((feature, idx) => (
+            <span key={idx} className="px-2 py-0.5 rounded-full bg-muted text-xs">
+              {feature}
+            </span>
+          ))}
+          {template.features.length > 3 && (
+            <span className="px-2 py-0.5 rounded-full bg-muted text-xs text-muted-foreground">
+              +{template.features.length - 3}
+            </span>
+          )}
+        </div>
 
-        {/* Community CTA */}
-        <section className="mt-16 pt-16 border-t">
-          <div className="rounded-3xl bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 p-8 md:p-12 border border-dashed">
-            <div className="max-w-3xl mx-auto text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 text-primary mb-6">
-                <Users className="w-8 h-8" />
-              </div>
-              
-              <h2 className="text-3xl font-bold mb-4">Join Our Template Community</h2>
-              <p className="text-lg text-muted-foreground mb-8">
-                Share your own templates, contribute to existing ones, and help accelerate scientific discovery worldwide.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="gap-2">
-                  <Sparkles className="w-5 h-5" />
-                  Submit Your Template
-                </Button>
-                <Button size="lg" variant="outline" className="gap-2">
-                  <MessageSquare className="w-5 h-5" />
-                  Join Discussion
-                </Button>
-                <Button size="lg" variant="ghost" className="gap-2">
-                  <BookOpen className="w-5 h-5" />
-                  Contribution Guidelines
-                </Button>
-              </div>
-              
-              <div className="mt-10 pt-8 border-t border-border/50">
-                <div className="flex flex-wrap justify-center gap-8 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600" />
-                    Peer-reviewed templates
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600" />
-                    Automated testing
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600" />
-                    Version controlled
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600" />
-                    Community support
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
+        {/* Action Button */}
+        <Button variant="outline" className="w-full gap-2 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
+          <ArrowRight className="w-4 h-4" />
+          Explore Template
+        </Button>
+      </div>
     </div>
+  );
+}
+
+// Template List Item Component (List View)
+function TemplateListItem({
+  template,
+  onSelect,
+  getCategoryColor,
+  TierBadge,
+  DifficultyBadge,
+  StatusBadge,
+}: {
+  template: TemplateData;
+  onSelect: () => void;
+  getCategoryColor: (cat: TemplateCategory) => string;
+  TierBadge: React.FC<{ tier: TemplateData['tier'] }>;
+  DifficultyBadge: React.FC<{ difficulty: TemplateData['difficulty'] }>;
+  StatusBadge: React.FC<{ status: TemplateData['status'] }>;
+}) {
+  return (
+    <div
+      className="group bg-card rounded-xl border p-6 hover:shadow-lg hover:border-primary/30 transition-all duration-300 cursor-pointer flex items-center gap-6"
+      onClick={onSelect}
+    >
+      {/* Icon */}
+      <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${getCategoryColor(template.category)} flex items-center justify-center text-white flex-shrink-0 group-hover:scale-105 transition-transform`}>
+        {template.icon}
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-3 mb-1">
+          <h3 className="font-semibold text-lg group-hover:text-primary transition-colors truncate">
+            {template.name}
+          </h3>
+          <TierBadge tier={template.tier} />
+          <DifficultyBadge difficulty={template.difficulty} />
+          <StatusBadge status={template.status} />
+          {template.oneClickSetup && (
+            <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-xs flex items-center gap-1">
+              <Zap className="w-3 h-3" />
+              One-Click
+            </span>
+          )}
+        </div>
+        
+        <p className="text-sm text-muted-foreground mb-2 line-clamp-1">{template.description}</p>
+        
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <Star className="w-3 h-3 fill-current text-amber-500" />
+            {template.communityRating}
+          </span>
+          <span className="flex items-center gap-1">
+            <Users className="w-3 h-3" />
+            {(template.totalUses / 1000).toFixed(1)}K uses
+          </span>
+          <span className="flex items-center gap-1">
+            <Clock className="w-3 h-3" />
+            {template.setupTime}
+          </span>
+          <span className="flex items-center gap-1">
+            <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+            {template.successRate} success
+          </span>
+        </div>
+      </div>
+
+      {/* Action */}
+      <Button variant="outline" size="sm" className="gap-2 flex-shrink-0 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
+        <ArrowRight className="w-4 h-4" />
+        View
+      </Button>
+    </div>
+  );
+}
+
+// Helper Badge Components
+function PresetCategoryBadge({ category }: { category: ParameterPreset['category'] }) {
+  const colors = {
+    beginner: 'bg-green-500/10 text-green-600 dark:text-green-400',
+    intermediate: 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400',
+    advanced: 'bg-orange-500/10 text-orange-600 dark:text-orange-400',
+    production: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
+  };
+  
+  const labels = {
+    beginner: 'Beginner',
+    intermediate: 'Intermediate',
+    advanced: 'Advanced',
+    production: 'Production',
+  };
+  
+  return (
+    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${colors[category]}`}>
+      {labels[category]}
+    </span>
+  );
+}
+
+function ContributionTypeBadge({ type }: { type: CommunityContribution['type'] }) {
+  const colors = {
+    plugin: 'bg-violet-500/10 text-violet-600 dark:text-violet-400',
+    improvement: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
+    'use-case': 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+    fix: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+    extension: 'bg-pink-500/10 text-pink-600 dark:text-pink-400',
+  };
+  
+  return (
+    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${colors[type]}`}>
+      {type.replace('-', ' ')}
+    </span>
+  );
+}
+
+function SeverityBadge({ severity }: { severity: BestPractice['severity'] }) {
+  const colors = {
+    critical: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20',
+    important: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+    recommended: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+    optional: 'bg-gray-500/10 text-gray-600 dark:text-gray-400 border-gray-500/20',
+  };
+  
+  return (
+    <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${colors[severity]}`}>
+      {severity}
+    </span>
+  );
+}
+
+function CategoryBadge({ category }: { category: BestPractice['category'] }) {
+  const icons = {
+    performance: <Zap className="w-3 h-3" />,
+    accuracy: <Target className="w-3 h-3" />,
+    reproducibility: <RefreshCw className="w-3 h-3" />,
+    security: <Shield className="w-3 h-3" />,
+    usability: <Users className="w-3 h-3" />,
+  };
+  
+  return (
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-muted">
+      {icons[category]}
+      {category}
+    </span>
+  );
+}
+
+function SeverityIcon({ severity }: { severity: BestPractice['severity'] }) {
+  switch (severity) {
+    case 'critical':
+      return <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />;
+    case 'important':
+      return <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />;
+    default:
+      return <Info className="w-5 h-5 text-blue-500 flex-shrink-0" />;
+  }
+}
+
+// DollarSign icon (not in lucide-react imports above)
+function DollarSign({ className }: { className?: string }) {
+  return (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="1" x2="12" y2="23"></line>
+      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+    </svg>
   );
 }
