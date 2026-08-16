@@ -1,181 +1,46 @@
 {
-  "timestamp": "2026-08-16T20:04:53.348797",
+  "timestamp": "2026-08-16T21:15:44.301537",
   "summary": {
     "total_files": 66,
-    "total_issues": 91,
+    "total_issues": 87,
     "by_severity": {
-      "WARNING": 73,
+      "WARNING": 69,
       "INFO": 18
     }
   },
   "issues": [
     {
       "severity": "WARNING",
-      "file": "components/SciCMP/ResearchTrendsPage.tsx",
-      "line": 470,
-      "component": "TierBadge",
+      "file": "components/SciCMP/PricingPage.tsx",
+      "line": 207,
+      "component": "PricingPage",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/PricingPage.tsx",
+      "line": 253,
+      "component": "PricingPage",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/PricingPage.tsx",
+      "line": 256,
+      "component": "PricingPage",
       "type": "MISSING_HANDLER",
       "message": "<Button> component without onClick handler",
       "suggestion": "Add onClick prop for interactivity"
     },
     {
       "severity": "INFO",
-      "file": "components/SciCMP/ResearchTrendsPage.tsx",
-      "line": 521,
-      "component": "TierBadge",
-      "type": "POTENTIALLY_INTERACTIVE",
-      "message": "Element with cursor-pointer but no visible onClick",
-      "suggestion": "Verify this should be clickable"
-    },
-    {
-      "severity": "WARNING",
-      "file": "components/SciCMP/ResearchTrendsPage.tsx",
-      "line": 612,
-      "component": "TierBadge",
-      "type": "MISSING_HANDLER",
-      "message": "<Button> component without onClick handler",
-      "suggestion": "Add onClick prop for interactivity"
-    },
-    {
-      "severity": "WARNING",
-      "file": "components/SciCMP/ResearchTrendsPage.tsx",
-      "line": 616,
-      "component": "TierBadge",
-      "type": "MISSING_HANDLER",
-      "message": "<Button> component without onClick handler",
-      "suggestion": "Add onClick prop for interactivity"
-    },
-    {
-      "severity": "WARNING",
-      "file": "components/SciCMP/ResearchTrendsPage.tsx",
-      "line": 625,
-      "component": "TierBadge",
-      "type": "MISSING_HANDLER",
-      "message": "<Button> component without onClick handler",
-      "suggestion": "Add onClick prop for interactivity"
-    },
-    {
-      "severity": "WARNING",
-      "file": "components/SciCMP/ResearchTrendsPage.tsx",
-      "line": 629,
-      "component": "TierBadge",
-      "type": "MISSING_HANDLER",
-      "message": "<Button> component without onClick handler",
-      "suggestion": "Add onClick prop for interactivity"
-    },
-    {
-      "severity": "WARNING",
-      "file": "components/SciCMP/ResearchTrendsPage.tsx",
-      "line": 638,
-      "component": "TierBadge",
-      "type": "MISSING_HANDLER",
-      "message": "<Button> component without onClick handler",
-      "suggestion": "Add onClick prop for interactivity"
-    },
-    {
-      "severity": "WARNING",
-      "file": "components/SciCMP/ResearchTrendsPage.tsx",
-      "line": 642,
-      "component": "TierBadge",
-      "type": "MISSING_HANDLER",
-      "message": "<Button> component without onClick handler",
-      "suggestion": "Add onClick prop for interactivity"
-    },
-    {
-      "severity": "WARNING",
-      "file": "components/SciCMP/ResearchTrendsPage.tsx",
-      "line": 708,
-      "component": "TierBadge",
-      "type": "MISSING_HANDLER",
-      "message": "<Button> component without onClick handler",
-      "suggestion": "Add onClick prop for interactivity"
-    },
-    {
-      "severity": "WARNING",
-      "file": "components/SciCMP/ResearchTrendsPage.tsx",
-      "line": 712,
-      "component": "TierBadge",
-      "type": "MISSING_HANDLER",
-      "message": "<Button> component without onClick handler",
-      "suggestion": "Add onClick prop for interactivity"
-    },
-    {
-      "severity": "WARNING",
-      "file": "components/SciCMP/ResearchTrendsPage.tsx",
-      "line": 830,
-      "component": "TierBadge",
-      "type": "MISSING_HANDLER",
-      "message": "<Button> component without onClick handler",
-      "suggestion": "Add onClick prop for interactivity"
-    },
-    {
-      "severity": "WARNING",
-      "file": "components/SciCMP/ResearchTrendsPage.tsx",
-      "line": 834,
-      "component": "TierBadge",
-      "type": "MISSING_HANDLER",
-      "message": "<Button> component without onClick handler",
-      "suggestion": "Add onClick prop for interactivity"
-    },
-    {
-      "severity": "WARNING",
-      "file": "components/SciCMP/ResearchTrendsPage.tsx",
-      "line": 838,
-      "component": "TierBadge",
-      "type": "MISSING_HANDLER",
-      "message": "<Button> component without onClick handler",
-      "suggestion": "Add onClick prop for interactivity"
-    },
-    {
-      "severity": "INFO",
-      "file": "components/SciCMP/TemplateGalleryPage.tsx",
-      "line": 120,
-      "component": "parseHashRoute",
-      "type": "TODO_FOUND",
-      "message": "description: 'AutoDock Vina docking pipeline with ligand preparation, receptor setup, binding pose analysis, and scoring visualization.',",
-      "suggestion": "Address this TODO before production"
-    },
-    {
-      "severity": "INFO",
-      "file": "components/SciCMP/TemplateGalleryPage.tsx",
-      "line": 125,
-      "component": "parseHashRoute",
-      "type": "TODO_FOUND",
-      "message": "tags: ['chemistry', 'docking', 'drug-discovery', 'AutoDock'],",
-      "suggestion": "Address this TODO before production"
-    },
-    {
-      "severity": "INFO",
-      "file": "components/SciCMP/TemplateGalleryPage.tsx",
-      "line": 283,
-      "component": "parseHashRoute",
-      "type": "TODO_FOUND",
-      "message": "description: 'AutoDock Vina with pre-configured docking scenarios.',",
-      "suggestion": "Address this TODO before production"
-    },
-    {
-      "severity": "WARNING",
-      "file": "components/SciCMP/TemplateGalleryPage.tsx",
-      "line": 390,
-      "component": "parseHashRoute",
-      "type": "DEBUG_CODE",
-      "message": "console.log statement found",
-      "suggestion": "Remove or replace with proper logging"
-    },
-    {
-      "severity": "WARNING",
-      "file": "components/SciCMP/TemplateGalleryPage.tsx",
-      "line": 407,
-      "component": "parseHashRoute",
-      "type": "DEBUG_CODE",
-      "message": "console.log statement found",
-      "suggestion": "Remove or replace with proper logging"
-    },
-    {
-      "severity": "INFO",
-      "file": "components/SciCMP/TemplateGalleryPage.tsx",
-      "line": 904,
-      "component": "parseHashRoute",
+      "file": "components/SciCMP/PricingPage.tsx",
+      "line": 280,
+      "component": "PricingPage",
       "type": "POTENTIALLY_INTERACTIVE",
       "message": "Element with cursor-pointer but no visible onClick",
       "suggestion": "Verify this should be clickable"
@@ -443,12 +308,120 @@
     },
     {
       "severity": "WARNING",
-      "file": "components/SciCMP/DashboardPage.tsx",
-      "line": 1076,
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 470,
       "component": "TierBadge",
       "type": "MISSING_HANDLER",
-      "message": "Button found without onClick handler",
-      "suggestion": "Add onClick handler or add disabled attribute"
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 521,
+      "component": "TierBadge",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 612,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 616,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 625,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 629,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 638,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 642,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 708,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 712,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 830,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 834,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 838,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
     },
     {
       "severity": "WARNING",
@@ -479,51 +452,6 @@
     },
     {
       "severity": "WARNING",
-      "file": "components/SciCMP/PricingPage.tsx",
-      "line": 136,
-      "component": "PricingPage",
-      "type": "MISSING_HANDLER",
-      "message": "Button found without onClick handler",
-      "suggestion": "Add onClick handler or add disabled attribute"
-    },
-    {
-      "severity": "WARNING",
-      "file": "components/SciCMP/PricingPage.tsx",
-      "line": 201,
-      "component": "PricingPage",
-      "type": "MISSING_HANDLER",
-      "message": "<Button> component without onClick handler",
-      "suggestion": "Add onClick prop for interactivity"
-    },
-    {
-      "severity": "WARNING",
-      "file": "components/SciCMP/PricingPage.tsx",
-      "line": 247,
-      "component": "PricingPage",
-      "type": "MISSING_HANDLER",
-      "message": "<Button> component without onClick handler",
-      "suggestion": "Add onClick prop for interactivity"
-    },
-    {
-      "severity": "WARNING",
-      "file": "components/SciCMP/PricingPage.tsx",
-      "line": 250,
-      "component": "PricingPage",
-      "type": "MISSING_HANDLER",
-      "message": "<Button> component without onClick handler",
-      "suggestion": "Add onClick prop for interactivity"
-    },
-    {
-      "severity": "INFO",
-      "file": "components/SciCMP/PricingPage.tsx",
-      "line": 274,
-      "component": "PricingPage",
-      "type": "POTENTIALLY_INTERACTIVE",
-      "message": "Element with cursor-pointer but no visible onClick",
-      "suggestion": "Verify this should be clickable"
-    },
-    {
-      "severity": "WARNING",
       "file": "components/SciCMP/Header.tsx",
       "line": 119,
       "component": "Header",
@@ -532,13 +460,58 @@
       "suggestion": "Add onClick prop for interactivity"
     },
     {
+      "severity": "INFO",
+      "file": "components/SciCMP/TemplateGalleryPage.tsx",
+      "line": 120,
+      "component": "parseHashRoute",
+      "type": "TODO_FOUND",
+      "message": "description: 'AutoDock Vina docking pipeline with ligand preparation, receptor setup, binding pose analysis, and scoring visualization.',",
+      "suggestion": "Address this TODO before production"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/TemplateGalleryPage.tsx",
+      "line": 125,
+      "component": "parseHashRoute",
+      "type": "TODO_FOUND",
+      "message": "tags: ['chemistry', 'docking', 'drug-discovery', 'AutoDock'],",
+      "suggestion": "Address this TODO before production"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/TemplateGalleryPage.tsx",
+      "line": 283,
+      "component": "parseHashRoute",
+      "type": "TODO_FOUND",
+      "message": "description: 'AutoDock Vina with pre-configured docking scenarios.',",
+      "suggestion": "Address this TODO before production"
+    },
+    {
       "severity": "WARNING",
-      "file": "components/ui/calendar.tsx",
-      "line": 189,
-      "component": "Calendar",
-      "type": "MISSING_HANDLER",
-      "message": "<Button> component without onClick handler",
-      "suggestion": "Add onClick prop for interactivity"
+      "file": "components/SciCMP/TemplateGalleryPage.tsx",
+      "line": 390,
+      "component": "parseHashRoute",
+      "type": "DEBUG_CODE",
+      "message": "console.log statement found",
+      "suggestion": "Remove or replace with proper logging"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/TemplateGalleryPage.tsx",
+      "line": 407,
+      "component": "parseHashRoute",
+      "type": "DEBUG_CODE",
+      "message": "console.log statement found",
+      "suggestion": "Remove or replace with proper logging"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/TemplateGalleryPage.tsx",
+      "line": 904,
+      "component": "parseHashRoute",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
     },
     {
       "severity": "WARNING",
@@ -566,6 +539,51 @@
       "type": "MISSING_HANDLER",
       "message": "<Button> component without onClick handler",
       "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/ui/calendar.tsx",
+      "line": 189,
+      "component": "Calendar",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/SciCMP/PricingPage.tsx",
+      "line": 207,
+      "component": "PricingPage",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/SciCMP/PricingPage.tsx",
+      "line": 253,
+      "component": "PricingPage",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/SciCMP/PricingPage.tsx",
+      "line": 256,
+      "component": "PricingPage",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/SciCMP/PricingPage.tsx",
+      "line": 280,
+      "component": "PricingPage",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
     },
     {
       "severity": "INFO",
@@ -740,15 +758,6 @@
     },
     {
       "severity": "WARNING",
-      "file": "components/SciCMP/SciCMP/DashboardPage.tsx",
-      "line": 369,
-      "component": "DashboardPage",
-      "type": "MISSING_HANDLER",
-      "message": "Button found without onClick handler",
-      "suggestion": "Add onClick handler or add disabled attribute"
-    },
-    {
-      "severity": "WARNING",
       "file": "components/SciCMP/SciCMP/AboutPage.tsx",
       "line": 247,
       "component": "AboutPage",
@@ -773,51 +782,6 @@
       "type": "MISSING_HANDLER",
       "message": "<Button> component without onClick handler",
       "suggestion": "Add onClick prop for interactivity"
-    },
-    {
-      "severity": "WARNING",
-      "file": "components/SciCMP/SciCMP/PricingPage.tsx",
-      "line": 136,
-      "component": "PricingPage",
-      "type": "MISSING_HANDLER",
-      "message": "Button found without onClick handler",
-      "suggestion": "Add onClick handler or add disabled attribute"
-    },
-    {
-      "severity": "WARNING",
-      "file": "components/SciCMP/SciCMP/PricingPage.tsx",
-      "line": 201,
-      "component": "PricingPage",
-      "type": "MISSING_HANDLER",
-      "message": "<Button> component without onClick handler",
-      "suggestion": "Add onClick prop for interactivity"
-    },
-    {
-      "severity": "WARNING",
-      "file": "components/SciCMP/SciCMP/PricingPage.tsx",
-      "line": 247,
-      "component": "PricingPage",
-      "type": "MISSING_HANDLER",
-      "message": "<Button> component without onClick handler",
-      "suggestion": "Add onClick prop for interactivity"
-    },
-    {
-      "severity": "WARNING",
-      "file": "components/SciCMP/SciCMP/PricingPage.tsx",
-      "line": 250,
-      "component": "PricingPage",
-      "type": "MISSING_HANDLER",
-      "message": "<Button> component without onClick handler",
-      "suggestion": "Add onClick prop for interactivity"
-    },
-    {
-      "severity": "INFO",
-      "file": "components/SciCMP/SciCMP/PricingPage.tsx",
-      "line": 274,
-      "component": "PricingPage",
-      "type": "POTENTIALLY_INTERACTIVE",
-      "message": "Element with cursor-pointer but no visible onClick",
-      "suggestion": "Verify this should be clickable"
     },
     {
       "severity": "WARNING",
