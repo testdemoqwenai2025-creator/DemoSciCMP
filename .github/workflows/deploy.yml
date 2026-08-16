@@ -3,10 +3,6 @@ name: Deploy DemoSciCMP to GitHub Pages
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - '**.md'
-      - 'LICENSE'
-      - '.gitignore'
   workflow_dispatch:  # Allow manual trigger
 
 permissions:
@@ -22,8 +18,6 @@ jobs:
   # Build job
   build:
     runs-on: ubuntu-latest
-    env:
-      NODE_VERSION: '18'
     
     steps:
       - name: Checkout repository
@@ -32,11 +26,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
+          node-version: '20'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build static site
         run: npm run build
