@@ -26,7 +26,11 @@ const AboutPage = dynamic(() => import('@/components/SciCMP/AboutPage'), {
   loading: () => <div className="min-h-screen bg-background flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>
 });
 
-type PageId = 'landing' | 'dashboard' | 'features' | 'pricing' | 'about';
+const ResearchTrendsPage = dynamic(() => import('@/components/SciCMP/ResearchTrendsPage'), {
+  loading: () => <div className="min-h-screen bg-background flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>
+});
+
+type PageId = 'landing' | 'dashboard' | 'features' | 'research-trends' | 'pricing' | 'about';
 
 export default function HomePage() {
   const [currentPage, setCurrentPage] = useState<PageId>('landing');
@@ -85,6 +89,8 @@ export default function HomePage() {
         return <PricingPage onNavigate={handleNavigate} />;
       case 'about':
         return <AboutPage />;
+      case 'research-trends':
+        return <ResearchTrendsPage />;
       default:
         return <LandingPage onNavigate={handleNavigate} />;
     }

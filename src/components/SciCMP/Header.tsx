@@ -26,6 +26,7 @@ const navItems = [
   { id: 'landing', label: 'Home' },
   { id: 'features', label: 'Features' },
   { id: 'dashboard', label: 'Dashboard' },
+  { id: 'research-trends', label: 'Research Trends' },
   { id: 'pricing', label: 'Pricing' },
   { id: 'about', label: 'About' },
 ];
