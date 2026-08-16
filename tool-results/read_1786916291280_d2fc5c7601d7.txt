@@ -1,0 +1,867 @@
+     1→'use client';
+     2→
+     3→import { useState } from 'react';
+     4→import { Button } from '@/components/ui/button';
+     5→import {
+     6→  // Hero & Navigation Icons
+     7→  Brain,
+     8→  Atom,
+     9→  Rocket,
+    10→  TrendingUp,
+    11→  Sparkles,
+    12→  Lightbulb,
+    13→  ArrowRight,
+    14→  ExternalLink,
+    15→  ChevronRight,
+    16→  ChevronDown,
+    17→  ChevronUp,
+    18→  
+    19→  // Feature Icons
+    20→  LayoutTemplate,
+    21→  Users,
+    22→  Smartphone,
+    23→  Calculator,
+    24→  Database,
+    25→  FileOutput,
+    26→  Wifi,
+    27→  Glasses,
+    28→  Network,
+    29→  Tablet,
+    30→  
+    31→  // Resource Icons
+    32→  BookOpen,
+    33→  Code2,
+    34→  Puzzle,
+    35→  Gift,
+    36→  Lock,
+    37→  Unlock,
+    38→  Crown,
+    39→  Star,
+    40→  
+    41→  // Status Icons
+    42→  CheckCircle2,
+    43→  Clock,
+    44→  Zap,
+    45→  Target,
+    46→  MessageSquare,
+    47→  Eye,
+    48→  Bell,
+    49→  Play
+    50→} from 'lucide-react';
+    51→
+    52→// Research Trends Data Structure
+    53→interface ResearchFeature {
+    54→  id: string;
+    55→  title: string;
+    56→  description: string;
+    57→  icon: React.ReactNode;
+    58→  status: 'available' | 'beta' | 'coming-soon' | 'planned';
+    59→  tier: 'free' | 'freemium' | 'premium';
+    60→  freeResources?: {
+    61→    title: string;
+    62→    url: string;
+    63→    type: 'tutorial' | 'template' | 'api-doc' | 'paper' | 'tool';
+    64→  }[];
+    65→  capabilities: string[];
+    66→  useCases: string[];
+    67→}
+    68→
+    69→interface PhaseData {
+    70→  id: string;
+    71→  title: string;
+    72→  subtitle: string;
+    73→  timeline: string;
+    74→  status: 'active' | 'upcoming' | 'future';
+    75→  color: string;
+    76→  gradient: string;
+    77→  gradientLight: string;
+    78→  icon: React.ReactNode;
+    79→  vision: string;
+    80→  highlights: string[];
+    81→  features: ResearchFeature[];
+    82→}
+    83→
+    84→const researchPhases: PhaseData[] = [
+    85→  {
+    86→    id: 'phase1',
+    87→    title: 'Phase 1',
+    88→    subtitle: 'Intelligent Workflows & Collaboration',
+    89→    timeline: 'Q4 2026 — Available Now',
+    90→    status: 'active',
+    91→    color: 'emerald',
+    92→    gradient: 'from-emerald-500 to-teal-600',
+    93→    gradientLight: 'from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30',
+    94→    icon: <Brain className="w-6 h-6" />,
+    95→    vision: 'Empowering researchers with AI-assisted workflows and seamless collaboration tools that adapt to your unique research style.',
+    96→    highlights: ['AI-Powered Recommendations', 'Template Gallery', 'Real-time Collaboration', 'Mobile-First Design'],
+    97→    features: [
+    98→      {
+    99→        id: 'ai-workflows',
+   100→        title: 'AI-Powered Workflow Recommendations',
+   101→        description: 'Intelligent suggestions based on your research patterns, automatically optimizing compute resources and suggesting next steps. Our AI learns from millions of research workflows to accelerate your discoveries.',
+   102→        icon: <Sparkles className="w-5 h-5" />,
+   103→        status: 'available',
+   104→        tier: 'freemium',
+   105→        freeResources: [
+   106→          { title: 'Getting Started Guide', url: '#/docs/ai-workflows/intro', type: 'tutorial' },
+   107→          { title: 'Basic Workflow Templates (5)', url: '#/templates/ai-workflows/free', type: 'template' },
+   108→          { title: 'API Documentation', url: '#/api/workflow-ai/basic', type: 'api-doc' }
+   109→        ],
+   110→        capabilities: ['Pattern recognition', 'Resource optimization', 'Smart suggestions', 'Auto-complete pipelines'],
+   111→        useCases: ['Repetitive analysis automation', 'Beginner-friendly guidance', 'Expert workflow acceleration']
+   112→      },
+   113→      {
+   114→        id: 'template-gallery',
+   115→        title: 'Template Gallery for Common Analyses',
+   116→        description: 'Pre-built, peer-reviewed templates for bioinformatics, cheminformatics, physics simulations, and more. Each template follows best practices and is optimized for reproducibility.',
+   117→        icon: <LayoutTemplate className="w-5 h-5" />,
+   118→        status: 'available',
+   119→        tier: 'free',
+   120→        freeResources: [
+   121→          { title: 'BLAST+ Sequence Analysis', url: '#/templates/bioinformatics/blast', type: 'template' },
+   122→          { title: 'Molecular Docking Setup', url: '#/templates/cheminformatics/docking', type: 'template' },
+   123→          { title: 'ML Model Training Pipeline', url: '#/templates/ml/training', type: 'template' },
+   124→          { title: 'Statistical Analysis Suite', url: '#/templates/statistics/basic', type: 'template' },
+   125→          { title: 'Visualization Templates', url: '#/templates/viz/publication-ready', type: 'template' },
+   126→          { title: 'Create Your Template Guide', url: '#/docs/templates/create', type: 'tutorial' }
+   127→        ],
+   128→        capabilities: ['One-click setup', 'Parameter presets', 'Best practices embedded', 'Community curated'],
+   129→        useCases: ['Quick start projects', 'Teaching & training', 'Standardization across labs']
+   130→      },
+   131→      {
+   132→        id: 'collaboration',
+   133→        title: 'Enhanced Collaboration Features',
+   134→        description: 'Real-time co-editing with live cursors, threaded comments, version history, and instant sharing. Work together seamlessly, whether across the hall or across the globe.',
+   135→        icon: <Users className="w-5 h-5" />,
+   136→        status: 'beta',
+   137→        tier: 'freemium',
+   138→        freeResources: [
+   139→          { title: 'Real-time Editing Basics', url: '#/docs/collab/realtime', type: 'tutorial' },
+   140→          { title: 'Commenting System Guide', url: '#/docs/collab/comments', type: 'api-doc' },
+   141→          { title: 'Free Tier: 3 Collaborators', url: '#/pricing#collaboration', type: 'tool' }
+   142→        ],
+   143→        capabilities: ['Live cursors', 'Threaded comments', '@mentions', 'Activity feeds'],
+   144→        useCases: ['Remote team collaboration', 'Peer review workflows', 'Shared lab notebooks']
+   145→      },
+   146→      {
+   147→        id: 'mobile-experience',
+   148→        title: 'Improved Mobile Experience',
+   149→        description: 'Responsive design optimized for tablets and phones with offline support and push notifications. Monitor jobs, review results, and collaborate from anywhere.',
+   150→        icon: <Smartphone className="w-5 h-5" />,
+   151→        status: 'beta',
+   152→        tier: 'free',
+   153→        freeResources: [
+   154→          { title: 'Mobile App Download (iOS)', url: '#/download/ios', type: 'tool' },
+   155→          { title: 'Mobile App Download (Android)', url: '#/download/android', type: 'tool' },
+   156→          { title: 'Mobile Features Overview', url: '#/docs/mobile/features', type: 'tutorial' }
+   157→        ],
+   158→        capabilities: ['Responsive UI', 'Offline mode', 'Push notifications', 'Touch gestures'],
+   159→        useCases: ['Field research monitoring', 'Quick job checks', 'On-the-go collaboration']
+   160→      }
+   161→    ]
+   162→  },
+   163→  {
+   164→    id: 'phase2',
+   165→    title: 'Phase 2',
+   166→    subtitle: 'Quantum Simulation & Advanced Analytics',
+   167→    timeline: 'Q1-Q2 2027 — Coming Soon',
+   168→    status: 'upcoming',
+   169→    color: 'violet',
+   170→    gradient: 'from-violet-500 to-purple-600',
+   171→    gradientLight: 'from-violet-50 to-purple-50 dark:from-violet-950/30 dark:to-purple-950/30',
+   172→    icon: <Atom className="w-6 h-6" />,
+   173→    vision: 'Bridging classical and quantum computing with advanced analytics and seamless database integrations for the next generation of scientific discovery.',
+   174→    highlights: ['Quantum Simulation Mode', 'Advanced Statistics', 'Database Integration', 'Auto Report Generation'],
+   175→    features: [
+   176→      {
+   177→        id: 'quantum-sim',
+   178→        title: 'Quantum Computing Simulation Mode',
+   179→        description: 'Simulate quantum algorithms on classical hardware using Qiskit and Cirq integrations. Prepare your research for the quantum advantage era with our intuitive simulation environment.',
+   180→        icon: <Atom className="w-5 h-5" />,
+   181→        status: 'coming-soon',
+   182→        tier: 'freemium',
+   183→        freeResources: [
+   184→          { title: 'Quantum Computing Primer', url: '#/learn/quantum/intro', type: 'tutorial' },
+   185→          { title: 'Qiskit Integration Docs', url: '#/integrations/qiskit', type: 'api-doc' },
+   186→          { title: 'Free: 10 Qubit Simulations/day', url: '#/pricing#quantum', type: 'tool' },
+   187→          { title: 'Research Paper: Quantum in Biology', url: '#/papers/quantum-bio-2026', type: 'paper' }
+   188→        ],
+   189→        capabilities: ['Qiskit/Cirq integration', 'Circuit visualization', 'Noise modeling', 'Hybrid algorithms'],
+   190→        useCases: ['Algorithm prototyping', 'Education & training', 'Proof-of-concept studies']
+   191→      },
+   192→      {
+   193→        id: 'stats-packages',
+   194→        title: 'Advanced Statistical Analysis Packages',
+   195→        description: 'Industry-standard statistical tools with Bayesian methods, causal inference, and uncertainty quantification. Bridge R and Python seamlessly in your analyses.',
+   196→        icon: <Calculator className="w-5 h-5" />,
+   197→        status: 'coming-soon',
+   198→        tier: 'free',
+   199→        freeResources: [
+   200→          { title: 'R/Python Bridge Documentation', url: '#/docs/stats/r-python', type: 'api-doc' },
+   201→          { title: 'Bayesian Analysis Tutorial', url: '#/learn/stats/bayesian', type: 'tutorial' },
+   202→          { title: 'Free Statistical Templates (12)', url: '#/templates/stats/free', type: 'template' },
+   203→          { title: 'Uncertainty Quantification Guide', url: '#/learn/stats/uq', type: 'tutorial' }
+   204→        ],
+   205→        capabilities: ['Bayesian inference', 'Causal analysis', 'UQ frameworks', 'Reproducible reports'],
+   206→        useCases: ['Clinical trial analysis', 'Experimental validation', 'Meta-analysis']
+   207→      },
+   208→      {
+   209→        id: 'db-integration',
+   210→        title: 'Integration with Major Databases',
+   211→        description: 'Seamless connectivity to PubMed, arXiv, PDB, UniProt, and other scientific repositories. Search, fetch, and cite without leaving your workspace.',
+   212→        icon: <Database className="w-5 h-5" />,
+   213→        status: 'coming-soon',
+   214→        tier: 'freemium',
+   215→        freeResources: [
+   216→          { title: 'PubMed Query Builder', url: '#/tools/pubmed-query', type: 'tool' },
+   217→          { title: 'arXiv API Integration', url: '#/integrations/arxiv', type: 'api-doc' },
+   218→          { title: 'PDB Structure Fetcher', url: '#/tools/pdb-fetch', type: 'tool' },
+   219→          { title: 'Free: 100 Queries/day', url: '#/pricing#databases', type: 'tool' }
+   220→        ],
+   221→        capabilities: ['Unified search', 'Auto-citation', 'Live data sync', 'API aggregation'],
+   222→        useCases: ['Literature reviews', 'Dataset discovery', 'Automated referencing']
+   223→      },
+   224→      {
+   225→        id: 'auto-reports',
+   226→        title: 'Automated Report Generation',
+   227→        description: 'Transform results into publication-ready documents with one click. Generate figures, tables, and citations formatted for Nature, Science, Cell, and more.',
+   228→        icon: <FileOutput className="w-5 h-5" />,
+   229→        status: 'coming-soon',
+   230→        tier: 'premium',
+   231→        freeResources: [
+   232→          { title: 'Report Templates (3 Free)', url: '#/templates/reports/free', type: 'template' },
+   233→          { title: 'LaTeX Export Guide', url: '#/docs/export/latex', type: 'tutorial' },
+   234→          { title: 'Figure Generation Basics', url: '#/docs/figures/create', type: 'tutorial' }
+   235→        ],
+   236→        capabilities: ['One-click PDF', 'Journal formatting', 'Auto-figures', 'Citation management'],
+   237→        useCases: ['Paper submissions', 'Grant reports', 'Lab documentation']
+   238→      }
+   239→    ]
+   240→  },
+   241→  {
+   242→    id: 'phase3',
+   243→    title: 'Phase 3',
+   244→    subtitle: 'Future Frontier Technologies',
+   245→    timeline: 'Q3-Q4 2027+ — Vision',
+   246→    status: 'future',
+   247→    color: 'rose',
+   248→    gradient: 'from-rose-500 to-orange-600',
+   249→    gradientLight: 'from-rose-50 to-orange-50 dark:from-rose-950/30 dark:to-orange-950/30',
+   250→    icon: <Rocket className="w-6 h-6" />,
+   251→    vision: 'Pioneering the next generation of scientific computing with quantum connectivity, immersive visualization, and federated intelligence.',
+   252→    highlights: ['Live Quantum Access', 'AR/VR Visualization', 'Federated Learning', 'Native Mobile Apps'],
+   253→    features: [
+   254→      {
+   255→        id: 'quantum-live',
+   256→        title: 'Actual Quantum Compute Connectivity',
+   257→        description: 'Direct access to IBM Quantum, Google Quantum AI, Rigetti, and other quantum processing units. Run real quantum experiments alongside classical computations.',
+   258→        icon: <Wifi className="w-5 h-5" />,
+   259→        status: 'planned',
+   260→        tier: 'premium',
+   261→        freeResources: [
+   262→          { title: 'Quantum Hardware Comparison', url: '#/learn/quantum/hardware', type: 'tutorial' },
+   263→          { title: 'Free: Monthly Quantum Credits', url: '#/pricing#quantum-live', type: 'tool' },
+   264→          { title: 'Roadmap & Waitlist', url: '#/roadmap/quantum', type: 'api-doc' }
+   265→        ],
+   266→        capabilities: ['Real QPU access', 'Queue management', 'Result caching', 'Error mitigation'],
+   267→        useCases: ['Production quantum experiments', 'Quantum ML training', 'Optimization problems']
+   268→      },
+   269→      {
+   270→        id: 'ar-vr',
+   271→        title: 'AR/VR Visualization Modes',
+   272→        description: 'Immersive 3D environments for molecular exploration, data visualization, and virtual lab experiences. Step inside your data like never before.',
+   273→        icon: <Glasses className="w-5 h-5" />,
+   274→        status: 'planned',
+   275→        tier: 'freemium',
+   276→        freeResources: [
+   277→          { title: 'VR Preview Demo', url: '#/demo/vr-molecule', type: 'tool' },
+   278→          { title: 'AR Setup Guide', url: '#/docs/arvr/setup', type: 'tutorial' },
+   279→          { title: 'Free: Basic VR Viewer', url: '#/pricing#arvr', type: 'tool' },
+   280→          { title: 'Use Cases Gallery', url: '#/showcase/arvr', type: 'tutorial' }
+   281→        ],
+   282→        capabilities: ['Molecular VR', 'Data immersion', 'Virtual labs', 'Collaborative spaces'],
+   283→        useCases: ['Drug design review', 'Structure analysis', 'Education & outreach']
+   284→      },
+   285→      {
+   286→        id: 'federated-learning',
+   287→        title: 'Federated Learning Framework',
+   288→        description: 'Train models across institutions without sharing sensitive data. Enable privacy-preserving collaboration while maintaining data sovereignty.',
+   289→        icon: <Network className="w-5 h-5" />,
+   290→        status: 'planned',
+   291→        tier: 'premium',
+   292→        freeResources: [
+   293→          { title: 'Federated Learning Whitepaper', url: '#/papers/federated-2027', type: 'paper' },
+   294→          { title: 'Privacy Framework Docs', url: '#/docs/federated/privacy', type: 'api-doc' },
+   295→          { title: 'Free: Small-scale FL (≤5 nodes)', url: '#/pricing#federated', type: 'tool' }
+   296→        ],
+   297→        capabilities: ['Differential privacy', 'Secure aggregation', 'Multi-site training', 'Audit trails'],
+   298→        useCases: ['Healthcare consortia', 'Competitive collaboration', 'Regulatory compliance']
+   299→      },
+   300→      {
+   301→        id: 'mobile-apps',
+   302→        title: 'Cross-Platform Mobile Apps',
+   303→        description: 'Native iOS and Android applications with full platform capabilities including job submission, result monitoring, and team communication on the go.',
+   304→        icon: <Tablet className="w-5 h-5" />,
+   305→        status: 'planned',
+   306→        tier: 'free',
+   307→        freeResources: [
+   308→          { title: 'App Store Preview', url: '#/download/apps', type: 'tool' },
+   309→          { title: 'Mobile API Documentation', url: '#/api/mobile', type: 'api-doc' },
+   310→          { title: 'Full Feature List', url: '#/features/mobile-full', type: 'tutorial' }
+   311→        ],
+   312→        capabilities: ['Native performance', 'Biometric auth', 'Background sync', 'Widgets'],
+   313→        useCases: ['Field data collection', 'Lab management', 'Conference presentations']
+   314→      }
+   315→    ]
+   316→  }
+   317→];
+   318→
+   319→// Sub-components
+   320→function TierBadge({ tier }: { tier: 'free' | 'freemium' | 'premium' }) {
+   321→  const config = {
+   322→    free: { icon: <Gift className="w-3 h-3" />, label: 'Free', bg: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' },
+   323→    freemium: { icon: <Star className="w-3 h-3" />, label: 'Freemium', bg: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' },
+   324→    premium: { icon: <Crown className="w-3 h-3" />, label: 'Premium', bg: 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300' }
+   325→  };
+   326→  
+   327→  return (
+   328→    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${config[tier].bg}`}>
+   329→      {config[tier].icon}
+   330→      {config[tier].label}
+   331→    </span>
+   332→  );
+   333→}
+   334→
+   335→function StatusBadge({ status }: { status: 'available' | 'beta' | 'coming-soon' | 'planned' }) {
+   336→  const config = {
+   337→    available: { label: 'Available Now', class: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300' },
+   338→    beta: { label: 'Beta', class: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' },
+   339→    'coming-soon': { label: 'Coming Soon', class: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' },
+   340→    planned: { label: 'Planned', class: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400' }
+   341→  };
+   342→  
+   343→  return (
+   344→    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${config[status].class}`}>
+   345→      {config[status].label}
+   346→    </span>
+   347→  );
+   348→}
+   349→
+   350→function ResourceLink({ resource }: { resource: ResearchFeature['freeResources'][0] }) {
+   351→  const typeConfig = {
+   352→    tutorial: { icon: <BookOpen className="w-3 h-3" />, color: 'text-blue-600' },
+   353→    template: { icon: <LayoutTemplate className="w-3 h-3" />, color: 'text-emerald-600' },
+   354→    'api-doc': { icon: <Code2 className="w-3 h-3" />, color: 'text-purple-600' },
+   355→    paper: { icon: <FileOutput className="w-3 h-3" />, color: 'text-orange-600' },
+   356→    tool: { icon: <Puzzle className="w-3 h-3" />, color: 'text-pink-600' }
+   357→  };
+   358→  
+   359→  const config = typeConfig[resource.type];
+   360→  
+   361→  return (
+   362→    <a
+   363→      href={resource.url}
+   364→      className={`flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors group ${config.color}`}
+   365→    >
+   366→      <span className="opacity-70 group-hover:opacity-100">{config.icon}</span>
+   367→      <span className="text-sm font-medium flex-1">{resource.title}</span>
+   368→      <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+   369→    </a>
+   370→  );
+   371→}
+   372→
+   373→function FeatureCard({ feature }: { feature: ResearchFeature }) {
+   374→  const [isExpanded, setIsExpanded] = useState(false);
+   375→  
+   376→  return (
+   377→    <div className="rounded-xl border bg-card overflow-hidden hover:shadow-lg transition-all duration-300">
+   378→      {/* Card Header */}
+   379→      <div className="p-5 border-b border-border/50">
+   380→        <div className="flex items-start justify-between mb-3">
+   381→          <div className="flex items-center gap-3">
+   382→            <div className="p-2 rounded-lg bg-primary/10 text-primary">
+   383→              {feature.icon}
+   384→            </div>
+   385→            <div>
+   386→              <h4 className="font-semibold text-base">{feature.title}</h4>
+   387→              <div className="flex items-center gap-2 mt-1">
+   388→                <StatusBadge status={feature.status} />
+   389→                <TierBadge tier={feature.tier} />
+   390→              </div>
+   391→            </div>
+   392→          </div>
+   393→          
+   394→          <button
+   395→            onClick={() => setIsExpanded(!isExpanded)}
+   396→            className="p-1 rounded-md hover:bg-accent transition-colors"
+   397→          >
+   398→            {isExpanded ? (
+   399→              <ChevronUp className="w-5 h-5 text-muted-foreground" />
+   400→            ) : (
+   401→              <ChevronDown className="w-5 h-5 text-muted-foreground" />
+   402→            )}
+   403→          </button>
+   404→        </div>
+   405→        
+   406→        <p className="text-sm text-muted-foreground leading-relaxed">
+   407→          {feature.description}
+   408→        </p>
+   409→      </div>
+   410→      
+   411→      {/* Expanded Content */}
+   412→      {isExpanded && (
+   413→        <div className="p-5 space-y-5 animate-in slide-in-from-top-2 duration-200">
+   414→          {/* Capabilities */}
+   415→          <div>
+   416→            <h5 className="text-sm font-semibold mb-2 flex items-center gap-2">
+   417→              <Zap className="w-4 h-4 text-primary" />
+   418→              Core Capabilities
+   419→            </h5>
+   420→            <div className="flex flex-wrap gap-2">
+   421→              {feature.capabilities.map((cap) => (
+   422→                <span key={cap} className="px-2 py-1 rounded-md bg-primary/5 text-xs font-medium text-primary border border-primary/10">
+   423→                  {cap}
+   424→                </span>
+   425→              ))}
+   426→            </div>
+   427→          </div>
+   428→          
+   429→          {/* Use Cases */}
+   430→          <div>
+   431→            <h5 className="text-sm font-semibold mb-2 flex items-center gap-2">
+   432→              <Target className="w-4 h-4 text-secondary" />
+   433→              Use Cases
+   434→            </h5>
+   435→            <ul className="space-y-1">
+   436→              {feature.useCases.map((useCase) => (
+   437→                <li key={useCase} className="flex items-center gap-2 text-sm text-muted-foreground">
+   438→                  <ChevronRight className="w-3 h-3" />
+   439→                  {useCase}
+   440→                </li>
+   441→              ))}
+   442→            </ul>
+   443→          </div>
+   444→          
+   445→          {/* Free Resources Section */}
+   446→          {feature.freeResources && feature.freeResources.length > 0 && (
+   447→            <div className="rounded-lg bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 p-4 border border-dashed border-primary/20">
+   448→              <h5 className="text-sm font-semibold mb-3 flex items-center gap-2">
+   449→                <Unlock className="w-4 h-4 text-green-600" />
+   450→                Free Tier Resources
+   451→                <span className="text-xs font-normal text-muted-foreground">
+   452→                  ({feature.freeResources.length} available)
+   453→                </span>
+   454→              </h5>
+   455→              
+   456→              <div className="space-y-2">
+   457→                {feature.freeResources.map((resource, idx) => (
+   458→                  <ResourceLink key={idx} resource={resource} />
+   459→                ))}
+   460→              </div>
+   461→              
+   462→              {/* Upgrade Prompt */}
+   463→              {(feature.tier === 'premium' || feature.tier === 'freemium') && (
+   464→                <div className="mt-3 pt-3 border-t border-border/50">
+   465→                  <div className="flex items-center justify-between">
+   466→                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+   467→                      <Lock className="w-4 h-4" />
+   468→                      <span>Want full access?</span>
+   469→                    </div>
+   470→                    <Button size="sm" variant="outline" className="gap-1 text-xs h-8">
+   471→                      <Crown className="w-3 h-3" />
+   472→                      {feature.tier === 'premium' ? 'Upgrade to Pro' : 'View Plans'}
+   473→                    </Button>
+   474→                  </div>
+   475→                </div>
+   476→              )}
+   477→            </div>
+   478→          )}
+   479→        </div>
+   480→      )}
+   481→      
+   482→      {/* Collapsed State - Show Resource Count */}
+   483→      {!isExpanded && feature.freeResources && feature.freeResources.length > 0 && (
+   484→        <div className="px-5 pb-4">
+   485→          <button
+   486→            onClick={() => setIsExpanded(true)}
+   487→            className="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-primary/5 hover:bg-primary/10 transition-colors text-sm text-primary font-medium"
+   488→          >
+   489→            <Gift className="w-4 h-4" />
+   490→            View {feature.freeResources.length} Free Resources
+   491→            <ChevronRight className="w-4 h-4" />
+   492→          </button>
+   493→        </div>
+   494→      )}
+   495→    </div>
+   496→  );
+   497→}
+   498→
+   499→function PhaseSection({ phase, isLast }: { phase: PhaseData; isLast: boolean }) {
+   500→  const [isExpanded, setIsExpanded] = useState(phase.status === 'active');
+   501→  
+   502→  const statusConfig = {
+   503→    active: {
+   504→      badge: '🚀 Active Development',
+   505→      badgeClass: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
+   506→    },
+   507→    upcoming: {
+   508→      badge: '🔮 Coming Soon',
+   509→      badgeClass: 'bg-violet-500/10 text-violet-600 border-violet-500/20'
+   510→    },
+   511→    future: {
+   512→      badge: '🌟 Future Vision',
+   513→      badgeClass: 'bg-rose-500/10 text-rose-600 border-rose-500/20'
+   514→    }
+   515→  };
+   516→  
+   517→  return (
+   518→    <div className={`${isLast ? '' : 'mb-12'}`}>
+   519→      {/* Phase Header */}
+   520→      <div
+   521→        className={`rounded-2xl border-2 p-8 md:p-10 cursor-pointer transition-all duration-300 hover:shadow-xl ${
+   522→          phase.status === 'active' 
+   523→            ? 'border-emerald-500/30 bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5'
+   524→            : phase.status === 'upcoming'
+   525→            ? 'border-violet-500/30 bg-gradient-to-br from-violet-500/5 via-transparent to-purple-500/5'
+   526→            : 'border-rose-500/30 bg-gradient-to-br from-rose-500/5 via-transparent to-orange-500/5'
+   527→        }`}
+   528→        onClick={() => setIsExpanded(!isExpanded)}
+   529→      >
+   530→        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+   531→          <div className="flex items-center gap-5">
+   532→            <div className={`p-5 rounded-2xl bg-gradient-to-br ${phase.gradient} text-white shadow-xl transform hover:scale-105 transition-transform`}>
+   533→              {phase.icon}
+   534→            </div>
+   535→            
+   536→            <div>
+   537→              <div className="flex items-center gap-3 mb-2">
+   538→                <h3 className="text-3xl md:text-4xl font-bold">{phase.title}</h3>
+   539→                <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${statusConfig[phase.status].badgeClass}`}>
+   540→                  {statusConfig[phase.status].badge}
+   541→                </span>
+   542→              </div>
+   543→              <p className="text-xl text-muted-foreground font-medium mb-2">{phase.subtitle}</p>
+   544→              <p className="text-sm text-muted-foreground flex items-center gap-2">
+   545→                <Clock className="w-4 h-4" />
+   546→                {phase.timeline}
+   547→              </p>
+   548→              
+   549→              {/* Highlights Pills */}
+   550→              <div className="flex flex-wrap gap-2 mt-4">
+   551→                {phase.highlights.map((highlight) => (
+   552→                  <span key={highlight} className="px-3 py-1 rounded-full text-xs font-medium bg-background/80 backdrop-blur border border-border/50">
+   553→                    {highlight}
+   554→                  </span>
+   555→                ))}
+   556→              </div>
+   557→            </div>
+   558→          </div>
+   559→          
+   560→          <div className="flex items-center gap-4">
+   561→            <div className="text-center hidden lg:block px-6 py-4 rounded-xl bg-background/60 backdrop-blur border">
+   562→              <p className="text-sm text-muted-foreground">Features</p>
+   563→              <p className="text-3xl font-bold text-primary">{phase.features.length}</p>
+   564→            </div>
+   565→            <div className={`p-3 rounded-full transition-transform duration-300 ${isExpanded ? 'rotate-180 bg-primary/10' : 'bg-muted'}`}>
+   566→              <ChevronDown className="w-6 h-6 text-muted-foreground" />
+   567→            </div>
+   568→          </div>
+   569→        </div>
+   570→        
+   571→        {/* Vision Statement */}
+   572→        <div className="mt-8 p-5 rounded-xl bg-background/60 backdrop-blur border border-border/50">
+   573→          <div className="flex items-start gap-4">
+   574→            <div className="p-2 rounded-lg bg-yellow-500/10 text-yellow-500">
+   575→              <Lightbulb className="w-5 h-5" />
+   576→            </div>
+   577→            <p className="text-base italic text-muted-foreground leading-relaxed">
+   578→              "{phase.vision}"
+   579→            </p>
+   580→          </div>
+   581→        </div>
+   582→      </div>
+   583→      
+   584→      {/* Phase Features (Expandable) */}
+   585→      {isExpanded && (
+   586→        <div className="mt-8 space-y-6 animate-in slide-in-from-top-4 duration-300">
+   587→          <div className="grid md:grid-cols-2 gap-6">
+   588→            {phase.features.map((feature) => (
+   589→              <FeatureCard key={feature.id} feature={feature} />
+   590→            ))}
+   591→          </div>
+   592→          
+   593→          {/* Phase CTA */}
+   594→          <div className={`rounded-2xl p-8 bg-gradient-to-r ${phase.gradient} text-white`}>
+   595→            <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+   596→              <div>
+   597→                <h4 className="font-bold text-2xl mb-2">
+   598→                  Ready to Explore {phase.title}?
+   599→                </h4>
+   600→                <p className="text-white/80 text-base max-w-xl">
+   601→                  {phase.status === 'active' 
+   602→                    ? 'Start using these features today with our generous free tier.'
+   603→                    : phase.status === 'upcoming'
+   604→                    ? 'Join the waitlist for early access to these upcoming features.'
+   605→                    : 'Share your feedback to help shape the future of scientific computing.'}
+   606→                </p>
+   607→              </div>
+   608→              
+   609→              <div className="flex flex-col sm:flex-row gap-3">
+   610→                {phase.status === 'active' && (
+   611→                  <>
+   612→                    <Button size="lg" variant="secondary" className="gap-2 whitespace-nowrap">
+   613→                      <Play className="w-4 h-4" />
+   614→                      Get Started Free
+   615→                    </Button>
+   616→                    <Button size="lg" variant="outline" className="gap-2 text-white border-white/30 hover:bg-white/10 whitespace-nowrap">
+   617→                      <BookOpen className="w-4 h-4" />
+   618→                      Documentation
+   619→                    </Button>
+   620→                  </>
+   621→                )}
+   622→                
+   623→                {phase.status === 'upcoming' && (
+   624→                  <>
+   625→                    <Button size="lg" variant="secondary" className="gap-2 whitespace-nowrap">
+   626→                      <Bell className="w-4 h-4" />
+   627→                      Join Waitlist
+   628→                    </Button>
+   629→                    <Button size="lg" variant="outline" className="gap-2 text-white border-white/30 hover:bg-white/10 whitespace-nowrap">
+   630→                      <Eye className="w-4 h-4" />
+   631→                      Preview Demo
+   632→                    </Button>
+   633→                  </>
+   634→                )}
+   635→                
+   636→                {phase.status === 'future' && (
+   637→                  <>
+   638→                    <Button size="lg" variant="secondary" className="gap-2 whitespace-nowrap">
+   639→                      <MessageSquare className="w-4 h-4" />
+   640→                      Share Feedback
+   641→                    </Button>
+   642→                    <Button size="lg" variant="outline" className="gap-2 text-white border-white/30 hover:bg-white/10 whitespace-nowrap">
+   643→                      <Rocket className="w-4 h-4" />
+   644→                      View Roadmap
+   645→                    </Button>
+   646→                  </>
+   647→                )}
+   648→              </div>
+   649→            </div>
+   650→          </div>
+   651→        </div>
+   652→      )}
+   653→    </div>
+   654→  );
+   655→}
+   656→
+   657→// Main Page Component
+   658→export default function ResearchTrendsPage() {
+   659→  const totalFeatures = researchPhases.reduce((acc, phase) => acc + phase.features.length, 0);
+   660→  const totalFreeResources = researchPhases.reduce(
+   661→    (acc, phase) => acc + phase.features.reduce((featAcc, feat) => featAcc + (feat.freeResources?.length || 0), 0), 
+   662→    0
+   663→  );
+   664→
+   665→  return (
+   666→    <div className="min-h-screen bg-background">
+   667→      {/* Hero Section */}
+   668→      <section className="relative overflow-hidden">
+   669→        {/* Background Effects */}
+   670→        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+   671→          <div className="absolute inset-0 opacity-20">
+   672→            <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500 rounded-full blur-[128px]"></div>
+   673→            <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500 rounded-full blur-[128px]"></div>
+   674→            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-emerald-500 rounded-full blur-[128px]"></div>
+   675→          </div>
+   676→          
+   677→          {/* Grid Pattern Overlay */}
+   678→          <div className="absolute inset-0 opacity-5" style={{
+   679→            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+   680→          }}></div>
+   681→        </div>
+   682→
+   683→        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
+   684→          <div className="max-w-4xl mx-auto text-center text-white">
+   685→            {/* Badge */}
+   686→            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-8">
+   687→              <TrendingUp className="w-4 h-4" />
+   688→              <span className="text-sm font-medium">Current Research Trends</span>
+   689→              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+   690→            </div>
+   691→
+   692→            {/* Title */}
+   693→            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+   694→              The Future of{' '}
+   695→              <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
+   696→                Scientific Computing
+   697→              </span>
+   698→            </h1>
+   699→
+   700→            {/* Description */}
+   701→            <p className="text-lg md:text-xl text-white/80 mb-10 max-w-3xl mx-auto leading-relaxed">
+   702→              Explore our phased roadmap integrating cutting-edge AI, quantum computing simulation, 
+   703→              and collaborative tools designed to accelerate your research journey.
+   704→            </p>
+   705→
+   706→            {/* CTA Buttons */}
+   707→            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+   708→              <Button size="lg" className="gap-2 bg-white text-slate-900 hover:bg-white/90 font-semibold px-8 h-12">
+   709→                <Sparkles className="w-5 h-5" />
+   710→                Explore All Phases
+   711→              </Button>
+   712→              <Button size="lg" variant="outline" className="gap-2 text-white border-white/30 hover:bg-white/10 px-8 h-12">
+   713→                <ExternalLink className="w-5 h-5" />
+   714→                View Source Analysis
+   715→              </Button>
+   716→            </div>
+   717→
+   718→            {/* Stats Row */}
+   719→            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
+   720→              {[
+   721→                { label: 'Development Phases', value: '3', icon: <Brain className="w-4 h-4" /> },
+   722→                { label: 'Total Features', value: String(totalFeatures), icon: <Zap className="w-4 h-4" /> },
+   723→                { label: 'Free Resources', value: `${totalFreeResources}+`, icon: <Gift className="w-4 h-4" /> },
+   724→                { label: 'Timeline Span', value: '12+ mo', icon: <Clock className="w-4 h-4" /> },
+   725→              ].map((stat, idx) => (
+   726→                <div key={idx} className="p-4 rounded-xl bg-white/5 backdrop-blur border border-white/10 text-center">
+   727→                  <div className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/10 mb-2 text-white/80">
+   728→                    {stat.icon}
+   729→                  </div>
+   730→                  <div className="text-2xl font-bold">{stat.value}</div>
+   731→                  <div className="text-xs text-white/60">{stat.label}</div>
+   732→                </div>
+   733→              ))}
+   734→            </div>
+   735→          </div>
+   736→        </div>
+   737→
+   738→        {/* Bottom Wave */}
+   739→        <div className="absolute bottom-0 left-0 right-0">
+   740→          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
+   741→            <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="currentColor" className="text-background"/>
+   742→          </svg>
+   743→        </div>
+   744→      </section>
+   745→
+   746→      {/* Main Content */}
+   747→      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+   748→        {/* Introduction */}
+   749→        <div className="max-w-3xl mx-auto text-center mb-16">
+   750→          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+   751→            Our Strategic{' '}
+   752→            <span className="text-primary">Roadmap</span>
+   753→          </h2>
+   754→          <p className="text-lg text-muted-foreground leading-relaxed">
+   755→            Based on comprehensive analysis of current research trends from ScienceDaily, arXiv, 
+   756→            and industry reports, we've crafted a three-phase approach to revolutionize how scientists 
+   757→            compute, collaborate, and discover.
+   758→          </p>
+   759→        </div>
+   760→
+   761→        {/* Phase Sections */}
+   762→        <div className="max-w-6xl mx-auto space-y-12">
+   763→          {researchPhases.map((phase, idx) => (
+   764→            <PhaseSection key={phase.id} phase={phase} isLast={idx === researchPhases.length - 1} />
+   765→          ))}
+   766→        </div>
+   767→
+   768→        {/* Timeline Visualization */}
+   769→        <div className="max-w-4xl mx-auto mt-24">
+   770→          <div className="text-center mb-12">
+   771→            <h3 className="text-2xl font-bold mb-3">Development Timeline</h3>
+   772→            <p className="text-muted-foreground">Our commitment to continuous innovation</p>
+   773→          </div>
+   774→          
+   775→          <div className="relative">
+   776→            {/* Timeline Line */}
+   777→            <div className="absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-violet-500 to-rose-500 rounded-full transform -translate-y-1/2 hidden md:block"></div>
+   778→            
+   779→            <div className="grid md:grid-cols-3 gap-8 relative">
+   780→              {[
+   781→                { time: 'Q4 2026', phase: 'Phase 1', desc: 'Available Now', color: 'from-emerald-500 to-teal-500', active: true },
+   782→                { time: 'Q1-Q2 2027', phase: 'Phase 2', desc: 'In Development', color: 'from-violet-500 to-purple-500', active: false },
+   783→                { time: 'Q3-Q4 2027+', phase: 'Phase 3', desc: 'Future Vision', color: 'from-rose-500 to-orange-500', active: false },
+   784→              ].map((item, idx) => (
+   785→                <div key={idx} className="relative">
+   786→                  <div className={`p-6 rounded-2xl border-2 bg-card text-center ${
+   787→                    item.active ? 'border-emerald-500 shadow-lg shadow-emerald-500/10' : 'border-transparent shadow-md'
+   788→                  }`}>
+   789→                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center text-white mx-auto mb-4 ${item.active ? 'ring-4 ring-offset-2 ring-offset-background ring-emerald-500/30' : ''}`}>
+   790→                      {idx === 0 ? <Brain className="w-7 h-7" /> : idx === 1 ? <Atom className="w-7 h-7" /> : <Rocket className="w-7 h-7" />}
+   791→                    </div>
+   792→                    <div className="text-sm font-semibold text-primary mb-1">{item.time}</div>
+   793→                    <div className="text-lg font-bold mb-1">{item.phase}</div>
+   794→                    <div className="text-sm text-muted-foreground">{item.desc}</div>
+   795→                    
+   796→                    {item.active && (
+   797→                      <div className="mt-3 inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium">
+   798→                        <CheckCircle2 className="w-3 h-3" />
+   799→                        Current Focus
+   800→                      </div>
+   801→                    )}
+   802→                  </div>
+   803→                </div>
+   804→              ))}
+   805→            </div>
+   806→          </div>
+   807→        </div>
+   808→
+   809→        {/* Community CTA */}
+   810→        <div className="mt-24 rounded-3xl border-2 border-dashed border-primary/30 p-8 md:p-12 text-center bg-gradient-to-b from-primary/5 to-transparent relative overflow-hidden">
+   811→          {/* Background Decoration */}
+   812→          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+   813→          <div className="absolute bottom-0 left-0 w-48 h-48 bg-secondary/5 rounded-full blur-3xl"></div>
+   814→          
+   815→          <div className="relative z-10 max-w-2xl mx-auto">
+   816→            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-primary/10 text-primary mb-6">
+   817→              <Lightbulb className="w-10 h-10" />
+   818→            </div>
+   819→            
+   820→            <h3 className="text-3xl md:text-4xl font-bold mb-4">
+   821→              Shape the Future With Us
+   822→            </h3>
+   823→            
+   824→            <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+   825→              We're building SciCMPMATH for researchers like you. Share your ideas, vote on features, 
+   826→              and help us prioritize what matters most to the scientific community.
+   827→            </p>
+   828→            
+   829→            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+   830→              <Button size="lg" className="gap-2 px-8">
+   831→                <MessageSquare className="w-5 h-5" />
+   832→                Submit Feature Request
+   833→              </Button>
+   834→              <Button size="lg" variant="outline" className="gap-2 px-8">
+   835→                <ExternalLink className="w-5 h-5" />
+   836→                Join Community Discussion
+   837→              </Button>
+   838→              <Button size="lg" variant="ghost" className="gap-2 px-8">
+   839→                <Eye className="w-5 h-5" />
+   840→                View Public Roadmap
+   841→              </Button>
+   842→            </div>
+   843→            
+   844→            {/* Trust Indicators */}
+   845→            <div className="mt-10 pt-8 border-t border-border/50">
+   846→              <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
+   847→                <div className="flex items-center gap-2">
+   848→                  <Users className="w-4 h-4" />
+   849→                  <span>1,200+ Researchers Engaged</span>
+   850→                </div>
+   851→                <div className="flex items-center gap-2">
+   852→                  <MessageSquare className="w-4 h-4" />
+   853→                  <span>350+ Feature Suggestions</span>
+   854→                </div>
+   855→                <div className="flex items-center gap-2">
+   856→                  <CheckCircle2 className="w-4 h-4" />
+   857→                  <span>Open Development Process</span>
+   858→                </div>
+   859→              </div>
+   860→            </div>
+   861→          </div>
+   862→        </div>
+   863→      </section>
+   864→    </div>
+   865→  );
+   866→}
+   867→

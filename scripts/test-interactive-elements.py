@@ -186,6 +186,96 @@ class InteractiveElementTester:
                 f += 1
         
         return p, f
+
+    def test_routing_functionality(self, filepath: Path) -> Tuple[int, int]:
+        """Test routing functionality and hash-based navigation"""
+        content = filepath.read_text(encoding='utf-8')
+        rel_path = str(filepath.relative_to(SRC_DIR))
+        
+        p, f = 0, 0
+        
+        print(f"\n🔗 Testing Routing Functionality:")
+        
+        # Test 1: Hash route patterns
+        hash_patterns = [
+            ('#/templates/', 'Template deep link pattern'),
+            ("'capabilities'", 'Capabilities section route'),
+            ("'use-cases'", 'Use cases section route'),
+            ("'free-tier'", 'Free tier section route'),
+            ('window.location.hash', 'Hash reading'),
+            ('hashchange', 'Hash change listener'),
+        ]
+        
+        print(f"\n  📍 Hash-based routing patterns:")
+        for pattern, description in hash_patterns:
+            if pattern in content:
+                print(f"    ✅ {description}: '{pattern}'")
+                p += 1
+            else:
+                print(f"    ❌ Missing {description}: '{pattern}'")
+                self.failed.append(f"{rel_path} - Missing routing pattern: {pattern}")
+                f += 1
+        
+        # Test 2: URL slug mappings
+        slug_mappings = [
+            'TEMPLATE_SLUGS',
+            "'blast'",
+            "'docking'",
+            "'training'",
+            "'stats'",
+            "'viz'",
+            "'guide'",
+        ]
+        
+        print(f"\n  📍 URL slug mappings:")
+        for slug in slug_mappings:
+            if slug in content:
+                p += 1
+                if slug.startswith("'"):
+                    print(f"    ✅ Slug mapping: {slug}")
+            else:
+                f += 1
+                print(f"    ❌ Missing slug: {slug}")
+                self.failed.append(f"{rel_path} - Missing slug mapping: {slug}")
+        
+        # Test 3: Navigation state management
+        nav_states = [
+            ('selectedTemplate', 'Selected template state'),
+            ('activeSection', 'Active section state'),
+            ('setSelectedTemplate', 'Template setter'),
+            ('setActiveSection', 'Section setter'),
+        ]
+        
+        print(f"\n  📍 Navigation state management:")
+        for state_var, description in nav_states:
+            if state_var in content:
+                print(f"    ✅ {description}: {state_var}")
+                p += 1
+            else:
+                print(f"    ❌ Missing {description}: {state_var}")
+                self.failed.append(f"{rel_path} - Missing navigation state: {state_var}")
+                f += 1
+        
+        # Test 4: One-click setup modal (new feature)
+        setup_features = [
+            ('showOneClickSetupModal', 'One-click modal state'),
+            ('setupTasks', 'Setup tasks state'),
+            ('triggerOneClickSetup', 'Trigger setup function'),
+            ('generateSetupTasks', 'Generate tasks function'),
+            ('SetupTask', 'SetupTask interface'),
+            ('closeOneClickSetupModal', 'Close modal function'),
+        ]
+        
+        print(f"\n  📍 One-Click Setup Modal features:")
+        for feature, description in setup_features:
+            if feature in content:
+                print(f"    ✅ {description}: {feature}")
+                p += 1
+            else:
+                print(f"    ❌ Missing {description}: {feature}")
+                self.warnings.append(f"{rel_path} - Missing one-click setup feature: {feature}")
+        
+        return p, f
     
     def run_all_tests(self) -> bool:
         """Run all tests and return True if all pass"""
@@ -219,6 +309,11 @@ class InteractiveElementTester:
                 tp, tf = self.test_template_gallery_specific(filepath)
                 total_p += tp
                 total_f += tf
+                
+                # Run routing functionality tests
+                rp, rf = self.test_routing_functionality(filepath)
+                total_p += rp
+                total_f += rf
         
         # Print results
         print("\n" + "=" * 70)

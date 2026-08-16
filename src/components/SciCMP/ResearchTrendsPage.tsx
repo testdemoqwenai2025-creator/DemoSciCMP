@@ -467,7 +467,17 @@ function FeatureCard({ feature }: { feature: ResearchFeature }) {
                       <Lock className="w-4 h-4" />
                       <span>Want full access?</span>
                     </div>
-                    <Button size="sm" variant="outline" className="gap-1 text-xs h-8">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="gap-1 text-xs h-8"
+                      onClick={() => {
+                        const msg = feature.tier === 'premium' 
+                          ? '💎 Upgrading to Pro tier...\n\nThis would:\n• Unlock all premium features\n• Enable advanced tools\n• Provide priority support'
+                          : '📋 Viewing available plans...';
+                        alert(msg);
+                      }}
+                    >
                       <Crown className="w-3 h-3" />
                       {feature.tier === 'premium' ? 'Upgrade to Pro' : 'View Plans'}
                     </Button>
@@ -609,11 +619,21 @@ function PhaseSection({ phase, isLast }: { phase: PhaseData; isLast: boolean }) 
               <div className="flex flex-col sm:flex-row gap-3">
                 {phase.status === 'active' && (
                   <>
-                    <Button size="lg" variant="secondary" className="gap-2 whitespace-nowrap">
+                    <Button 
+                      size="lg" 
+                      variant="secondary" 
+                      className="gap-2 whitespace-nowrap"
+                      onClick={() => alert('🚀 Starting with free tier...\n\nRedirecting to template gallery!')}
+                    >
                       <Play className="w-4 h-4" />
                       Get Started Free
                     </Button>
-                    <Button size="lg" variant="outline" className="gap-2 text-white border-white/30 hover:bg-white/10 whitespace-nowrap">
+                    <Button 
+                      size="lg" 
+                      variant="outline" 
+                      className="gap-2 text-white border-white/30 hover:bg-white/10 whitespace-nowrap"
+                      onClick={() => alert('📖 Opening documentation...\n\nLoading user guides and API docs.')}
+                    >
                       <BookOpen className="w-4 h-4" />
                       Documentation
                     </Button>
@@ -622,11 +642,23 @@ function PhaseSection({ phase, isLast }: { phase: PhaseData; isLast: boolean }) 
                 
                 {phase.status === 'upcoming' && (
                   <>
-                    <Button size="lg" variant="secondary" className="gap-2 whitespace-nowrap">
+                    <Button 
+                      size="lg" 
+                      variant="secondary" 
+                      className="gap-2 whitespace-nowrap"
+                      onClick={() => {
+                        alert('🔔 Joining waitlist...\n\nYou will be notified when these features are available!\n\nPhase: ' + phase.title);
+                      }}
+                    >
                       <Bell className="w-4 h-4" />
                       Join Waitlist
                     </Button>
-                    <Button size="lg" variant="outline" className="gap-2 text-white border-white/30 hover:bg-white/10 whitespace-nowrap">
+                    <Button 
+                      size="lg" 
+                      variant="outline" 
+                      className="gap-2 text-white border-white/30 hover:bg-white/10 whitespace-nowrap"
+                      onClick={() => alert('👁️ Loading preview demo...\n\nShowing sneak peek of upcoming features.')}
+                    >
                       <Eye className="w-4 h-4" />
                       Preview Demo
                     </Button>
@@ -635,11 +667,23 @@ function PhaseSection({ phase, isLast }: { phase: PhaseData; isLast: boolean }) 
                 
                 {phase.status === 'future' && (
                   <>
-                    <Button size="lg" variant="secondary" className="gap-2 whitespace-nowrap">
+                    <Button 
+                      size="lg" 
+                      variant="secondary" 
+                      className="gap-2 whitespace-nowrap"
+                      onClick={() => {
+                        alert('💬 Opening feedback form...\n\nYour input helps shape the future of SciCMP!');
+                      }}
+                    >
                       <MessageSquare className="w-4 h-4" />
                       Share Feedback
                     </Button>
-                    <Button size="lg" variant="outline" className="gap-2 text-white border-white/30 hover:bg-white/10 whitespace-nowrap">
+                    <Button 
+                      size="lg" 
+                      variant="outline" 
+                      className="gap-2 text-white border-white/30 hover:bg-white/10 whitespace-nowrap"
+                      onClick={() => alert('🗺️ Viewing full roadmap...\n\nShowing timeline for all planned features.')}
+                    >
                       <Rocket className="w-4 h-4" />
                       View Roadmap
                     </Button>
