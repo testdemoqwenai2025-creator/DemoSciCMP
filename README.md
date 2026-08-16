@@ -1,102 +1,56 @@
-# 🚀 DemoSciCMP - SciCMPMATH Public Preview
+# DemoSciCMP - Public Preview & Demonstration
 
 <div align="center">
 
-![DemoSciCMP](https://img.shields.io/badge/DemoSciCMP-Preview-6366f1?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Live-green?style=for-the-badge)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)
+![DemoSciCMP](https://img.shields.io/badge/DemoSciCMP-Preview-orange?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Live-green.svg)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-**Interactive Preview of SciCMPMATH Platform**
+**Interactive Preview of the SciCMPMATH Platform**
 
-[🌐 Live Demo](#) • [📖 Documentation](https://github.com/testdemoqwenai2025-creator/SciCMPMATH) • [🐛 Report Issue](../../issues)
+🌐 **View Live Preview:** [GitHub Pages](#setup-instructions)  
+📖 **Main Repo:** [SciCMPMATH (Private)](https://github.com/testdemoqwenai2025-creator/SciCMPMATH)  
+🐛 **Issues:** [Report Here](../../issues)
 
 </div>
 
 ---
 
-## ✨ What is This?
+## 🎯 What is DemoSciCMP?
 
-**DemoSciCMP** is the **public preview showcase** for [SciCMPMATH](https://github.com/testdemoqwenai2025-creator/SciCMPMATH) — The GitHub for Scientific Computing.
+**DemoSciCMP** is the **public demonstration and preview showcase** for the **SciCMPMATH** platform - the "GitHub for Scientific Computing." 
 
-This repository contains only the **preview/demo application code** needed to showcase the platform's user interface and core features. It does **not** contain:
-- Backend business logic
-- Database schemas
-- Authentication systems
-- Proprietary algorithms
-- Sensitive configurations
+### ⚠️ Important: Preview-Only Repository
 
-### 🎯 Purpose
+This repository contains **ONLY the code needed for visual preview**. It does **NOT** include:
+- ❌ Real authentication or user management
+- ❌ Actual compute job execution
+- ❌ Database connections or data persistence
+- ❌ Production API endpoints
+- ❌ Backend business logic
 
-- Demonstrate UI/UX design
-- Showcase feature set
-- Provide interactive preview for potential users
-- Support marketing and sales efforts
-- Enable community feedback on design
+### ✅ What This Contains
 
----
-
-## 🖥️ Live Preview
-
-### Access the Demo
-
-The live preview is available at: **[demo.scicmpmath.com](https://preview-<bot-id>.space-z.ai/)** (or your deployment URL)
-
-> ⚠️ **Note:** This is a **demonstration only**. No real computations are performed. All data shown is sample/mock data.
+- ✅ **Fully interactive UI components** (React/Next.js)
+- ✅ **Dark/Light theme toggle** with smooth transitions
+- ✅ **Landing page** with compelling CTAs
+- ✅ **Dashboard preview** with sample/mock data
+- ✅ **Features, Pricing, and About pages**
+- ✅ **Responsive design** for all devices
+- ✅ **Static export ready** for GitHub Pages
 
 ---
 
-## 🎨 Features Demonstrated
+## 🚀 Quick Start (GitHub Preview)
 
-### Pages Included
+### Option 1: View on GitHub Pages (Recommended)
 
-| Page | Description | Status |
-|------|-------------|--------|
-| **Landing Page** | Hero section, features overview, CTA, testimonials | ✅ Complete |
-| **Dashboard** | Workspace management, job monitoring, package browser | ✅ Complete |
-| **Features** | Detailed feature breakdown by category | ✅ Complete |
-| **Pricing** | Tier comparison (Free/Pro/Enterprise), FAQ | ✅ Complete |
-| **About** | Team info, mission, roadmap | ✅ Complete |
-
-### UI Features
-
-- ✅ **Dark/Light Theme Toggle** - Smooth theme switching with system preference detection
-- ✅ **Responsive Design** - Mobile-first, works on all screen sizes
-- ✅ **Modern UI Components** - Built with shadcn/ui + Tailwind CSS
-- ✅ **Smooth Animations** - Page transitions, hover effects, loading states
-- ✅ **Accessibility** - ARIA labels, keyboard navigation, screen reader support
-
-### Interactive Elements
-
-- Navigation between pages
-- Theme toggle (dark/light mode)
-- Mobile menu
-- Hover effects on cards/buttons
-- Simulated dashboard interactions
-- Tab switching in dashboard
-
----
-
-## 🛠️ Tech Stack (Preview Only)
-
-```yaml
-Frontend Framework: Next.js 16 (App Router)
-Language: TypeScript 5
-Styling: Tailwind CSS 4
-UI Library: shadcn/ui
-Icons: Lucide React
-Animations: CSS Transitions + Framer Motion (limited)
+After setup (see below), access:
+```
+https://testdemoqwenai2025-creator.github.io/DemoSciCMP/
 ```
 
----
-
-## 🚀 Quick Start (Local Development)
-
-### Prerequisites
-
-- Node.js 18+ 
-- npm or yarn or pnpm
-
-### Installation & Run
+### Option 2: Run Locally
 
 ```bash
 # Clone this repository
@@ -109,173 +63,213 @@ npm install
 # Start development server
 npm run dev
 
-# Open in browser
-# → http://localhost:3000
+# Open http://localhost:3000
 ```
 
-### Available Scripts
+### Option 3: Build Static Export
 
 ```bash
-npm run dev      # Start development server
-npm run build    # Build for production
-npm run start    # Start production server
-npm run lint     # Run ESLint
-npm run type-check # Run TypeScript checker
+npm run build
+# Output in 'out/' directory - can be hosted anywhere
 ```
 
 ---
 
-## 📁 Repository Structure
+## 📱 Available Pages
+
+| Page | Route | Description |
+|------|-------|-------------|
+| **Landing** | `/` | Hero section, features, testimonials, CTA |
+| **Dashboard** | `/dashboard` | Interactive dashboard mockup with sample data |
+| **Features** | `/features` | Comprehensive platform capabilities |
+| **Pricing** | `/pricing` | Three-tier pricing model |
+| **About** | `/about` | Mission, team, and roadmap |
+
+---
+
+## 🎨 Design Features
+
+### Dark/Light Theme Toggle
+- ☀️/🌙 Smooth transition animations
+- 💾 Persistent preference (localStorage)
+- 🖥️ System preference detection
+- ⌨️ Keyboard shortcut: `Cmd/Ctrl + D`
+
+### Responsive Design
+- 📱 Mobile-first approach
+- 📐 Breakpoints: sm, md, lg, xl
+- 👆 Touch-friendly interactions (44px minimum targets)
+- 📋 Collapsible mobile navigation
+
+### Accessibility
+- ♿ Semantic HTML structure
+- 🏷️ ARIA labels and roles
+- ⌨️ Full keyboard navigation
+- 🔍 Screen reader compatible
+
+---
+
+## 🛠️ Technology Stack (Preview Only)
+
+| Technology | Purpose |
+|------------|---------|
+| Next.js 16 | React framework (App Router) |
+| TypeScript 5 | Type safety |
+| Tailwind CSS 4 | Utility-first styling |
+| shadcn/ui | Component library |
+| Lucide React | Icons |
+
+---
+
+## 🔗 Repository Ecosystem
 
 ```
-DemoSciCMP/
-├── src/
-│   ├── app/
-│   │   ├── page.tsx              # Main app entry (routing)
-│   │   ├── layout.tsx            # Root layout
-│   │   └── globals.css           # Global styles
-│   └── components/
-│       └── SciCMP/               # Platform components
-│           ├── Header.tsx        # Navigation header
-│           ├── Footer.tsx        # Site footer
-│           ├── LandingPage.tsx    # Landing page content
-│           ├── DashboardPage.tsx  # Dashboard demo
-│           ├── FeaturesPage.tsx   # Features showcase
-│           ├── PricingPage.tsx    # Pricing information
-│           └── AboutPage.tsx      # About/team info
-├── public/                        # Static assets
-├── package.json
-├── tsconfig.json
-├── tailwind.config.ts
-└── README.md                      # This file
+┌─────────────────────────────────────────────────────────────┐
+│                    SCICMPMATH ECOSYSTEM                      │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│   ┌─────────────────────┐     ┌─────────────────────┐       │
+│   │    SciCMPMATH       │     │     DemoSciCMP      │       │
+│   │   (Private Repo)    │────▶│   (Public Repo)     │       │
+│   │                     │     │                     │       │
+│   │ • Full source code  │     │ • UI preview ONLY   │       │
+│   │ • Backend services  │     │ • Mock/sample data  │       │
+│   │ • Database schemas  │     │ • No real logic     │       │
+│   │ • API endpoints     │     │ • GitHub Pages host │       │
+│   └─────────────────────┘     └─────────────────────┘       │
+│            ▲                           │                     │
+│            │           Sync UI changes  │                     │
+│            └───────────────────────────┘                     │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🎨 Design System
+## 📦 Setup Instructions for GitHub Pages
 
-### Colors
+### Automatic Deployment (Recommended)
 
+1. Go to **Settings** → **Pages** in this repository
+2. Under **Source**, select **GitHub Actions**
+3. Create `.github/workflows/deploy.yml`:
+
+```yaml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build static site
+        run: npm run build
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with: path: ./out
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
 ```
-Primary:     hsl(224, 71%, 45%)    /* Indigo/Violet */
-Secondary:   hsl(220, 14%, 96%)    /* Light Gray */
-Accent:      hsl(220, 9%, 83%)     /* Muted */
-Success:     hsl(142, 76%, 36%)    /* Green */
-Warning:     hsl(38, 92%, 50%)     /* Yellow */
-Error:       hsl(0, 84%, 60%)      /* Red */
-```
 
-### Typography
+4. Your site will be live at: `https://testdemoqwenai2025-creator.github.io/DemoSciCMP/`
 
-```
-Font Family: Inter (system-ui fallback)
-Headings:   Bold (600-700), tracking tight
-Body:       Regular (400), line-height relaxed
-Code:       Mono (JetBrains Mono)
-```
+### Manual Deployment
 
-### Spacing Scale
+```bash
+# Build locally
+npm run build
 
-```
-4px → 8px → 12px → 16px → 24px → 32px → 48px → 64px → 96px → 128px
-```
-
----
-
-## 🔗 Related Repositories
-
-| Repository | Type | Description |
-|------------|------|-------------|
-| [**SciCMPMATH**](https://github.com/testdemoqwenai2025-creator/SciCMPMATH) | 🔒 Private | Main platform source code |
-| [**SciMSPT**](https://github.com/testdemoqwenai2025-creator/SciMSPT) | 🔒 Private | Investor package & documentation |
-| **DemoSciCMP** | 🌐 Public | **This repo** - Preview/demo only |
-
----
-
-## 🤝 Contributing to Demo
-
-We welcome contributions to improve the preview! Areas where you can help:
-
-- **UI Improvements:** Better designs, animations, interactions
-- **Bug Fixes:** Layout issues, responsive problems
-- **Accessibility:** Screen reader improvements, keyboard navigation
-- **Documentation:** Better comments, guides
-- **New Demo Pages:** Additional showcase pages
-
-### How to Contribute
-
-1. Fork this repository
-2. Create your branch (`git checkout -b feature/amazing-preview`)
-3. Commit changes (`git commit -m 'Add amazing preview feature'`)
-4. Push to branch (`git push origin feature/amazing-preview`)
-5. Open a Pull Request
-
-> **Note:** This is a **public demo only**. Do not submit actual backend code, sensitive data, or production logic here.
-
----
-
-## 📝 License
-
-This demo project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-```
-MIT License
-
-Copyright (c) 2026 Endeavor Science (AETH-1)
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction...
+# Deploy 'out/' folder to GitHub Pages branch
+# Or use any static hosting service
 ```
 
 ---
 
-## ⚠️ Important Disclaimers
+## 🔄 Sync from SciCMPMATH → DemoSciCMP
 
-### What This Is NOT
+To sync UI changes from the main repository:
 
-- ❌ Not the full SciCMPMATH platform
-- ❌ Not functional scientific computing software
-- ❌ Not connected to real databases or services
-- ❌ Not suitable for actual research work
-- ❌ Not containing proprietary algorithms
+```bash
+# From SciCMPMATH repo
+cp -r src/components/SciCMP/ ../DemoSciCMP/src/components/SciCMP/
+cp src/app/page.tsx ../DemoSciCMP/src/app/page.tsx
+cp src/app/layout.tsx ../DemoSciCMP/src/app/layout.tsx
 
-### Data Shown
-
-All data displayed in this demo is:
-- **Sample/Mock data** created for demonstration purposes
-- **Not real research results**
-- **Not associated with actual users or organizations**
-- **Fictional** (except where noted as based on real use cases)
-
----
-
-## 🙏 Acknowledgments
-
-- **shadcn/ui Team** - Beautiful component library
-- **Tailwind CSS** - Utility-first CSS framework
-- **Lucide Icons** - Clean icon set
-- **Vercel/Next.js Team** - Amazing framework
+# Commit and push DemoSciCMP
+cd ../DemoSciCMP
+git add .
+git commit "🔄 Sync UI changes from SciCMPMATH"
+git push origin main
+```
 
 ---
 
-## 📬 Contact
+## 🤝 Contributing
 
-For questions about the **full platform**, please contact:
+For platform contributions:
+→ Visit [SciCMPMATH repository](https://github.com/testdemoqwenai2025-creator/SciCMPMATH)
 
-- **Email:** testdemoqwenai2025@gmail.com
-- **Main Repo:** https://github.com/testdemoqwenai2025-creator/SciCMPMATH
+For demo-specific issues:
+→ Open an issue here with label `demo-preview`
 
-For **demo-specific issues** (bugs, suggestions), open an issue in this repository.
+---
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file.
+
+---
+
+## 📞 Contact
+
+| Purpose | Contact |
+|---------|---------|
+| General Inquiries | hello@scicmpmath.com |
+| Sales | sales@scicmpmath.com |
+| Support | support@scicmpmath.com |
 
 ---
 
 <div align="center">
 
-**Built with 💜 for the scientific community**
+**Built with ❤️ for the global scientific community**
 
-*Endeavor Science (AETH-1)* © 2026
+*DemoSciCMP © 2026 Endeavor Science (AETH-1)*
 
-⭐ If you like this demo, give it a star!
+**Preview demonstrates the future of scientific computing**
 
 </div>

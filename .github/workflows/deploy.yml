@@ -1,0 +1,82 @@
+name: Deploy DemoSciCMP to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - '.gitignore'
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-latest
+    env:
+      NODE_VERSION: '18'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build static site
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./out
+
+  # Deployment job
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # Post-deployment notification (optional)
+  notify:
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: success()
+    
+    steps:
+      - name: Summary
+        run: |
+          echo "## 🎉 DemoSciCMP Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Preview URL:** https://testdemoqwenai2025-creator.github.io/DemoSciCMP/" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### What's Included:" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Landing page with CTA" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Dashboard preview" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Dark/Light theme toggle" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Responsive design" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Features, Pricing, About pages" >> $GITHUB_STEP_SUMMARY
