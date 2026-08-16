@@ -50,3 +50,7 @@ Thumbs.db
 tmp/
 temp/
 upload/
+deploy-github-pages.sh
+deploy-to-github-pages.sh
+emergency-deploy.sh
+scripts/deploy-direct.sh
