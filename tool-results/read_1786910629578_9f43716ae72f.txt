@@ -1,0 +1,1123 @@
+     1→'use client';
+     2→
+     3→import { useState } from 'react';
+     4→import { Button } from '@/components/ui/button';
+     5→import { 
+     6→  FlaskConical, 
+     7→  Play, 
+     8→  Pause, 
+     9→  RotateCcw,
+    10→  Plus,
+    11→  Search,
+    12→  Filter,
+    13→  MoreVertical,
+    14→  Clock,
+    15→  Cpu,
+    16→  HardDrive,
+    17→  CheckCircle2,
+    18→  AlertCircle,
+    19→  Loader2,
+    20→  Terminal,
+    21→  FileText,
+    22→  Users,
+    23→  TrendingUp,
+    24→  Activity,
+    25→  Package,
+    26→  GitBranch,
+    27→  Settings,
+    28→  Bell,
+    29→  ChevronRight,
+    30→  Zap,
+    31→  BarChart3,
+    32→  Layers,
+    33→  // Research Trends Icons
+    34→  Brain,
+    35→  LayoutTemplate,
+    36→  MousePointer2,
+    37→  Smartphone,
+    38→  Atom,
+    39→  Calculator,
+    40→  Database,
+    41→  FileOutput,
+    42→  Wifi,
+    43→  Glasses,
+    44→  Network,
+    45→  Tablet,
+    46→  Sparkles,
+    47→  Lock,
+    48→  Unlock,
+    49→  Star,
+    50→  Rocket,
+    51→  Target,
+    52→  Lightbulb,
+    53→  ArrowRight,
+    54→  ExternalLink,
+    55→  Crown,
+    56→  Gift,
+    57→  ChevronDown,
+    58→  ChevronUp,
+    59→  BookOpen,
+    60→  Code2,
+    61→  Puzzle,
+    62→  MessageSquare,
+    63→  Eye
+    64→} from 'lucide-react';
+    65→
+    66→// Research Trends Data Structure
+    67→interface ResearchFeature {
+    68→  id: string;
+    69→  title: string;
+    70→  description: string;
+    71→  icon: React.ReactNode;
+    72→  status: 'available' | 'beta' | 'coming-soon' | 'planned';
+    73→  tier: 'free' | 'freemium' | 'premium';
+    74→  freeResources?: {
+    75→    title: string;
+    76→    url: string;
+    77→    type: 'tutorial' | 'template' | 'api-doc' | 'paper' | 'tool';
+    78→  }[];
+    79→  capabilities: string[];
+    80→  useCases: string[];
+    81→}
+    82→
+    83→interface PhaseData {
+    84→  id: string;
+    85→  title: string;
+    86→  subtitle: string;
+    87→  timeline: string;
+    88→  status: 'active' | 'upcoming' | 'future';
+    89→  color: string;
+    90→  gradient: string;
+    91→  icon: React.ReactNode;
+    92→  features: ResearchFeature[];
+    93→  vision: string;
+    94→}
+    95→
+    96→const researchPhases: PhaseData[] = [
+    97→  {
+    98→    id: 'phase1',
+    99→    title: 'Phase 1',
+   100→    subtitle: 'Intelligent Workflows & Collaboration',
+   101→    timeline: 'Q4 2026 - Available Now',
+   102→    status: 'active',
+   103→    color: 'emerald',
+   104→    gradient: 'from-emerald-500 to-teal-600',
+   105→    icon: <Brain className="w-6 h-6" />,
+   106→    vision: 'Empowering researchers with AI-assisted workflows and seamless collaboration tools that adapt to your research style.',
+   107→    features: [
+   108→      {
+   109→        id: 'ai-workflows',
+   110→        title: 'AI-Powered Workflow Recommendations',
+   111→        description: 'Intelligent suggestions based on your research patterns, automatically optimizing compute resources and suggesting next steps.',
+   112→        icon: <Sparkles className="w-5 h-5" />,
+   113→        status: 'available',
+   114→        tier: 'freemium',
+   115→        freeResources: [
+   116→          { title: 'Getting Started Guide', url: '#/docs/ai-workflows/intro', type: 'tutorial' },
+   117→          { title: 'Basic Workflow Templates (5)', url: '#/templates/ai-workflows/free', type: 'template' },
+   118→          { title: 'API Documentation', url: '#/api/workflow-ai/basic', type: 'api-doc' }
+   119→        ],
+   120→        capabilities: ['Pattern recognition', 'Resource optimization', 'Smart suggestions', 'Auto-complete pipelines'],
+   121→        useCases: ['Repetitive analysis automation', 'Beginner-friendly guidance', 'Expert workflow acceleration']
+   122→      },
+   123→      {
+   124→        id: 'template-gallery',
+   125→        title: 'Template Gallery for Common Analyses',
+   126→        description: 'Pre-built, peer-reviewed templates for bioinformatics, cheminformatics, physics simulations, and more.',
+   127→        icon: <LayoutTemplate className="w-5 h-5" />,
+   128→        status: 'available',
+   129→        tier: 'free',
+   130→        freeResources: [
+   131→          { title: 'BLAST+ Sequence Analysis', url: '#/templates/bioinformatics/blast', type: 'template' },
+   132→          { title: 'Molecular Docking Setup', url: '#/templates/cheminformatics/docking', type: 'template' },
+   133→          { title: 'ML Model Training Pipeline', url: '#/templates/ml/training', type: 'template' },
+   134→          { title: 'Statistical Analysis Suite', url: '#/templates/statistics/basic', type: 'template' },
+   135→          { title: 'Visualization Templates', url: '#/templates/viz/publication-ready', type: 'template' },
+   136→          { title: 'Create Your Template Guide', url: '#/docs/templates/create', type: 'tutorial' }
+   137→        ],
+   138→        capabilities: ['One-click setup', 'Parameter presets', 'Best practices embedded', 'Community curated'],
+   139→        useCases: ['Quick start projects', 'Teaching & training', 'Standardization across labs']
+   140→      },
+   141→      {
+   142→        id: 'collaboration',
+   143→        title: 'Enhanced Collaboration Features',
+   144→        description: 'Real-time co-editing with live cursors, threaded comments, version history, and instant sharing.',
+   145→        icon: <Users className="w-5 h-5" />,
+   146→        status: 'beta',
+   147→        tier: 'freemium',
+   148→        freeResources: [
+   149→          { title: 'Real-time Editing Basics', url: '#/docs/collab/realtime', type: 'tutorial' },
+   150→          { title: 'Commenting System Guide', url: '#/docs/collab/comments', type: 'api-doc' },
+   151→          { title: 'Free Tier: 3 Collaborators', url: '#/pricing#collaboration', type: 'tool' }
+   152→        ],
+   153→        capabilities: ['Live cursors', 'Threaded comments', '@mentions', 'Activity feeds'],
+   154→        useCases: ['Remote team collaboration', 'Peer review workflows', 'Shared lab notebooks']
+   155→      },
+   156→      {
+   157→        id: 'mobile-experience',
+   158→        title: 'Improved Mobile Experience',
+   159→        description: 'Responsive design optimized for tablets and phones with offline support and push notifications.',
+   160→        icon: <Smartphone className="w-5 h-5" />,
+   161→        status: 'beta',
+   162→        tier: 'free',
+   163→        freeResources: [
+   164→          { title: 'Mobile App Download (iOS)', url: '#/download/ios', type: 'tool' },
+   165→          { title: 'Mobile App Download (Android)', url: '#/download/android', type: 'tool' },
+   166→          { title: 'Mobile Features Overview', url: '#/docs/mobile/features', type: 'tutorial' }
+   167→        ],
+   168→        capabilities: ['Responsive UI', 'Offline mode', 'Push notifications', 'Touch gestures'],
+   169→        useCases: ['Field research monitoring', 'Quick job checks', 'On-the-go collaboration']
+   170→      }
+   171→    ]
+   172→  },
+   173→  {
+   174→    id: 'phase2',
+   175→    title: 'Phase 2',
+   176→    subtitle: 'Quantum Simulation & Advanced Analytics',
+   177→    timeline: 'Q1-Q2 2027 - Coming Soon',
+   178→    status: 'upcoming',
+   179→    color: 'violet',
+   180→    gradient: 'from-violet-500 to-purple-600',
+   181→    icon: <Atom className="w-6 h-6" />,
+   182→    vision: 'Bridging classical and quantum computing with advanced analytics and seamless database integrations.',
+   183→    features: [
+   184→      {
+   185→        id: 'quantum-sim',
+   186→        title: 'Quantum Computing Simulation Mode',
+   187→        description: 'Simulate quantum algorithms on classical hardware, preparing for the quantum advantage era.',
+   188→        icon: <Atom className="w-5 h-5" />,
+   189→        status: 'coming-soon',
+   190→        tier: 'freemium',
+   191→        freeResources: [
+   192→          { title: 'Quantum Computing Primer', url: '#/learn/quantum/intro', type: 'tutorial' },
+   193→          { title: 'Qiskit Integration Docs', url: '#/integrations/qiskit', type: 'api-doc' },
+   194→          { title: 'Free: 10 Qubit Simulations/day', url: '#/pricing#quantum', type: 'tool' },
+   195→          { title: 'Research Paper: Quantum in Biology', url: '#/papers/quantum-bio-2026', type: 'paper' }
+   196→        ],
+   197→        capabilities: ['Qiskit/Cirq integration', 'Circuit visualization', 'Noise modeling', 'Hybrid algorithms'],
+   198→        useCases: ['Algorithm prototyping', 'Education & training', 'Proof-of-concept studies']
+   199→      },
+   200→      {
+   201→        id: 'stats-packages',
+   202→        title: 'Advanced Statistical Analysis Packages',
+   203→        description: 'Industry-standard statistical tools with Bayesian methods, causal inference, and uncertainty quantification.',
+   204→        icon: <Calculator className="w-5 h-5" />,
+   205→        status: 'coming-soon',
+   206→        tier: 'free',
+   207→        freeResources: [
+   208→          { title: 'R/Python Bridge Documentation', url: '#/docs/stats/r-python', type: 'api-doc' },
+   209→          { title: 'Bayesian Analysis Tutorial', url: '#/learn/stats/bayesian', type: 'tutorial' },
+   210→          { title: 'Free Statistical Templates (12)', url: '#/templates/stats/free', type: 'template' },
+   211→          { title: 'Uncertainty Quantification Guide', url: '#/learn/stats/uq', type: 'tutorial' }
+   212→        ],
+   213→        capabilities: ['Bayesian inference', 'Causal analysis', 'UQ frameworks', 'Reproducible reports'],
+   214→        useCases: ['Clinical trial analysis', 'Experimental validation', 'Meta-analysis']
+   215→      },
+   216→      {
+   217→        id: 'db-integration',
+   218→        title: 'Integration with Major Databases',
+   219→        description: 'Seamless connectivity to PubMed, arXiv, PDB, UniProt, and other scientific repositories.',
+   220→        icon: <Database className="w-5 h-5" />,
+   221→        status: 'coming-soon',
+   222→        tier: 'freemium',
+   223→        freeResources: [
+   224→          { title: 'PubMed Query Builder', url: '#/tools/pubmed-query', type: 'tool' },
+   225→          { title: 'arXiv API Integration', url: '#/integrations/arxiv', type: 'api-doc' },
+   226→          { title: 'PDB Structure Fetcher', url: '#/tools/pdb-fetch', type: 'tool' },
+   227→          { title: 'Free: 100 Queries/day', url: '#/pricing#databases', type: 'tool' }
+   228→        ],
+   229→        capabilities: ['Unified search', 'Auto-citation', 'Live data sync', 'API aggregation'],
+   230→        useCases: ['Literature reviews', 'Dataset discovery', 'Automated referencing']
+   231→      },
+   232→      {
+   233→        id: 'auto-reports',
+   234→        title: 'Automated Report Generation',
+   235→        description: 'Transform results into publication-ready documents with one click, including figures, tables, and citations.',
+   236→        icon: <FileOutput className="w-5 h-5" />,
+   237→        status: 'coming-soon',
+   238→        tier: 'premium',
+   239→        freeResources: [
+   240→          { title: 'Report Templates (3 Free)', url: '#/templates/reports/free', type: 'template' },
+   241→          { title: 'LaTeX Export Guide', url: '#/docs/export/latex', type: 'tutorial' },
+   242→          { title: 'Figure Generation Basics', url: '#/docs/figures/create', type: 'tutorial' }
+   243→        ],
+   244→        capabilities: ['One-click PDF', 'Journal formatting', 'Auto-figures', 'Citation management'],
+   245→        useCases: ['Paper submissions', 'Grant reports', 'Lab documentation']
+   246→      }
+   247→    ]
+   248→  },
+   249→  {
+   250→    id: 'phase3',
+   251→    title: 'Phase 3',
+   252→    subtitle: 'Future Frontier Technologies',
+   253→    timeline: 'Q3-Q4 2027+ - Vision',
+   254→    status: 'future',
+   255→    color: 'rose',
+   256→    gradient: 'from-rose-500 to-orange-600',
+   257→    icon: <Rocket className="w-6 h-6" />,
+   258→    vision: 'Pioneering the next generation of scientific computing with quantum connectivity, immersive visualization, and federated intelligence.',
+   259→    features: [
+   260→      {
+   261→        id: 'quantum-live',
+   262→        title: 'Actual Quantum Compute Connectivity',
+   263→        description: 'Direct access to IBM Quantum, Google Quantum AI, Rigetti, and other quantum processing units.',
+   264→        icon: <Wifi className="w-5 h-5" />,
+   265→        status: 'planned',
+   266→        tier: 'premium',
+   267→        freeResources: [
+   268→          { title: 'Quantum Hardware Comparison', url: '#/learn/quantum/hardware', type: 'tutorial' },
+   269→          { title: 'Free: Monthly Quantum Credits', url: '#/pricing#quantum-live', type: 'tool' },
+   270→          { title: 'Roadmap & Waitlist', url: '#/roadmap/quantum', type: 'api-doc' }
+   271→        ],
+   272→        capabilities: ['Real QPU access', 'Queue management', 'Result caching', 'Error mitigation'],
+   273→        useCases: ['Production quantum experiments', 'Quantum ML training', 'Optimization problems']
+   274→      },
+   275→      {
+   276→        id: 'ar-vr',
+   277→        title: 'AR/VR Visualization Modes',
+   278→        description: 'Immersive 3D environments for molecular exploration, data visualization, and virtual lab experiences.',
+   279→        icon: <Glasses className="w-5 h-5" />,
+   280→        status: 'planned',
+   281→        tier: 'freemium',
+   282→        freeResources: [
+   283→          { title: 'VR Preview Demo', url: '#/demo/vr-molecule', type: 'tool' },
+   284→          { title: 'AR Setup Guide', url: '#/docs/arvr/setup', type: 'tutorial' },
+   285→          { title: 'Free: Basic VR Viewer', url: '#/pricing#arvr', type: 'tool' },
+   286→          { title: 'Use Cases Gallery', url: '#/showcase/arvr', type: 'tutorial' }
+   287→        ],
+   288→        capabilities: ['Molecular VR', 'Data immersion', 'Virtual labs', 'Collaborative spaces'],
+   289→        useCases: ['Drug design review', 'Structure analysis', 'Education & outreach']
+   290→      },
+   291→      {
+   292→        id: 'federated-learning',
+   293→        title: 'Federated Learning Framework',
+   294→        description: 'Train models across institutions without sharing sensitive data, enabling privacy-preserving collaboration.',
+   295→        icon: <Network className="w-5 h-5" />,
+   296→        status: 'planned',
+   297→        tier: 'premium',
+   298→        freeResources: [
+   299→          { title: 'Federated Learning Whitepaper', url: '#/papers/federated-2027', type: 'paper' },
+   300→          { title: 'Privacy Framework Docs', url: '#/docs/federated/privacy', type: 'api-doc' },
+   301→          { title: 'Free: Small-scale FL (≤5 nodes)', url: '#/pricing#federated', type: 'tool' }
+   302→        ],
+   303→        capabilities: ['Differential privacy', 'Secure aggregation', 'Multi-site training', 'Audit trails'],
+   304→        useCases: ['Healthcare consortia', 'Competitive collaboration', 'Regulatory compliance']
+   305→      },
+   306→      {
+   307→        id: 'mobile-apps',
+   308→        title: 'Cross-Platform Mobile Apps',
+   309→        description: 'Native iOS and Android applications with full platform capabilities, including job submission and monitoring.',
+   310→        icon: <Tablet className="w-5 h-5" />,
+   311→        status: 'planned',
+   312→        tier: 'free',
+   313→        freeResources: [
+   314→          { title: 'App Store Preview', url: '#/download/apps', type: 'tool' },
+   315→          { title: 'Mobile API Documentation', url: '#/api/mobile', type: 'api-doc' },
+   316→          { title: 'Full Feature List', url: '#/features/mobile-full', type: 'tutorial' }
+   317→        ],
+   318→        capabilities: ['Native performance', 'Biometric auth', 'Background sync', 'Widgets'],
+   319→        useCases: ['Field data collection', 'Lab management', 'Conference presentations']
+   320→      }
+   321→    ]
+   322→  }
+   323→];
+   324→
+   325→function TierBadge({ tier }: { tier: 'free' | 'freemium' | 'premium' }) {
+   326→  const config = {
+   327→    free: { icon: <Gift className="w-3 h-3" />, label: 'Free', bg: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' },
+   328→    freemium: { icon: <Star className="w-3 h-3" />, label: 'Freemium', bg: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' },
+   329→    premium: { icon: <Crown className="w-3 h-3" />, label: 'Premium', bg: 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300' }
+   330→  };
+   331→  
+   332→  return (
+   333→    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${config[tier].bg}`}>
+   334→      {config[tier].icon}
+   335→      {config[tier].label}
+   336→    </span>
+   337→  );
+   338→}
+   339→
+   340→function StatusBadge({ status }: { status: 'available' | 'beta' | 'coming-soon' | 'planned' }) {
+   341→  const config = {
+   342→    available: { label: 'Available', class: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300' },
+   343→    beta: { label: 'Beta', class: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' },
+   344→    'coming-soon': { label: 'Coming Soon', class: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' },
+   345→    planned: { label: 'Planned', class: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400' }
+   346→  };
+   347→  
+   348→  return (
+   349→    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${config[status].class}`}>
+   350→      {config[status].label}
+   351→    </span>
+   352→  );
+   353→}
+   354→
+   355→function ResourceLink({ resource }: { resource: ResearchFeature['freeResources'][0] }) {
+   356→  const typeConfig = {
+   357→    tutorial: { icon: <BookOpen className="w-3 h-3" />, color: 'text-blue-600' },
+   358→    template: { icon: <LayoutTemplate className="w-3 h-3" />, color: 'text-emerald-600' },
+   359→    'api-doc': { icon: <Code2 className="w-3 h-3" />, color: 'text-purple-600' },
+   360→    paper: { icon: <FileText className="w-3 h-3" />, color: 'text-orange-600' },
+   361→    tool: { icon: <Puzzle className="w-3 h-3" />, color: 'text-pink-600' }
+   362→  };
+   363→  
+   364→  const config = typeConfig[resource.type];
+   365→  
+   366→  return (
+   367→    <a
+   368→      href={resource.url}
+   369→      className={`flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors group ${config.color}`}
+   370→    >
+   371→      <span className="opacity-70 group-hover:opacity-100">{config.icon}</span>
+   372→      <span className="text-sm font-medium flex-1">{resource.title}</span>
+   373→      <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+   374→    </a>
+   375→  );
+   376→}
+   377→
+   378→function FeatureCard({ feature }: { feature: ResearchFeature }) {
+   379→  const [isExpanded, setIsExpanded] = useState(false);
+   380→  
+   381→  return (
+   382→    <div className="rounded-xl border bg-card overflow-hidden hover:shadow-lg transition-all duration-300">
+   383→      {/* Card Header */}
+   384→      <div className="p-5 border-b border-border/50">
+   385→        <div className="flex items-start justify-between mb-3">
+   386→          <div className="flex items-center gap-3">
+   387→            <div className="p-2 rounded-lg bg-primary/10 text-primary">
+   388→              {feature.icon}
+   389→            </div>
+   390→            <div>
+   391→              <h4 className="font-semibold text-base">{feature.title}</h4>
+   392→              <div className="flex items-center gap-2 mt-1">
+   393→                <StatusBadge status={feature.status} />
+   394→                <TierBadge tier={feature.tier} />
+   395→              </div>
+   396→            </div>
+   397→          </div>
+   398→          
+   399→          {/* Expand/Collapse Button */}
+   400→          <button
+   401→            onClick={() => setIsExpanded(!isExpanded)}
+   402→            className="p-1 rounded-md hover:bg-accent transition-colors"
+   403→          >
+   404→            {isExpanded ? (
+   405→              <ChevronUp className="w-5 h-5 text-muted-foreground" />
+   406→            ) : (
+   407→              <ChevronDown className="w-5 h-5 text-muted-foreground" />
+   408→            )}
+   409→          </button>
+   410→        </div>
+   411→        
+   412→        <p className="text-sm text-muted-foreground leading-relaxed">
+   413→          {feature.description}
+   414→        </p>
+   415→      </div>
+   416→      
+   417→      {/* Expanded Content */}
+   418→      {isExpanded && (
+   419→        <div className="p-5 space-y-5 animate-in slide-in-from-top-2 duration-200">
+   420→          {/* Capabilities */}
+   421→          <div>
+   422→            <h5 className="text-sm font-semibold mb-2 flex items-center gap-2">
+   423→              <Zap className="w-4 h-4 text-primary" />
+   424→              Core Capabilities
+   425→            </h5>
+   426→            <div className="flex flex-wrap gap-2">
+   427→              {feature.capabilities.map((cap) => (
+   428→                <span key={cap} className="px-2 py-1 rounded-md bg-primary/5 text-xs font-medium text-primary border border-primary/10">
+   429→                  {cap}
+   430→                </span>
+   431→              ))}
+   432→            </div>
+   433→          </div>
+   434→          
+   435→          {/* Use Cases */}
+   436→          <div>
+   437→            <h5 className="text-sm font-semibold mb-2 flex items-center gap-2">
+   438→              <Target className="w-4 h-4 text-secondary" />
+   439→              Use Cases
+   440→            </h5>
+   441→            <ul className="space-y-1">
+   442→              {feature.useCases.map((useCase) => (
+   443→                <li key={useCase} className="flex items-center gap-2 text-sm text-muted-foreground">
+   444→                  <ChevronRight className="w-3 h-3" />
+   445→                  {useCase}
+   446→                </li>
+   447→              ))}
+   448→            </ul>
+   449→          </div>
+   450→          
+   451→          {/* Free Resources Section */}
+   452→          {feature.freeResources && feature.freeResources.length > 0 && (
+   453→            <div className="rounded-lg bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 p-4 border border-dashed border-primary/20">
+   454→              <h5 className="text-sm font-semibold mb-3 flex items-center gap-2">
+   455→                <Unlock className="w-4 h-4 text-green-600" />
+   456→                Free Tier Resources
+   457→                <span className="text-xs font-normal text-muted-foreground">
+   458→                  ({feature.freeResources.length} available)
+   459→                </span>
+   460→              </h5>
+   461→              
+   462→              <div className="space-y-2">
+   463→                {feature.freeResources.map((resource, idx) => (
+   464→                  <ResourceLink key={idx} resource={resource} />
+   465→                ))}
+   466→              </div>
+   467→              
+   468→              {/* Upgrade Prompt for Premium/Freemium */}
+   469→              {(feature.tier === 'premium' || feature.tier === 'freemium') && (
+   470→                <div className="mt-3 pt-3 border-t border-border/50">
+   471→                  <div className="flex items-center justify-between">
+   472→                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+   473→                      <Lock className="w-4 h-4" />
+   474→                      <span>Want full access?</span>
+   475→                    </div>
+   476→                    <Button size="sm" variant="outline" className="gap-1 text-xs h-8">
+   477→                      <Crown className="w-3 h-3" />
+   478→                      {feature.tier === 'premium' ? 'Upgrade to Pro' : 'View Plans'}
+   479→                    </Button>
+   480→                  </div>
+   481→                </div>
+   482→              )}
+   483→            </div>
+   484→          )}
+   485→        </div>
+   486→      )}
+   487→      
+   488→      {/* Always show resource count when collapsed */}
+   489→      {!isExpanded && feature.freeResources && feature.freeResources.length > 0 && (
+   490→        <div className="px-5 pb-4">
+   491→          <button
+   492→            onClick={() => setIsExpanded(true)}
+   493→            className="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-primary/5 hover:bg-primary/10 transition-colors text-sm text-primary font-medium"
+   494→          >
+   495→            <Gift className="w-4 h-4" />
+   496→            View {feature.freeResources.length} Free Resources
+   497→            <ChevronRight className="w-4 h-4" />
+   498→          </button>
+   499→        </div>
+   500→      )}
+   501→    </div>
+   502→  );
+   503→}
+   504→
+   505→function PhaseSection({ phase, isLast }: { phase: PhaseData; isLast: boolean }) {
+   506→  const [isExpanded, setIsExpanded] = useState(phase.status === 'active');
+   507→  
+   508→  const statusConfig = {
+   509→    active: {
+   510→      badge: '🚀 Active Development',
+   511→      class: 'border-emerald-500/30 bg-emerald-500/5'
+   512→    },
+   513→    upcoming: {
+   514→      badge: '🔮 Coming Soon',
+   515→      class: 'border-violet-500/30 bg-violet-500/5'
+   516→    },
+   517→    future: {
+   518→      badge: '🌟 Future Vision',
+   519→      class: 'border-rose-500/30 bg-rose-500/5'
+   520→    }
+   521→  };
+   522→  
+   523→  return (
+   524→    <div className={`${isLast ? '' : 'mb-8'}`}>
+   525→      {/* Phase Header */}
+   526→      <div
+   527→        className={`rounded-2xl border-2 p-6 md:p-8 cursor-pointer transition-all duration-300 hover:shadow-xl ${statusConfig[phase.status].class}`}
+   528→        onClick={() => setIsExpanded(!isExpanded)}
+   529→      >
+   530→        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+   531→          <div className="flex items-center gap-4">
+   532→            <div className={`p-4 rounded-2xl bg-gradient-to-br ${phase.gradient} text-white shadow-lg`}>
+   533→              {phase.icon}
+   534→            </div>
+   535→            
+   536→            <div>
+   537→              <div className="flex items-center gap-3 mb-1">
+   538→                <h3 className="text-2xl md:text-3xl font-bold">{phase.title}</h3>
+   539→                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-background/80 backdrop-blur">
+   540→                  {statusConfig[phase.status].badge}
+   541→                </span>
+   542→              </div>
+   543→              <p className="text-lg text-muted-foreground font-medium">{phase.subtitle}</p>
+   544→              <p className="text-sm text-muted-foreground mt-1 flex items-center gap-2">
+   545→                <Clock className="w-4 h-4" />
+   546→                {phase.timeline}
+   547→              </p>
+   548→            </div>
+   549→          </div>
+   550→          
+   551→          <div className="flex items-center gap-3">
+   552→            <div className="text-right hidden md:block">
+   553→              <p className="text-sm text-muted-foreground">Features</p>
+   554→              <p className="text-2xl font-bold text-primary">{phase.features.length}</p>
+   555→            </div>
+   556→            <div className={`p-2 rounded-full transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
+   557→              <ChevronDown className="w-6 h-6 text-muted-foreground" />
+   558→            </div>
+   559→          </div>
+   560→        </div>
+   561→        
+   562→        {/* Vision Statement */}
+   563→        <div className="mt-6 p-4 rounded-xl bg-background/60 backdrop-blur border border-border/50">
+   564→          <div className="flex items-start gap-3">
+   565→            <Lightbulb className="w-5 h-5 text-yellow-500 mt-0.5 flex-shrink-0" />
+   566→            <p className="text-sm italic text-muted-foreground leading-relaxed">
+   567→              "{phase.vision}"
+   568→            </p>
+   569→          </div>
+   570→        </div>
+   571→      </div>
+   572→      
+   573→      {/* Phase Features (Expandable) */}
+   574→      {isExpanded && (
+   575→        <div className="mt-6 grid gap-4 md:gap-6 animate-in slide-in-from-top-4 duration-300">
+   576→          {phase.features.map((feature) => (
+   577→            <FeatureCard key={feature.id} feature={feature} />
+   578→          ))}
+   579→          
+   580→          {/* Phase CTA */}
+   581→          <div className={`rounded-xl p-6 bg-gradient-to-r ${phase.gradient} text-white`}>
+   582→            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+   583→              <div>
+   584→                <h4 className="font-bold text-lg mb-1">
+   585→                  Ready to Explore {phase.title}?
+   586→                </h4>
+   587→                <p className="text-white/80 text-sm">
+   588→                  {phase.status === 'active' 
+   589→                    ? 'Start using these features today with our free tier.'
+   590→                    : phase.status === 'upcoming'
+   591→                    ? 'Join the waitlist for early access to these upcoming features.'
+   592→                    : 'Share your feedback to shape the future of scientific computing.'}
+   593→                </p>
+   594→              </div>
+   595→              
+   596→              <div className="flex gap-3">
+   597→                {phase.status === 'active' && (
+   598→                  <>
+   599→                    <Button variant="secondary" size="sm" className="gap-2 whitespace-nowrap">
+   600→                      <Play className="w-4 h-4" />
+   601→                      Get Started Free
+   602→                    </Button>
+   603→                    <Button variant="outline" size="sm" className="gap-2 text-white border-white/30 hover:bg-white/10 whitespace-nowrap">
+   604→                      <BookOpen className="w-4 h-4" />
+   605→                      View Documentation
+   606→                    </Button>
+   607→                  </>
+   608→                )}
+   609→                
+   610→                {phase.status === 'upcoming' && (
+   611→                  <>
+   612→                    <Button variant="secondary" size="sm" className="gap-2 whitespace-nowrap">
+   613→                      <Bell className="w-4 h-4" />
+   614→                      Join Waitlist
+   615→                    </Button>
+   616→                    <Button variant="outline" size="sm" className="gap-2 text-white border-white/30 hover:bg-white/10 whitespace-nowrap">
+   617→                      <Eye className="w-4 h-4" />
+   618→                      Preview Demo
+   619→                    </Button>
+   620→                  </>
+   621→                )}
+   622→                
+   623→                {phase.status === 'future' && (
+   624→                  <>
+   625→                    <Button variant="secondary" size="sm" className="gap-2 whitespace-nowrap">
+   626→                      <MessageSquare className="w-4 h-4" />
+   627→                      Share Feedback
+   628→                    </Button>
+   629→                    <Button variant="outline" size="sm" className="gap-2 text-white border-white/30 hover:bg-white/10 whitespace-nowrap">
+   630→                      <Rocket className="w-4 h-4" />
+   631→                      View Roadmap
+   632→                    </Button>
+   633→                  </>
+   634→                )}
+   635→              </div>
+   636→            </div>
+   637→          </div>
+   638→        </div>
+   639→      )}
+   640→    </div>
+   641→  );
+   642→}
+   643→
+   644→export default function DashboardPage() {
+   645→  const [activeTab, setActiveTab] = useState('overview');
+   646→  const [selectedJob, setSelectedJob] = useState<string | null>(null);
+   647→
+   648→  const sidebarItems = [
+   649→    { id: 'overview', icon: <BarChart3 className="w-5 h-5" />, label: 'Overview' },
+   650→    { id: 'workspaces', icon: <Layers className="w-5 h-5" />, label: 'Workspaces' },
+   651→    { id: 'jobs', icon: <Activity className="w-5 h-5" />, label: 'Jobs' },
+   652→    { id: 'packages', icon: <Package className="w-5 h-5" />, label: 'Packages' },
+   653→    { id: 'trends', icon: <TrendingUp className="w-5 h-5" />, label: 'Research Trends' },
+   654→    { id: 'terminal', icon: <Terminal className="w-5 h-5" />, label: 'Terminal' },
+   655→    { id: 'collaborators', icon: <Users className="w-5 h-5" />, label: 'Team' },
+   656→    { id: 'settings', icon: <Settings className="w-5 h-5" />, label: 'Settings' },
+   657→  ];
+   658→
+   659→  const workspaces = [
+   660→    { id: 'ws1', name: 'Protein Folding Analysis', files: 147, jobs: 892, updated: '2 hours ago', status: 'active' },
+   661→    { id: 'ws2', name: 'Drug Discovery Pipeline', files: 234, jobs: 1247, updated: '5 hours ago', status: 'active' },
+   662→    { id: 'ws3', name: 'Genome Sequencing Project', files: 89, jobs: 456, updated: '1 day ago', status: 'idle' },
+   663→    { id: 'ws4', name: 'Materials Simulation', files: 56, jobs: 234, updated: '3 days ago', status: 'completed' },
+   664→  ];
+   665→
+   666→  const recentJobs = [
+   667→    { id: 'job1', name: 'BLAST+ Sequence Search', package: '@ncbi/blast-plus', status: 'completed', duration: '45 min', cost: '$0.45', time: '10 min ago' },
+   668→    { id: 'job2', name: 'Molecular Docking (Glide)', package: '@schrodinger/glide', status: 'running', progress: 67, duration: '2h 15m remaining', cost: '$12.30 so far', time: 'Running' },
+   669→    { id: 'job3', name: 'DFT Calculation (VASP)', package: '@vasp/vasp', status: 'queued', duration: '~8h estimated', cost: '$24.00 estimated', time: 'In queue' },
+   670→    { id: 'job4', name: 'ML Training (PyTorch)', package: '@pytorch/pytorch', status: 'failed', duration: '1h 20m', cost: '$8.50', time: '2 hours ago' },
+   671→    { id: 'job5', name: 'RNA-seq Analysis (DESeq2)', package: '@bioconductor/deseq2', status: 'completed', duration: '32 min', cost: '$0.22', time: '4 hours ago' },
+   672→  ];
+   673→
+   674→  const packages = [
+   675→    { name: '@ncbi/blast-plus', version: '2.15.0', downloads: '125K', category: 'Bioinformatics' },
+   676→    { name: '@schrodinger/glide', version: '2024.2', downloads: '45K', category: 'Cheminformatics' },
+   677→    { name: '@vasp/vasp', version: '6.4.3', downloads: '32K', category: 'Materials Science' },
+   678→    { name: '@pytorch/pytorch', version: '2.1.0', downloads: '89K', category: 'Machine Learning' },
+   679→    { name: '@rdkit/rdkit', version: '2023.09', downloads: '56K', category: 'Cheminformatics' },
+   680→  ];
+   681→
+   682→  const getStatusIcon = (status: string) => {
+   683→    switch (status) {
+   684→      case 'completed':
+   685→        return <CheckCircle2 className="w-4 h-4 text-green-500" />;
+   686→      case 'running':
+   687→        return <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />;
+   688→      case 'failed':
+   689→        return <AlertCircle className="w-4 h-4 text-red-500" />;
+   690→      case 'queued':
+   691→        return <Clock className="w-4 h-4 text-yellow-500" />;
+   692→      default:
+   693→        return null;
+   694→    }
+   695→  };
+   696→
+   697→  const getStatusColor = (status: string) => {
+   698→    switch (status) {
+   699→      case 'completed': return 'text-green-600 bg-green-50 dark:bg-green-950';
+   700→      case 'running': return 'text-blue-600 bg-blue-50 dark:bg-blue-950';
+   701→      case 'failed': return 'text-red-600 bg-red-50 dark:bg-red-950';
+   702→      case 'queued': return 'text-yellow-600 bg-yellow-50 dark:bg-yellow-950';
+   703→      default: return 'text-gray-600 bg-gray-50';
+   704→    }
+   705→  };
+   706→
+   707→  return (
+   708→    <div className="min-h-screen bg-background">
+   709→      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+   710→        {/* Dashboard Header */}
+   711→        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+   712→          <div>
+   713→            <h1 className="text-3xl font-bold flex items-center gap-3">
+   714→              <FlaskConical className="w-8 h-8 text-primary" />
+   715→              Dashboard
+   716→            </h1>
+   717→            <p className="text-muted-foreground mt-1">Welcome back! Here's your research overview and future roadmap.</p>
+   718→          </div>
+   719→          
+   720→          <div className="flex items-center gap-3">
+   721→            <Button variant="outline" size="sm" className="gap-2">
+   722→              <Bell className="w-4 h-4" />
+   723→              Notifications
+   724→              <span className="ml-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">3</span>
+   725→            </Button>
+   726→            <Button size="sm" className="gradient-bg text-white border-0 gap-2">
+   727→              <Plus className="w-4 h-4" />
+   728→              New Workspace
+   729→            </Button>
+   730→          </div>
+   731→        </div>
+   732→
+   733→        {/* Stats Cards */}
+   734→        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+   735→          {[
+   736→            { label: 'Active Workspaces', value: '4', icon: <Layers className="w-5 h-5" />, change: '+1 this week', color: 'text-blue-600' },
+   737→            { label: 'Jobs Completed', value: '2,829', icon: <CheckCircle2 className="w-5 h-5" />, change: '+127 this month', color: 'text-green-600' },
+   738→            { label: 'Compute Hours', value: '1,247', icon: <Cpu className="w-5 h-5" />, change: '-12% vs last month', color: 'text-purple-600' },
+   739→            { label: 'Total Cost (MTD)', value: '$342.50', icon: <TrendingUp className="w-5 h-5" />, change: '+8% vs budget', color: 'text-orange-600' },
+   740→          ].map((stat, index) => (
+   741→            <div key={index} className="p-6 rounded-xl border bg-card hover:shadow-md transition-shadow">
+   742→              <div className="flex justify-between items-start mb-4">
+   743→                <div className={`p-2 rounded-lg bg-muted ${stat.color}`}>
+   744→                  {stat.icon}
+   745→                </div>
+   746→                <span className={`text-xs font-medium ${stat.change.includes('+') ? 'text-green-600' : 'text-red-600'}`}>
+   747→                  {stat.change}
+   748→                </span>
+   749→              </div>
+   750→              <div className="text-2xl font-bold">{stat.value}</div>
+   751→              <div className="text-sm text-muted-foreground">{stat.label}</div>
+   752→            </div>
+   753→          ))}
+   754→        </div>
+   755→
+   756→        <div className="flex flex-col lg:flex-row gap-8">
+   757→          {/* Sidebar Navigation */}
+   758→          <div className="lg:w-64 flex-shrink-0">
+   759→            <nav className="lg:sticky lg:top-24 space-y-1">
+   760→              {sidebarItems.map((item) => (
+   761→                <button
+   762→                  key={item.id}
+   763→                  onClick={() => setActiveTab(item.id)}
+   764→                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${
+   765→                    activeTab === item.id
+   766→                      ? 'bg-primary text-primary-foreground'
+   767→                      : 'hover:bg-accent text-muted-foreground hover:text-foreground'
+   768→                  }`}
+   769→                >
+   770→                  {item.icon}
+   771→                  <span className="font-medium">{item.label}</span>
+   772→                  {item.id === 'trends' && (
+   773→                    <span className="ml-auto w-2 h-2 rounded-full bg-gradient-to-r from-emerald-500 to-violet-500 animate-pulse"></span>
+   774→                  )}
+   775→                </button>
+   776→              ))}
+   777→            </nav>
+   778→          </div>
+   779→
+   780→          {/* Main Content */}
+   781→          <div className="flex-1 min-w-0">
+   782→            {/* Research Trends Tab - NEW SECTION */}
+   783→            {activeTab === 'trends' && (
+   784→              <div className="space-y-8">
+   785→                {/* Hero Banner */}
+   786→                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8 md:p-12 text-white">
+   787→                  <div className="absolute inset-0 opacity-20">
+   788→                    <div className="absolute top-10 left-10 w-32 h-32 bg-blue-500 rounded-full blur-3xl"></div>
+   789→                    <div className="absolute bottom-10 right-10 w-40 h-40 bg-purple-500 rounded-full blur-3xl"></div>
+   790→                    <div className="absolute top-1/2 left-1/2 w-24 h-24 bg-emerald-500 rounded-full blur-3xl"></div>
+   791→                  </div>
+   792→                  
+   793→                  <div className="relative z-10">
+   794→                    <div className="flex items-center gap-3 mb-4">
+   795→                      <div className="p-2 rounded-lg bg-white/10 backdrop-blur">
+   796→                        <TrendingUp className="w-6 h-6" />
+   797→                      </div>
+   798→                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/10 backdrop-blur border border-white/20">
+   799→                        Current Research Trends
+   800→                      </span>
+   801→                    </div>
+   802→                    
+   803→                    <h2 className="text-3xl md:text-4xl font-bold mb-4">
+   804→                      The Future of Scientific Computing
+   805→                    </h2>
+   806→                    <p className="text-lg text-white/80 max-w-2xl leading-relaxed">
+   807→                      Explore our phased roadmap integrating cutting-edge AI, quantum computing simulation, 
+   808→                      and collaborative tools designed to accelerate your research journey.
+   809→                    </p>
+   810→                    
+   811→                    <div className="flex flex-wrap gap-4 mt-8">
+   812→                      <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 backdrop-blur">
+   813→                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+   814→                        <span className="text-sm"><strong>Phase 1:</strong> Available Now</span>
+   815→                      </div>
+   816→                      <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 backdrop-blur">
+   817→                        <Clock className="w-4 h-4 text-yellow-400" />
+   818→                        <span className="text-sm"><strong>Phase 2:</strong> Q1-Q2 2027</span>
+   819→                      </div>
+   820→                      <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 backdrop-blur">
+   821→                        <Rocket className="w-4 h-4 text-rose-400" />
+   822→                        <span className="text-sm"><strong>Phase 3:</strong> Q3 2027+</span>
+   823→                      </div>
+   824→                    </div>
+   825→                  </div>
+   826→                </div>
+   827→
+   828→                {/* Quick Stats Bar */}
+   829→                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+   830→                  {[
+   831→                    { label: 'Total Features', value: '12', icon: <Zap className="w-4 h-4" /> },
+   832→                    { label: 'Free Tier Items', value: '28+', icon: <Gift className="w-4 h-4" /> },
+   833→                    { label: 'In Development', value: '4', icon: <Loader2 className="w-4 h-4 animate-spin" /> },
+   834→                    { label: 'Community Votes', value: '1.2K', icon: <Users className="w-4 h-4" /> },
+   835→                  ].map((stat, idx) => (
+   836→                    <div key={idx} className="p-4 rounded-xl border bg-card text-center">
+   837→                      <div className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary mb-2">
+   838→                        {stat.icon}
+   839→                      </div>
+   840→                      <div className="text-xl font-bold">{stat.value}</div>
+   841→                      <div className="text-xs text-muted-foreground">{stat.label}</div>
+   842→                    </div>
+   843→                  ))}
+   844→                </div>
+   845→
+   846→                {/* Phase Sections */}
+   847→                {researchPhases.map((phase, idx) => (
+   848→                  <PhaseSection key={phase.id} phase={phase} isLast={idx === researchPhases.length - 1} />
+   849→                ))}
+   850→
+   851→                {/* Bottom CTA */}
+   852→                <div className="rounded-2xl border-2 border-dashed border-primary/30 p-8 text-center bg-gradient-to-b from-primary/5 to-transparent">
+   853→                  <div className="max-w-2xl mx-auto">
+   854→                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 text-primary mb-4">
+   855→                      <Lightbulb className="w-8 h-8" />
+   856→                    </div>
+   857→                    <h3 className="text-2xl font-bold mb-2">Have Ideas for Future Features?</h3>
+   858→                    <p className="text-muted-foreground mb-6">
+   859→                      We're building SciCMPMATH for researchers like you. Share your vision and help shape the platform's evolution.
+   860→                    </p>
+   861→                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+   862→                      <Button size="lg" className="gap-2">
+   863→                        <MessageSquare className="w-4 h-4" />
+   864→                        Submit Feature Request
+   865→                      </Button>
+   866→                      <Button variant="outline" size="lg" className="gap-2">
+   867→                        <ExternalLink className="w-4 h-4" />
+   868→                        Join Community Discussion
+   869→                      </Button>
+   870→                    </div>
+   871→                  </div>
+   872→                </div>
+   873→              </div>
+   874→            )}
+   875→
+   876→            {/* Workspaces Tab */}
+   877→            {activeTab === 'workspaces' && (
+   878→              <div className="space-y-6">
+   879→                <div className="flex justify-between items-center">
+   880→                  <h2 className="text-xl font-semibold">Your Workspaces</h2>
+   881→                  <div className="flex gap-2">
+   882→                    <Button variant="outline" size="sm" className="gap-2">
+   883→                      <Filter className="w-4 h-4" />
+   884→                      Filter
+   885→                    </Button>
+   886→                    <Button variant="outline" size="sm" className="gap-2">
+   887→                      <Search className="w-4 h-4" />
+   888→                      Search
+   889→                    </Button>
+   890→                  </div>
+   891→                </div>
+   892→
+   893→                <div className="grid gap-4">
+   894→                  {workspaces.map((workspace) => (
+   895→                    <div
+   896→                      key={workspace.id}
+   897→                      className="p-6 rounded-xl border bg-card hover:shadow-md transition-all cursor-pointer group"
+   898→                    >
+   899→                      <div className="flex justify-between items-start">
+   900→                        <div className="flex-1">
+   901→                          <div className="flex items-center gap-3 mb-2">
+   902→                            <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
+   903→                              {workspace.name}
+   904→                            </h3>
+   905→                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+   906→                              workspace.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+   907→                            }`}>
+   908→                              {workspace.status}
+   909→                            </span>
+   910→                          </div>
+   911→                          <div className="flex gap-6 text-sm text-muted-foreground">
+   912→                            <span className="flex items-center gap-1">
+   913→                              <FileText className="w-4 h-4" /> {workspace.files} files
+   914→                            </span>
+   915→                            <span className="flex items-center gap-1">
+   916→                              <Activity className="w-4 h-4" /> {workspace.jobs} jobs
+   917→                            </span>
+   918→                            <span>Updated {workspace.updated}</span>
+   919→                          </div>
+   920→                        </div>
+   921→                        <Button variant="ghost" size="icon">
+   922→                          <MoreVertical className="w-4 h-4" />
+   923→                        </Button>
+   924→                      </div>
+   925→                    </div>
+   926→                  ))}
+   927→                </div>
+   928→              </div>
+   929→            )}
+   930→
+   931→            {/* Jobs Tab */}
+   932→            {activeTab === 'jobs' && (
+   933→              <div className="space-y-6">
+   934→                <div className="flex justify-between items-center">
+   935→                  <h2 className="text-xl font-semibold">Recent Jobs</h2>
+   936→                  <Button size="sm" className="gradient-bg text-white border-0 gap-2">
+   937→                    <Play className="w-4 h-4" />
+   938→                    Submit New Job
+   939→                  </Button>
+   940→                </div>
+   941→
+   942→                <div className="border rounded-xl overflow-hidden">
+   943→                  {/* Table Header */}
+   944→                  <div className="grid grid-cols-12 gap-4 p-4 bg-muted/50 text-sm font-semibold text-muted-foreground">
+   945→                    <div className="col-span-1"></div>
+   946→                    <div className="col-span-3">Job Name</div>
+   947→                    <div className="col-span-2">Package</div>
+   948→                    <div className="col-span-2">Status</div>
+   949→                    <div className="col-span-2">Duration / Cost</div>
+   950→                    <div className="col-span-2">Time</div>
+   951→                  </div>
+   952→
+   953→                  {/* Table Rows */}
+   954→                  {recentJobs.map((job) => (
+   955→                    <div
+   956→                      key={job.id}
+   957→                      onClick={() => setSelectedJob(job.id === selectedJob ? null : job.id)}
+   958→                      className={`grid grid-cols-12 gap-4 p-4 border-t items-center cursor-pointer transition-colors hover:bg-accent/50 ${
+   959→                        selectedJob === job.id ? 'bg-accent' : ''
+   960→                      }`}
+   961→                    >
+   962→                      <div className="col-span-1">{getStatusIcon(job.status)}</div>
+   963→                      <div className="col-span-3 font-medium truncate">{job.name}</div>
+   964→                      <div className="col-span-2 text-sm text-muted-foreground truncate">{job.package}</div>
+   965→                      <div className="col-span-2">
+   966→                        <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(job.status)}`}>
+   967→                          {job.status}
+   968→                          {job.status === 'running' && (
+   969→                            <span className="ml-1">{job.progress}%</span>
+   970→                          )}
+   971→                        </span>
+   972→                      </div>
+   973→                      <div className="col-span-2 text-sm">
+   974→                        <div>{job.duration}</div>
+   975→                        <div className="text-muted-foreground">{job.cost}</div>
+   976→                      </div>
+   977→                      <div className="col-span-2 text-sm text-muted-foreground">{job.time}</div>
+   978→                    </div>
+   979→                  ))}
+   980→                </div>
+   981→
+   982→                {/* Job Details Panel */}
+   983→                {selectedJob && (
+   984→                  <div className="p-6 rounded-xl border bg-card mt-4 animate-in slide-in-from-bottom-2">
+   985→                    <h3 className="font-semibold mb-4">Job Details</h3>
+   986→                    <div className="grid md:grid-cols-2 gap-4 text-sm">
+   987→                      <div>
+   988→                        <p className="text-muted-foreground">Job ID</p>
+   989→                        <p className="font-mono">{selectedJob}</p>
+   990→                      </div>
+   991→                      <div>
+   992→                        <p className="text-muted-foreground">Workspace</p>
+   993→                        <p>Drug Discovery Pipeline</p>
+   994→                      </div>
+   995→                      <div>
+   996→                        <p className="text-muted-foreground">Resources Used</p>
+   997→                        <p>16 CPU cores, 64GB RAM, GPU: T4 x1</p>
+   998→                      </div>
+   999→                      <div>
+  1000→                        <p className="text-muted-foreground">Environment</p>
+  1001→                        <p>python-3.11-bio (Docker)</p>
+  1002→                      </div>
+  1003→                    </div>
+  1004→                    <div className="mt-4 flex gap-2">
+  1005→                      <Button variant="outline" size="sm" className="gap-2">
+  1006→                        <RotateCcw className="w-4 h-4" />
+  1007→                        Rerun Job
+  1008→                      </Button>
+  1009→                      <Button variant="outline" size="sm" className="gap-2">
+  1010→                        <FileText className="w-4 h-4" />
+  1011→                        View Logs
+  1012→                      </Button>
+  1013→                      <Button variant="outline" size="sm" className="gap-2">
+  1014→                        Download Results
+  1015→                      </Button>
+  1016→                    </div>
+  1017→                  </div>
+  1018→                )}
+  1019→              </div>
+  1020→            )}
+  1021→
+  1022→            {/* Packages Tab */}
+  1023→            {activeTab === 'packages' && (
+  1024→              <div className="space-y-6">
+  1025→                <div className="flex justify-between items-center">
+  1026→                  <h2 className="text-xl font-semibold">SciPKG Registry</h2>
+  1027→                  <Button variant="outline" size="sm" className="gap-2">
+  1028→                    <Search className="w-4 h-4" />
+  1029→                    Search Packages
+  1030→                  </Button>
+  1031→                </div>
+  1032→
+  1033→                <div className="grid gap-4">
+  1034→                  {packages.map((pkg, index) => (
+  1035→                    <div key={index} className="p-4 rounded-xl border bg-card hover:shadow-md transition-all cursor-pointer group">
+  1036→                      <div className="flex justify-between items-center">
+  1037→                        <div className="flex items-center gap-4">
+  1038→                          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white font-bold">
+  1039→                            {pkg.name.charAt(1).toUpperCase()}
+  1040→                          </div>
+  1041→                          <div>
+  1042→                            <h3 className="font-semibold group-hover:text-primary transition-colors">{pkg.name}</h3>
+  1043→                            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+  1044→                              <span>v{pkg.version}</span>
+  1045→                              <span>•</span>
+  1046→                              <span>{pkg.category}</span>
+  1047→                              <span>•</span>
+  1048→                              <span>{pkg.downloads} downloads</span>
+  1049→                            </div>
+  1050→                          </div>
+  1051→                        </div>
+  1052→                        <Button variant="outline" size="sm" className="group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+  1053→                          Install
+  1054→                        </Button>
+  1055→                      </div>
+  1056→                    </div>
+  1057→                  ))}
+  1058→                </div>
+  1059→              </div>
+  1060→            )}
+  1061→
+  1062→            {/* Overview Tab (Default) */}
+  1063→            {(activeTab === 'overview' || !['workspaces', 'jobs', 'packages', 'trends'].includes(activeTab)) && (
+  1064→              <div className="space-y-6">
+  1065→                <h2 className="text-xl font-semibold">Quick Actions</h2>
+  1066→                
+  1067→                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  1068→                  {[
+  1069→                    { title: 'Run BLAST Search', desc: 'Sequence alignment against NCBI databases', icon: <Zap className="w-5 h-5" />, color: 'from-blue-500 to-blue-600' },
+  1070→                    { title: 'Start Docking', desc: 'Virtual screening with Glide/AutoDock', icon: <Cpu className="w-5 h-5" />, color: 'from-green-500 to-green-600' },
+  1071→                    { title: 'Launch Notebook', desc: 'Interactive Jupyter environment', icon: <Terminal className="w-5 h-5" />, color: 'from-orange-500 to-orange-600' },
+  1072→                    { title: 'Upload Dataset', desc: 'Import FASTA, PDB, SDF files', icon: <HardDrive className="w-5 h-5" />, color: 'from-purple-500 to-purple-600' },
+  1073→                    { title: 'View Reports', desc: 'Generate publication-ready figures', icon: <FileText className="w-5 h-5" />, color: 'from-pink-500 to-pink-600' },
+  1074→                    { title: 'Invite Collaborator', desc: 'Share workspace with team members', icon: <Users className="w-5 h-5" />, color: 'from-cyan-500 to-cyan-600' },
+  1075→                  ].map((action, index) => (
+  1076→                    <button
+  1077→                      key={index}
+  1078→                      className="p-4 rounded-xl border bg-card hover:shadow-md transition-all text-left group"
+  1079→                    >
+  1080→                      <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${action.color} flex items-center justify-center text-white mb-3 group-hover:scale-110 transition-transform`}>
+  1081→                        {action.icon}
+  1082→                      </div>
+  1083→                      <h3 className="font-semibold mb-1">{action.title}</h3>
+  1084→                      <p className="text-sm text-muted-foreground">{action.desc}</p>
+  1085→                    </button>
+  1086→                  ))}
+  1087→                </div>
+  1088→
+  1089→                {/* Recent Activity Feed */}
+  1090→                <div className="mt-8">
+  1091→                  <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
+  1092→                  <div className="space-y-3">
+  1093→                    {[
+  1094→                      { action: 'Completed', item: 'BLAST+ job #2847', time: '10 minutes ago', type: 'success' },
+  1095→                      { action: 'Started', item: 'Molecular docking batch', time: '25 minutes ago', type: 'info' },
+  1096→                      { action: 'Invited', item: 'dr.sarah.chen@mit.edu to workspace', time: '1 hour ago', type: 'info' },
+  1097→                      { action: 'Published', item: 'Custom pipeline v2.1', time: '3 hours ago', type: 'success' },
+  1098→                      { action: 'Failed', item: 'DFT calculation (memory exceeded)', time: '5 hours ago', type: 'error' },
+  1099→                    ].map((activity, index) => (
+  1100→                      <div key={index} className="flex items-center gap-4 p-3 rounded-lg bg-card border">
+  1101→                        <div className={`w-2 h-2 rounded-full ${
+  1102→                          activity.type === 'success' ? 'bg-green-500' :
+  1103→                          activity.type === 'error' ? 'bg-red-500' :
+  1104→                          'bg-blue-500'
+  1105→                        }`} />
+  1106→                        <div className="flex-1">
+  1107→                          <span className="font-medium">{activity.action}</span>{' '}
+  1108→                          <span className="text-muted-foreground">{activity.item}</span>
+  1109→                        </div>
+  1110→                        <span className="text-sm text-muted-foreground">{activity.time}</span>
+  1111→                      </div>
+  1112→                    ))}
+  1113→                  </div>
+  1114→                </div>
+  1115→              </div>
+  1116→            )}
+  1117→          </div>
+  1118→        </div>
+  1119→      </div>
+  1120→    </div>
+  1121→  );
+  1122→}
+  1123→

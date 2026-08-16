@@ -1076,6 +1076,7 @@ export default function DashboardPage() {
                     <button
                       key={index}
                       className="p-4 rounded-xl border bg-card hover:shadow-md transition-all text-left group"
+                      onClick={() => alert(`🚀 ${action.title}\\n\\n${action.desc}\\n\\nThis would open the ${action.title.toLowerCase()} feature.`)}
                     >
                       <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${action.color} flex items-center justify-center text-white mb-3 group-hover:scale-110 transition-transform`}>
                         {action.icon}

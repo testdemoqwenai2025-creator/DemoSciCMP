@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   Check, 
@@ -116,6 +117,8 @@ const faqs = [
 ];
 
 export default function PricingPage({ onNavigate }: PricingPageProps) {
+  const [isAnnual, setIsAnnual] = useState(false);
+  
   return (
     <div className="min-h-screen bg-background">
       {/* Hero */}
@@ -132,11 +135,14 @@ export default function PricingPage({ onNavigate }: PricingPageProps) {
 
             {/* Billing Toggle */}
             <div className="inline-flex items-center gap-3 p-1 rounded-full bg-muted">
-              <span className="px-4 py-2 text-sm font-medium">Monthly</span>
-              <button className="relative w-14 h-7 rounded-full bg-primary transition-colors">
-                <div className="absolute right-1 top-1 w-5 h-5 rounded-full bg-white transition-transform shadow-sm" />
+              <span className={`px-4 py-2 text-sm font-medium ${!isAnnual ? 'text-primary' : 'text-muted-foreground'}`}>Monthly</span>
+              <button 
+                className={`relative w-14 h-7 rounded-full transition-colors ${isAnnual ? 'bg-primary' : 'bg-muted-foreground/20'}`}
+                onClick={() => setIsAnnual(!isAnnual)}
+              >
+                <div className={`absolute top-1 w-5 h-5 rounded-full bg-white transition-transform shadow-sm ${isAnnual ? 'left-1' : 'right-1'}`} />
               </button>
-              <span className="px-4 py-2 text-sm font-medium text-primary">
+              <span className={`px-4 py-2 text-sm font-medium ${isAnnual ? 'text-primary' : 'text-muted-foreground'}`}>
                 Annual <span className="text-xs text-green-600">(Save 20%)</span>
               </span>
             </div>
