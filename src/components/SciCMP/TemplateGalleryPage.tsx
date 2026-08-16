@@ -2184,6 +2184,131 @@ const templates: TemplateData[] = [
 ];
 
 // ============================================================================
+// URL ROUTING CONFIGURATION
+// Maps friendly URL slugs to template IDs for hash-based navigation
+// ============================================================================
+
+/** Category short names for URL mapping */
+const CATEGORY_SLUGS: Record<string, TemplateCategory> = {
+  'bio': 'bioinformatics',
+  'bioinformatics': 'bioinformatics',
+  'chem': 'cheminformatics',
+  'cheminformatics': 'cheminformatics',
+  'ml': 'machine-learning',
+  'machine-learning': 'machine-learning',
+  'training': 'machine-learning',
+  'stats': 'statistics',
+  'statistics': 'statistics',
+  'viz': 'visualization',
+  'visualization': 'visualization',
+  'quantum': 'quantum-computing',
+  'quantum-computing': 'quantum-computing',
+  'physics': 'computational-physics',
+  'computational-physics': 'computational-physics',
+  'image': 'image-analysis',
+  'image-analysis': 'image-analysis',
+  'nlp': 'nlp',
+  'signal': 'signal-processing',
+  'signal-processing': 'signal-processing',
+};
+
+/** Template slug mappings for friendly URLs */
+const TEMPLATE_SLUGS: Record<string, string> = {
+  // Bioinformatics
+  'blast': 'blast-sequence-analysis',
+  'genome': 'genome-assembly-pipeline',
+  'protein': 'protein-structure-prediction',
+  
+  // Cheminformatics
+  'docking': 'molecular-docking-workflow',
+  
+  // Machine Learning
+  'training': 'transformer-training-pipeline',
+  'transformer': 'transformer-training-pipeline',
+  'ml-pipeline': 'automated-ml-pipeline',
+  'automl': 'automated-ml-pipeline',
+  
+  // Statistics
+  'bayesian': 'bayesian-inference-framework',
+  
+  // Visualization
+  'dashboard': 'scientific-dashboard-kit',
+  'viz-kit': 'scientific-dashboard-kit',
+  
+  // Quantum Computing
+  'quantum-sim': 'quantum-algorithm-simulator',
+  'vqe': 'quantum-algorithm-simulator',
+  
+  // Image Analysis
+  'segmentation': 'medical-image-segmentation',
+  'medical-image': 'medical-image-segmentation',
+  
+  // NLP
+  'document': 'scientific-document-processor',
+  'nlp-processor': 'scientific-document-processor',
+  
+  // Signal Processing
+  'timeseries': 'time-series-analyzer',
+  'time-series': 'time-series-analyzer',
+};
+
+/** Parse hash route and return template ID or null */
+function parseHashRoute(hash: string): { templateId: string | null; category: TemplateCategory | 'all' } {
+  // Remove # prefix if present
+  const cleanHash = hash.replace(/^#/, '');
+  
+  // Match patterns like /templates/{category}/{template} or /templates/{template}
+  const templatesMatch = cleanHash.match(/\/templates\/(?:([^/]+)\/)?([^/]+)\/?$/);
+  
+  if (templatesMatch) {
+    const categorySlug = templatesMatch[1]; // May be undefined
+    const templateSlug = templatesMatch[2];
+    
+    // Try to find template by direct ID match first
+    const directMatch = templates.find(t => t.id === templateSlug || t.id === templateSlug.replace(/-/g, '_'));
+    if (directMatch) {
+      return { templateId: directMatch.id, category: directMatch.category };
+    }
+    
+    // Try slug mapping
+    const mappedId = TEMPLATE_SLUGS[templateSlug.toLowerCase()];
+    if (mappedId) {
+      const template = templates.find(t => t.id === mappedId);
+      if (template) {
+        return { templateId: template.id, category: template.category };
+      }
+    }
+    
+    // Try finding template by name partial match
+    const nameMatch = templates.find(t => 
+      t.name.toLowerCase().includes(templateSlug.toLowerCase()) ||
+      templateSlug.toLowerCase().includes(t.name.toLowerCase().split(' ')[0])
+    );
+    if (nameMatch) {
+      return { templateId: nameMatch.id, category: nameMatch.category };
+    }
+    
+    // If only category provided, filter by category
+    if (categorySlug && !templatesMatch[2]) {
+      const mappedCategory = CATEGORY_SLUGS[categorySlug.toLowerCase()];
+      if (mappedCategory) {
+        return { templateId: null, category: mappedCategory };
+      }
+    }
+    
+    // If category slug is valid, set category filter
+    if (categorySlug) {
+      const mappedCategory = CATEGORY_SLUGS[categorySlug.toLowerCase()];
+      if (mappedCategory) {
+        return { templateId: null, category: mappedCategory };
+      }
+    }
+  }
+  
+  return { templateId: null, category: 'all' };
+}
+
+// ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
@@ -2202,78 +2327,50 @@ export default function TemplateGalleryPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'papers' | 'presets' | 'community' | 'practices'>('overview');
   const [filterTier, setFilterTier] = useState<'all' | 'free' | 'freemium' | 'premium'>('all');
   const [filterDifficulty, setFilterDifficulty] = useState<'all' | TemplateData['difficulty']>('all');
+  const [isInitialized, setIsInitialized] = useState(false);
   
-  // Accordion state for bottom sections
+  // Accordion state for bottom sections - ALL sections expandable
   const [expandedSections, setExpandedSections] = useState<{
+    'core-capabilities': boolean;
     'quick-start': boolean;
     'teaching-training': boolean;
     'standardization': boolean;
+    'free-tier': boolean;
+    'use-cases': boolean;
   }>({
+    'core-capabilities': false,
     'quick-start': false,
     'teaching-training': false,
     'standardization': false,
+    'free-tier': false,
+    'use-cases': false,
   });
   
-  // Toggle section expansion
-  const toggleSection = useCallback((sectionId: 'quick-start' | 'teaching-training' | 'standardization') => {
+  // Toggle section expansion - enhanced to handle all sections
+  const toggleSection = useCallback((sectionId: keyof typeof expandedSections) => {
     setExpandedSections(prev => ({
       ...prev,
       [sectionId]: !prev[sectionId]
     }));
   }, []);
-
+  
+  // Expand all sections utility
+  const expandAllSections = useCallback(() => {
+    setExpandedSections({
+      'core-capabilities': true,
+      'quick-start': true,
+      'teaching-training': true,
+      'standardization': true,
+      'free-tier': true,
+      'use-cases': true,
+    });
+  }, []);
+  
   // ====================================================================
-  // REVOLUTIONARY TEMPLATE PORTAL STATE MANAGEMENT
+  // HASH-BASED ROUTING EFFECT
   // ====================================================================
   
-  /** Portal view modes for the enhanced template experience */
-  type PortalView = 'overview' | 'playground' | 'ai-assistant' | 'workflow' | 'compute' | 'community';
-  const [portalView, setPortalView] = useState<PortalView>('overview');
-  
-  /** Code editor state for interactive playground */
-  const [codeEditorContent, setCodeEditorContent] = useState<string>('');
-  const [codeLanguage, setCodeLanguage] = useState<string>('python');
-  const [isRunningCode, setIsRunningCode] = useState(false);
-  const [codeOutput, setCodeOutput] = useState<string>('');
-  
-  /** AI Research Assistant state */
-  const [aiChatMessages, setAiChatMessages] = useState<Array<{role: 'user' | 'assistant', content: string, timestamp: Date}>>([]);
-  const [aiInputMessage, setAiInputMessage] = useState<string>('');
-  const [isAiThinking, setIsAiThinking] = useState(false);
-  
-  /** Workflow visualization state */
-  const [activeWorkflowStep, setActiveWorkflowStep] = useState<number>(0);
-  const [workflowZoomLevel, setWorkflowZoomLevel] = useState<number>(100);
-  
-  /** Compute simulator state */
-  const [computeSimulation, setComputeSimulation] = useState<{
-    estimatedTime: string;
-    resourceUsage: {cpu: number; memory: number; gpu: number};
-    costEstimate: string;
-    progress: number;
-    isSimulating: boolean;
-  }>({
-    estimatedTime: '~15 min',
-    resourceUsage: { cpu: 0, memory: 0, gpu: 0 },
-    costEstimate: '$0.00',
-    progress: 0,
-    isSimulating: false,
-  });
-  
-  /** Template customization state */
-  const [customParameters, setCustomParameters] = useState<Record<string, string>>({});
-  const [showCustomizer, setShowCustomizer] = useState(false);
-  
-  /** Collaboration & activity state */
-  const [recentActivity, setRecentActivity] = useState<Array<{
-    user: string;
-    action: string;
-    templateName: string;
-    timestamp: Date;
-    avatar?: string;
-  }>>([]);
-  
-  /** Portal initialization when template is selected */
+  /** Initialize portal for template - defined before use */
   const initializePortalForTemplate = useCallback((template: TemplateData) => {
     // Set default code based on template category
     const defaultCodes: Record<string, string> = {
@@ -2377,417 +2474,192 @@ analysis = mol_workspace.analyze(molecule, methods=[
 
 # Get predicted properties
 properties = analysis.get_properties([
-    "LogP",
     "MolecularWeight",
+    "LogP",
     "TPSA",
     "HBD",
     "HBA"
 ])
 
-# Visualize molecular orbitals
-analysis.visualize_orbitals()
-analysis.export_results(format="sdf")`,
+print(f"🧪 Analysis complete!")
+print(f"   MW: {properties.MolecularWeight:.2f} g/mol")
+print(f"   LogP: {properties.LogP:.2f}")`,
 
-      'physics': `# ${template.name} - SciCMPMATH Template
-# Quantum Simulation Framework
+      'default': `# ${template.name} - SciCMPMATH Template
+# Scientific Computing Pipeline
 
 import scicmppath as sci
 import numpy as np
-
-# Initialize quantum simulator
-simulator = sci.QuantumSimulator(
-    method="density_functional_theory",
-    basis_set="def2-TZVP"
-)
-
-# Define system Hamiltonian
-hamiltonian = simulator.create_hamiltonian(
-    particles=10,
-    dimensions=3,
-    potential="harmonic_oscillator"
-)
-
-# Set initial conditions
-initial_state = simulator.prepare_state(
-    temperature=300,  # Kelvin
-    magnetic_field=1.0  # Tesla
-)
-
-# Run time evolution simulation
-evolution = simulator.evolve(
-    hamiltonian=hamiltonian,
-    initial_state=initial_state,
-    time_steps=1000,
-    dt=0.001
-)
-
-# Extract observables
-observables = evolution.measure([
-    "energy",
-    "position_momentum",
-    "spin_correlation"
-])
-
-# Generate publication-quality plots
-sci.plotting.quantum_evolution(observables)
-evolution.export_data("simulation_results.hdf5")`,
-
-      'visualization': `# ${template.name} - SciCMPMATH Template
-# Scientific Visualization Suite
-
-import scicmppath as sci
-import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 
-# Initialize visualization engine
-viz = sci.VisualizationEngine(
-    theme="scientific_dark",
-    dpi=300,
-    export_format="vector"
-)
-
-# Load your dataset
-data = viz.load_dataset("experimental_results.csv")
-
-# Create multi-panel scientific figure
-fig = viz.create_figure(rows=2, cols=2, figsize=(12, 10))
-
-# Panel 1: Main data visualization
-viz.add_plot(fig, position=(0, 0), type="scatter_3d",
-             x=data.x, y=data.y, z=data.z,
-             color=data.intensity,
-             title="3D Data Distribution")
-
-# Panel 2: Statistical analysis
-viz.add_plot(fig, position=(0, 1), type="histogram",
-             data=data.values,
-             distribution="normal",
-             title="Statistical Distribution")
-
-# Panel 3: Time series
-viz.add_plot(fig, position=(1, 0), type="line",
-             x=data.time, y=data.signal,
-             error_bars=True,
-             title="Signal Evolution")
-
-# Panel 4: Correlation matrix
-viz.add_plot(fig, position=(1, 1), type="heatmap",
-             data=data.correlation_matrix(),
-             clustering=True,
-             title="Feature Correlations")
-
-# Export in multiple formats
-fig.export("figure.pdf")
-fig.export("figure.svg")
-fig.export("figure.png", transparent=True)`,
-
-      'statistics': `# ${template.name} - SciCMPMATH Template
-# Statistical Analysis Framework
-
-import scicmppath as sci
-import scipy.stats as stats
-import pandas as pd
-
-# Initialize statistical environment
-stats_env = sci.StatisticalEnvironment(
-    significance_level=0.05,
-    multiple_testing="bonferroni"
-)
+# Initialize your scientific workspace
+workspace = sci.Workspace("${template.id}")
 
 # Load and preprocess data
-data = pd.read_csv("research_data.csv")
-cleaned = stats_env.preprocess(data, methods=[
-    "handle_missing",
-    "remove_outliers",
-    "normalize"
-])
+data = workspace.load_data("./your_data.csv")
+processed = workspace.preprocess(data, normalize=True, handle_missing=True)
 
-# Perform comprehensive statistical tests
-results = stats_env.analyze(cleaned, tests={
-    "normality": ["shapiro-wilk", "anderson-darling"],
-    "comparison": ["t-test", "mann-whitney", "anova"],
-    "correlation": ["pearson", "spearman", "kendall"],
-    "regression": ["linear", "multiple", "logistic"]
+# Configure analysis parameters
+params = workspace.configure({
+    "method": "auto",
+    "confidence": 0.95,
+    "iterations": 1000,
+    "parallel": True
 })
 
-# Bayesian inference (if applicable)
-bayesian_results = stats_env.bayesian_analysis(
-    data=cleaned,
-    priors="informative",
-    mcmc_samples=10000
-)
+# Run analysis with automatic optimization
+results = workspace.analyze(processed, params)
 
-# Generate statistical report
-report = stats_env.generate_report(
-    results=results,
-    bayesian=bayesian_results,
-    format="apa7",
-    include_tables=True,
-            include_figures=True
-)
+# Generate publication-quality visualizations
+figures = workspace.visualize(results, style="nature")
+workspace.export(results, format=["pdf", "csv", "xlsx"])
 
-report.save("statistical_analysis.pdf")
-print(f"📊 Analysis complete: p-value = {results.min_p_value:.4f}")`,
-      
-      'quantum': `# ${template.name} - SciCMPMATH Template
-# Quantum Computing Interface
-
-import scicmppath as sci
-from qiskit import QuantumCircuit, Aer, execute
-
-# Initialize quantum backend
-backend = sci.QuantumBackend(
-    provider="ibmq",
-    simulator=True,  # Set False for real quantum hardware
-    qubits=5
-)
-
-# Create quantum circuit for algorithm
-qc = QuantumCircuit(backend.qubits)
-
-# Implement ${template.name.split(' ')[0].toLowerCase()} algorithm
-# Circuit construction
-qc.h(0)  # Superposition
-for i in range(backend.qubits - 1):
-    qc.cx(i, i + 1)  # Entanglement
-    
-# Parameterized rotation gates
-theta = sci.Parameter("θ")
-qc.rz(theta, range(backend.qubits))
-
-# Measurement
-qc.measure_all()
-
-# Execute on quantum simulator
-job = backend.run(qc, shots=8192)
-result = job.result()
-
-# Analyze quantum statistics
-counts = result.get_counts()
-probability_distribution = backend.analyze_counts(counts)
-
-# Visualize quantum state
-backend.plot_bloch_sphere(qc)
-backend.plot_histogram(counts)
-
-# Export quantum circuit diagram
-qc.draw(output="mpl", filename="circuit_diagram.png")`,
-
-      'imaging': `# ${template.name} - SciCMPMATH Template
-# Medical Image Processing Pipeline
-
-import scicmppath as sci
-import numpy as np
-import SimpleITK as sitk
-
-# Initialize medical imaging environment
-med_img = sci.MedicalImagingEnvironment(
-    modality="MRI",  # CT, MRI, PET, X-ray
-    output_dtype=np.float32
-)
-
-# Load medical image series
-image_series = med_img.load_series(
-    path="./patient_scans/",
-    format="DICOM"
-)
-
-# Preprocessing pipeline
-preprocessed = med_img.preprocess(image_series, steps=[
-    ("noise_reduction", {"method": "gaussian", "sigma": 1.0}),
-    ("intensity_normalization", {"method": "percentile"}),
-    ("registration", {"reference": "atlas"}),
-    ("skull_stripping", {"method": "bet"})
-)
-
-# AI-powered segmentation (U-Net, Transformer, etc.)
-segmentation_model = med_img.load_model(
-    architecture="nnUNet",
-    pretrained="medical_net"
-)
-
-mask = segmentation_model.segment(preprocessed)
-segments = med_img.extract_segments(mask, labels=[
-    "gray_matter",
-    "white_matter", 
-    "csf",
-    "lesions"
-])
-
-# Quantitative analysis
-measurements = med_img.analyze(segments, metrics=[
-    "volume",
-    "surface_area",
-    "mean_intensity",
-    "texture_features"
-])
-
-# Generate clinical report with visualizations
-report = med_img.generate_report(
-    measurements=measurements,
-    mask_overlay=True,
-    slices_to_show=[30, 50, 70]
-)
-report.export("clinical_report.pdf")`,
-
-      'documentation': `# ${template.name} - SciCMPMATH Template
-# Scientific Document Processor
-
-import scicmppath as sci
-from docx import Document
-from bibtex.parser import bibtex_parser
-
-# Initialize document processor
-doc_processor = sci.DocumentProcessor(
-    format="latex",  # latex, word, markdown
-    citation_style="nature"  # apa, ieee, nature, science
-)
-
-# Load source materials
-paper = doc_processor.load_paper("manuscript.tex")
-references = doc_processor.load_references("references.bib")
-figures = doc_processor.load_figures("./figures/")
-
-# Automated formatting and style check
-formatted = doc_processor.format(paper, style_guide="nature_template")
-style_issues = doc_processor.check_style(formatted)
-
-# Citation management
-citations = doc_processor.manage_citations(
-    paper=formatted,
-    references=references,
-    auto_complete=True,
-    detect_duplicates=True
-)
-
-# Figure and table processing
-processed_figures = doc_processor.process_figures(
-    figures,
-    resolution=300,
-    format="vector",
-    compress=True
-)
-
-# Generate multiple output formats
-outputs = doc_processor.export(
-    paper=citations,
-    formats=["pdf", "html", "docx"],
-    include_supplementary=True,
-    plagiarism_check=True
-)
-
-print(f"📄 Document processed: {len(outputs)} formats generated")`,
-
-      'time-series': `# ${template.name} - SciCMPMATH Template
-# Time Series Analysis Engine
-
-import scicmppath as sci
-import pandas as pd
-import prophet
-from sklearn.ensemble import IsolationForest
-
-# Initialize time series environment
-ts_env = sci.TimeSeriesEnvironment(
-    frequency="D",  # Daily data
-    seasonality_mode="multiplicative"
-)
-
-# Load temporal data
-data = pd.read_csv("time_series_data.csv", parse_dates=["date"])
-ts = ts_env.create_series(data, date_column="date", value_column="value")
-
-# Exploratory analysis
-decomposition = ts_env.decompose(ts, method="STL")
-stationarity_test = ts_env.test_stationarity(ts, tests=["adf", "kpss", "pp"])
-
-# Feature engineering
-features = ts_env.engineer_features(ts, lags=[1, 7, 30], 
-                                     rolling_windows=[7, 14, 30],
-                                     fourier_terms=4)
-
-# Multiple forecasting models
-models = {
-    "prophet": ts_env.fit_prophet(ts, seasonality=True),
-    "arima": ts_env.fit_arima(ts, order=(5, 1, 1)),
-    "lstm": ts_env.fit_lstm(features, lookback=30),
-    "ensemble": ts_env.fit_ensemble([prophet, arima, lstm])
-}
-
-# Anomaly detection
-anomaly_detector = IsolationForest(contamination=0.05)
-anomalies = ts_env.detect_anomalies(ts, detector=anomaly_detector)
-
-# Forecasting with uncertainty quantification
-forecast = models["ensemble"].forecast(
-    periods=90,
-    confidence_intervals=[0.80, 0.95],
-    simulation_runs=1000
-)
-
-# Comprehensive visualization
-ts_env.plot_forecast(forecast, anomalies=anomalies)
-ts_env.plot_decomposition(decomposition)
-forecast.save("forecast_results.pkl")`
+print(f"✨ Analysis complete! Generated {len(figures)} figures")`
     };
     
-    setCodeEditorContent(defaultCodes[template.category] || defaultCodes['bioinformatics']);
-    setCodeLanguage('python');
+    // Select code based on category or use default
+    const categoryKey = template.category === 'cheminformatics' ? 'chemistry' : 
+                        template.category === 'machine-learning' ? 'machine-learning' :
+                        template.category === 'bioinformatics' ? 'bioinformatics' : 'default';
     
-    // Initialize AI assistant with context
+    setCodeEditorContent(defaultCodes[categoryKey] || defaultCodes['default']);
+    setCodeLanguage('python');
+    setCodeOutput('');
+    
+    // Set AI chat welcome message
     setAiChatMessages([{
       role: 'assistant',
-      content: `Hello! I'm your **SciCMPMATH Research Assistant** for the **${template.name}** template. I can help you:\n\n• 🧬 Understand the underlying algorithms\n• ⚙️ Optimize parameters for your specific use case\n• 🔍 Troubleshoot common issues\n• 📚 Find relevant papers and citations\n• 💡 Suggest improvements or extensions\n\nWhat would you like to explore?`,
+      content: `Hello! I'm your **AI Research Assistant** for **${template.name}**. 🧪\n\nI can help you:\n\n- 🔬 **Understand** the underlying algorithms\n- ⚙️ **Optimize** parameters for your use case\n- 📚 **Find relevant papers** and citations\n- 🐛 **Troubleshoot** common issues\n\nWhat would you like to explore?`,
       timestamp: new Date()
     }]);
     
-    // Simulate recent community activity
+    // Reset workflow step
+    setActiveWorkflowStep(0);
+    
+    // Generate simulated recent activity
     setRecentActivity([
-      {
-        user: "Dr. Sarah Chen",
-        action: "ran analysis with",
-        templateName: template.name,
-        timestamp: new Date(Date.now() - 5 * 60000),
-        avatar: "SC"
-      },
-      {
-        user: "Prof. Marcus Rodriguez",
-        action: "forked and modified",
-        templateName: template.name,
-        timestamp: new Date(Date.now() - 23 * 60000),
-        avatar: "MR"
-      },
-      {
-        user: "Yuki Tanaka",
-        action: "shared results from",
-        templateName: template.name,
-        timestamp: new Date(Date.now() - 47 * 60000),
-        avatar: "YT"
-      },
-      {
-        user: "AI Lab Stanford",
-        action: "deployed production version of",
-        templateName: template.name,
-        timestamp: new Date(Date.now() - 2 * 3600000),
-        avatar: "AI"
-      }
+      { user: 'Dr. Sarah Chen', action: 'launched', templateName: template.name, timestamp: new Date(Date.now() - 3600000) },
+      { user: 'Prof. James Wilson', action: 'modified config for', templateName: template.name, timestamp: new Date(Date.now() - 7200000) },
+      { user: 'Lab Stanford', action: 'shared results from', templateName: template.name, timestamp: new Date(Date.now() - 86400000) },
     ]);
-    
-    // Reset compute simulation
-    setComputeSimulation({
-      estimatedTime: template.setupTime === '<5 min' ? '~3 min' : template.setupTime === '<15 min' ? '~12 min' : '~45 min',
-      resourceUsage: {
-        cpu: Math.floor(Math.random() * 40) + 60,
-        memory: Math.floor(Math.random() * 30) + 50,
-        gpu: template.computeRequirements.gpu ? Math.floor(Math.random() * 60) + 40 : 0
-      },
-      costEstimate: `$${(Math.random() * 2 + 0.5).toFixed(2)}`,
-      progress: 0,
-      isSimulating: false
-    });
-    
-    // Set portal view to overview
-    setPortalView('overview');
   }, []);
+  
+  /** Parse URL hash and auto-select template on mount and change */
+  useMemo(() => {
+    if (typeof window === 'undefined') return;
+    
+    const hash = window.location.hash;
+    if (!hash || hash === '#landing' || hash === '#dashboard' || hash === '#templates') {
+      setIsInitialized(true);
+      return;
+    }
+    
+    const { templateId, category } = parseHashRoute(hash);
+    
+    // Set category filter if specified
+    if (category !== 'all') {
+      setSelectedCategory(category);
+    }
+    
+    // Auto-select template if found
+    if (templateId) {
+      const template = templates.find(t => t.id === templateId);
+      if (template) {
+        setSelectedTemplate(template);
+        setActiveTab('overview');
+        // Initialize portal with template-specific content
+        setTimeout(() => initializePortalForTemplate(template), 100);
+      }
+    }
+    
+    setIsInitialized(true);
+  }, [initializePortalForTemplate]);
+  
+  /** Listen for hash changes */
+  useMemo(() => {
+    if (typeof window === 'undefined') return;
+    
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (!hash || hash === '#landing' || hash === '#dashboard') {
+        setSelectedTemplate(null);
+        setSelectedCategory('all');
+        return;
+      }
+      
+      const { templateId, category } = parseHashRoute(hash);
+      
+      if (category !== 'all') {
+        setSelectedCategory(category);
+      }
+      
+      if (templateId) {
+        const template = templates.find(t => t.id === templateId);
+        if (template) {
+          setSelectedTemplate(template);
+          setActiveTab('overview');
+          // Initialize portal with template-specific content
+          setTimeout(() => initializePortalForTemplate(template), 100);
+        }
+      } else {
+        setSelectedTemplate(null);
+      }
+    };
+    
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [initializePortalForTemplate]);
+
+  // ====================================================================
+  // REVOLUTIONARY TEMPLATE PORTAL STATE MANAGEMENT
+  // ====================================================================
+  
+  /** Portal view modes for the enhanced template experience */
+  type PortalView = 'overview' | 'playground' | 'ai-assistant' | 'workflow' | 'compute' | 'community';
+  const [portalView, setPortalView] = useState<PortalView>('overview');
+  
+  /** Code editor state for interactive playground */
+  const [codeEditorContent, setCodeEditorContent] = useState<string>('');
+  const [codeLanguage, setCodeLanguage] = useState<string>('python');
+  const [isRunningCode, setIsRunningCode] = useState(false);
+  const [codeOutput, setCodeOutput] = useState<string>('');
+  
+  /** AI Research Assistant state */
+  const [aiChatMessages, setAiChatMessages] = useState<Array<{role: 'user' | 'assistant', content: string, timestamp: Date}>>([]);
+  const [aiInputMessage, setAiInputMessage] = useState<string>('');
+  const [isAiThinking, setIsAiThinking] = useState(false);
+  
+  /** Workflow visualization state */
+  const [activeWorkflowStep, setActiveWorkflowStep] = useState<number>(0);
+  const [workflowZoomLevel, setWorkflowZoomLevel] = useState<number>(100);
+  
+  /** Compute simulator state */
+  const [computeSimulation, setComputeSimulation] = useState<{
+    estimatedTime: string;
+    resourceUsage: {cpu: number; memory: number; gpu: number};
+    costEstimate: string;
+    progress: number;
+    isSimulating: boolean;
+  }>({
+    estimatedTime: '~15 min',
+    resourceUsage: { cpu: 0, memory: 0, gpu: 0 },
+    costEstimate: '$0.00',
+    progress: 0,
+    isSimulating: false,
+  });
+  
+  /** Template customization state */
+  const [customParameters, setCustomParameters] = useState<Record<string, string>>({});
+  const [showCustomizer, setShowCustomizer] = useState(false);
+  
+  /** Collaboration & activity state */
+  const [recentActivity, setRecentActivity] = useState<Array<{
+    user: string;
+    action: string;
+    templateName: string;
+    timestamp: Date;
+    avatar?: string;
+  }>>([]);
 
   // Scroll handler - uses SCROLL_THRESHOLD_PX constant for consistency
   const handleScroll = useCallback(() => {
@@ -3288,6 +3160,500 @@ Ready for next operation...`;
               </span>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ================================================================== */}
+      {/* CORE CAPABILITIES SECTION - Interactive Accordion */}
+      {/* ================================================================== */}
+      <section className="py-8 bg-gradient-to-b from-primary/5 to-transparent" id="core-capabilities">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Clickable Section Header */}
+          <div 
+            onClick={() => toggleSection('core-capabilities')}
+            className="text-center mb-8 cursor-pointer group select-none"
+            role="button"
+            tabIndex={0}
+            aria-expanded={expandedSections['core-capabilities']}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleSection('core-capabilities'); }}}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4 group-hover:bg-primary/20 transition-colors">
+              <Sparkles className={`w-4 h-4 text-primary transition-transform duration-300 ${expandedSections['core-capabilities'] ? 'rotate-90' : ''}`} />
+              <span className="text-sm font-medium text-primary">Platform Features</span>
+              <ChevronDown className={`w-4 h-4 text-primary transition-transform duration-300 ${expandedSections['core-capabilities'] ? 'rotate-180' : ''}`} />
+            </div>
+            
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <h2 className="text-3xl font-bold group-hover:text-primary transition-colors">Core Capabilities</h2>
+              <ChevronDown className={`w-6 h-6 text-muted-foreground group-hover:text-primary transition-all duration-300 ${expandedSections['core-capabilities'] ? 'rotate-180' : ''}`} />
+            </div>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Discover what makes SciCMPMATH the premier scientific computing platform
+              with production-ready features designed for researchers.
+            </p>
+            <div className="mt-3 text-sm text-primary font-medium">
+              {expandedSections['core-capabilities'] ? '▲ Click to collapse' : '▼ Click to expand'}
+            </div>
+          </div>
+
+          {/* Expandable Content - Core Capabilities Grid */}
+          {expandedSections['core-capabilities'] && (
+          <div className="animate-in slide-in-from-top-4 duration-300">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {/* One-Click Setup Capability */}
+            <div className="group p-6 rounded-xl border bg-gradient-to-br from-emerald-500/5 to-transparent hover:from-emerald-500/10 hover:border-emerald-500/30 transition-all">
+              <div className="w-14 h-14 rounded-xl bg-emerald-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <Zap className="w-7 h-7 text-emerald-500" />
+              </div>
+              <h3 className="font-semibold text-lg mb-2 group-hover:text-emerald-600 transition-colors">One-Click Setup</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Get started in minutes with automated environment setup, dependency installation, and example data loading. No manual configuration required.
+              </p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Auto environment configuration</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Dependency resolution</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Example data included</span>
+                </div>
+              </div>
+              <div className="mt-4 pt-4 border-t border-emerald-500/10">
+                <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                  {templates.filter(t => t.oneClickSetup).length} templates available
+                </span>
+              </div>
+            </div>
+
+            {/* Parameter Presets Capability */}
+            <div className="group p-6 rounded-xl border bg-gradient-to-br from-blue-500/5 to-transparent hover:from-blue-500/10 hover:border-blue-500/30 transition-all">
+              <div className="w-14 h-14 rounded-xl bg-blue-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <Settings className="w-7 h-7 text-blue-500" />
+              </div>
+              <h3 className="font-semibold text-lg mb-2 group-hover:text-blue-600 transition-colors">Parameter Presets</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Expert-curated configurations for common use cases. From beginner to production-ready, find the right settings instantly.
+              </p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Beginner-friendly defaults</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Production-optimized configs</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Domain-specific presets</span>
+                </div>
+              </div>
+              <div className="mt-4 pt-4 border-t border-blue-500/10">
+                <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
+                  {templates.reduce((acc, t) => acc + t.parameterPresets.length, 0)}+ preset configurations
+                </span>
+              </div>
+            </div>
+
+            {/* Best Practices Capability */}
+            <div className="group p-6 rounded-xl border bg-gradient-to-br from-violet-500/5 to-transparent hover:from-violet-500/10 hover:border-violet-500/30 transition-all">
+              <div className="w-14 h-14 rounded-xl bg-violet-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <Award className="w-7 h-7 text-violet-500" />
+              </div>
+              <h3 className="font-semibold text-lg mb-2 group-hover:text-violet-600 transition-colors">Best Practices Embedded</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Research-backed guidelines embedded directly into workflows. Ensure reproducibility and avoid common pitfalls.
+              </p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-xs text-violet-600 dark:text-violet-400">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Critical warnings highlighted</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-violet-600 dark:text-violet-400">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Performance optimizations</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-violet-600 dark:text-violet-400">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Reproducibility checks</span>
+                </div>
+              </div>
+              <div className="mt-4 pt-4 border-t border-violet-500/10">
+                <span className="text-xs font-medium text-violet-600 dark:text-violet-400">
+                  {templates.reduce((acc, t) => acc + t.bestPractices.length, 0)}+ best practices
+                </span>
+              </div>
+            </div>
+
+            {/* Community Curated Capability */}
+            <div className="group p-6 rounded-xl border bg-gradient-to-br from-pink-500/5 to-transparent hover:from-pink-500/10 hover:border-pink-500/30 transition-all">
+              <div className="w-14 h-14 rounded-xl bg-pink-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <Users className="w-7 h-7 text-pink-500" />
+              </div>
+              <h3 className="font-semibold text-lg mb-2 group-hover:text-pink-600 transition-colors">Community Curated</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Plugins, extensions, and improvements from the global research community. Verified and tested contributions.
+              </p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-xs text-pink-600 dark:text-pink-400">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Verified community plugins</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-pink-600 dark:text-pink-400">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Researcher contributions</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-pink-600 dark:text-pink-400">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Real-world use cases</span>
+                </div>
+              </div>
+              <div className="mt-4 pt-4 border-t border-pink-500/10">
+                <span className="text-xs font-medium text-pink-600 dark:text-pink-400">
+                  {templates.reduce((acc, t) => acc + t.communityContributions.length, 0)}+ community additions
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Expand All Button */}
+          <div className="text-center">
+            <Button 
+              variant="outline" 
+              onClick={(e) => { e.stopPropagation(); expandAllSections(); }}
+              className="gap-2"
+            >
+              <Layers className="w-4 h-4" />
+              Expand All Sections Below
+            </Button>
+          </div>
+          </div>
+          )}
+        </div>
+      </section>
+
+      {/* ================================================================== */}
+      {/* USE CASES SECTION - Interactive Accordion */}
+      {/* ================================================================== */}
+      <section className="py-8 bg-card/50" id="use-cases">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Clickable Section Header */}
+          <div 
+            onClick={() => toggleSection('use-cases')}
+            className="text-center mb-8 cursor-pointer group select-none"
+            role="button"
+            tabIndex={0}
+            aria-expanded={expandedSections['use-cases']}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleSection('use-cases'); }}}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/10 border border-orange-500/20 mb-4 group-hover:bg-orange-500/20 transition-colors">
+              <Target className={`w-4 h-4 text-orange-500 transition-transform duration-300 ${expandedSections['use-cases'] ? 'rotate-90' : ''}`} />
+              <span className="text-sm font-medium text-orange-500">Real Applications</span>
+              <ChevronDown className={`w-4 h-4 text-orange-500 transition-transform duration-300 ${expandedSections['use-cases'] ? 'rotate-180' : ''}`} />
+            </div>
+            
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <h2 className="text-3xl font-bold group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">Use Cases</h2>
+              <ChevronDown className={`w-6 h-6 text-muted-foreground group-hover:text-orange-500 transition-all duration-300 ${expandedSections['use-cases'] ? 'rotate-180' : ''}`} />
+            </div>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Explore how researchers worldwide are using SciCMPMATH templates
+              to accelerate their scientific discoveries.
+            </p>
+            <div className="mt-3 text-sm text-orange-600 dark:text-orange-400 font-medium">
+              {expandedSections['use-cases'] ? '▲ Click to collapse' : '▼ Click to expand'}
+            </div>
+          </div>
+
+          {/* Expandable Content - Use Cases Grid */}
+          {expandedSections['use-cases'] && (
+          <div className="animate-in slide-in-from-top-4 duration-300">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Use Case 1 */}
+            <div className="group p-6 rounded-xl border hover:border-orange-500/30 hover:shadow-lg transition-all cursor-pointer"
+                 onClick={() => {
+                   const blastTemplate = templates.find(t => t.id === 'blast-sequence-analysis');
+                   if (blastTemplate) handleTemplateSelect(blastTemplate);
+                 }}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white">
+                  <Dna className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-semibold group-hover:text-emerald-500 transition-colors">Genomic Research</h3>
+                  <span className="text-xs text-muted-foreground">Bioinformatics</span>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Sequence alignment, genome assembly, and phylogenetic analysis for evolutionary biology and clinical genomics.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <span className="px-2 py-1 text-xs rounded-full bg-emerald-500/10 text-emerald-600">BLAST+</span>
+                <span className="px-2 py-1 text-xs rounded-full bg-emerald-500/10 text-emerald-600">Genome Assembly</span>
+                <span className="px-2 py-1 text-xs rounded-full bg-emerald-500/10 text-emerald-600">Annotation</span>
+              </div>
+            </div>
+
+            {/* Use Case 2 */}
+            <div className="group p-6 rounded-xl border hover:border-blue-500/30 hover:shadow-lg transition-all cursor-pointer"
+                 onClick={() => {
+                   const mlTemplate = templates.find(t => t.id === 'transformer-training-pipeline');
+                   if (mlTemplate) handleTemplateSelect(mlTemplate);
+                 }}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white">
+                  <Brain className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-semibold group-hover:text-blue-500 transition-colors">ML/AI Development</h3>
+                  <span className="text-xs text-muted-foreground">Machine Learning</span>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Transformer training, fine-tuning, and deployment pipelines for NLP, computer vision, and multimodal AI applications.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <span className="px-2 py-1 text-xs rounded-full bg-blue-500/10 text-blue-600">Transformers</span>
+                <span className="px-2 py-1 text-xs rounded-full bg-blue-500/10 text-blue-600">LoRA</span>
+                <span className="px-2 py-1 text-xs rounded-full bg-blue-500/10 text-blue-600">AutoML</span>
+              </div>
+            </div>
+
+            {/* Use Case 3 */}
+            <div className="group p-6 rounded-xl border hover:border-violet-500/30 hover:shadow-lg transition-all cursor-pointer"
+                 onClick={() => {
+                   const dockTemplate = templates.find(t => t.id === 'molecular-docking-workflow');
+                   if (dockTemplate) handleTemplateSelect(dockTemplate);
+                 }}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white">
+                  <MoleculeIcon className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-semibold group-hover:text-violet-500 transition-colors">Drug Discovery</h3>
+                  <span className="text-xs text-muted-foreground">Cheminformatics</span>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Molecular docking, virtual screening, and property prediction for pharmaceutical research and development.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <span className="px-2 py-1 text-xs rounded-full bg-violet-500/10 text-violet-600">Docking</span>
+                <span className="px-2 py-1 text-xs rounded-full bg-violet-500/10 text-violet-600">Virtual Screen</span>
+                <span className="px-2 py-1 text-xs rounded-full bg-violet-500/10 text-violet-600">QSAR</span>
+              </div>
+            </div>
+
+            {/* Use Case 4 */}
+            <div className="group p-6 rounded-xl border hover:border-cyan-500/30 hover:shadow-lg transition-all cursor-pointer"
+                 onClick={() => {
+                   const quantumTemplate = templates.find(t => t.id === 'quantum-algorithm-simulator');
+                   if (quantumTemplate) handleTemplateSelect(quantumTemplate);
+                 }}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center text-white">
+                  <Atom className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-semibold group-hover:text-cyan-500 transition-colors">Quantum Computing</h3>
+                  <span className="text-xs text-muted-foreground">Quantum Algorithms</span>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Quantum algorithm simulation, circuit design, and hybrid classical-quantum optimization methods.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <span className="px-2 py-1 text-xs rounded-full bg-cyan-500/10 text-cyan-600">VQE</span>
+                <span className="px-2 py-1 text-xs rounded-full bg-cyan-500/10 text-cyan-600">QAOA</span>
+                <span className="px-2 py-1 text-xs rounded-full bg-cyan-500/10 text-cyan-600">Grover</span>
+              </div>
+            </div>
+
+            {/* Use Case 5 */}
+            <div className="group p-6 rounded-xl border hover:border-rose-500/30 hover:shadow-lg transition-all cursor-pointer"
+                 onClick={() => {
+                   const vizTemplate = templates.find(t => t.id === 'scientific-dashboard-kit');
+                   if (vizTemplate) handleTemplateSelect(vizTemplate);
+                 }}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center text-white">
+                  <BarChart3 className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-semibold group-hover:text-rose-500 transition-colors">Data Visualization</h3>
+                  <span className="text-xs text-muted-foreground">Scientific Figures</span>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Publication-quality figures, interactive dashboards, and real-time data exploration tools.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <span className="px-2 py-1 text-xs rounded-full bg-rose-500/10 text-rose-600">Dashboards</span>
+                <span className="px-2 py-1 text-xs rounded-full bg-rose-500/10 text-rose-600">3D Plots</span>
+                <span className="px-2 py-1 text-xs rounded-full bg-rose-500/10 text-rose-600">Publications</span>
+              </div>
+            </div>
+
+            {/* Use Case 6 */}
+            <div className="group p-6 rounded-xl border hover:border-fuchsia-500/30 hover:shadow-lg transition-all cursor-pointer"
+                 onClick={() => {
+                   const imageTemplate = templates.find(t => t.id === 'medical-image-segmentation');
+                   if (imageTemplate) handleTemplateSelect(imageTemplate);
+                 }}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-fuchsia-500 to-purple-600 flex items-center justify-center text-white">
+                  <Image className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-semibold group-hover:text-fuchsia-500 transition-colors">Medical Imaging</h3>
+                  <span className="text-xs text-muted-foreground">Image Analysis</span>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Organ segmentation, tumor detection, and diagnostic image analysis with deep learning.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <span className="px-2 py-1 text-xs rounded-full bg-fuchsia-500/10 text-fuchsia-600">Segmentation</span>
+                <span className="px-2 py-1 text-xs rounded-full bg-fuchsia-500/10 text-fuchsia-600">Detection</span>
+                <span className="px-2 py-1 text-xs rounded-full bg-fuchsia-500/10 text-fuchsia-600">DICOM</span>
+              </div>
+            </div>
+          </div>
+          </div>
+          )}
+        </div>
+      </section>
+
+      {/* ================================================================== */}
+      {/* FREE TIER RESOURCES SECTION - Interactive Accordion */}
+      {/* ================================================================== */}
+      <section className="py-8" id="free-tier">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Clickable Section Header */}
+          <div 
+            onClick={() => toggleSection('free-tier')}
+            className="text-center mb-8 cursor-pointer group select-none"
+            role="button"
+            tabIndex={0}
+            aria-expanded={expandedSections['free-tier']}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleSection('free-tier'); }}}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4 group-hover:bg-emerald-500/20 transition-colors">
+              <Gift className={`w-4 h-4 text-emerald-500 transition-transform duration-300 ${expandedSections['free-tier'] ? 'rotate-90' : ''}`} />
+              <span className="text-sm font-medium text-emerald-500">No Cost Entry</span>
+              <ChevronDown className={`w-4 h-4 text-emerald-500 transition-transform duration-300 ${expandedSections['free-tier'] ? 'rotate-180' : ''}`} />
+            </div>
+            
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <h2 className="text-3xl font-bold group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Free Tier Resources</h2>
+              <ChevronDown className={`w-6 h-6 text-muted-foreground group-hover:text-emerald-500 transition-all duration-300 ${expandedSections['free-tier'] ? 'rotate-180' : ''}`} />
+            </div>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Start your scientific computing journey free with these fully-featured templates.
+              No credit card required, no time limits.
+            </p>
+            <div className="mt-3 text-sm text-emerald-600 dark:text-emerald-400 font-medium">
+              {expandedSections['free-tier'] ? '▲ Click to collapse' : '▼ Click to expand'}
+            </div>
+          </div>
+
+          {/* Expandable Content - Free Tier Templates */}
+          {expandedSections['free-tier'] && (
+          <div className="animate-in slide-in-from-top-4 duration-300">
+          <div className="mb-6 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
+            <div className="flex items-center gap-3">
+              <Gift className="w-6 h-6 text-emerald-500" />
+              <div>
+                <h3 className="font-semibold text-emerald-700 dark:text-emerald-400">{templates.filter(t => t.tier === 'free').length} Free Templates Available</h3>
+                <p className="text-sm text-muted-foreground">Full access to core features with community support</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {templates
+              .filter(t => t.tier === 'free')
+              .slice(0, 6)
+              .map((template) => (
+                <button
+                  key={template.id}
+                  onClick={() => handleTemplateSelect(template)}
+                  className={`group p-6 rounded-xl border text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
+                    selectedTemplate?.id === template.id ? 'border-emerald-500 bg-emerald-500/5' : 'border-border hover:border-emerald-500/30'
+                  }`}
+                  aria-label={`Open ${template.name} template details`}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white bg-gradient-to-br ${getCategoryColor(template.category)}`}>
+                      {template.icon}
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                        <Gift className="w-3 h-3" />
+                        Free
+                      </span>
+                      {template.oneClickSetup && (
+                        <span className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-500" title="One-click setup">
+                          <Zap className="w-4 h-4" />
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <h3 className="font-semibold mb-2 group-hover:text-emerald-600 transition-colors">{template.name}</h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{template.description}</p>
+                  
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <Users className="w-3 h-3" />
+                      {(template.totalUses / 1000).toFixed(1)}K uses
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Star className="w-3 h-3" />
+                      {template.communityRating}
+                    </span>
+                  </div>
+                </button>
+              ))}
+          </div>
+
+          {templates.filter(t => t.tier === 'freemium').length > 0 && (
+            <div className="mt-8 p-6 rounded-xl border border-blue-200 dark:border-blue-800 bg-gradient-to-r from-blue-50 to-transparent dark:from-blue-950/20">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                  <Unlock className="w-6 h-6 text-blue-500" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
+                    Freemium Templates Also Available
+                    <BadgeCheck className="w-5 h-5 text-blue-500" />
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Upgrade for advanced features, priority support, and increased compute resources. 
+                    Start free, scale when ready.
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <Button variant="outline" size="sm" className="gap-2 border-blue-200 text-blue-600 hover:bg-blue-50">
+                      <Eye className="w-4 h-4" />
+                      View {templates.filter(t => t.tier === 'freemium').length} Freemium Templates
+                    </Button>
+                    <Button size="sm" className="gap-2 gradient-bg text-white border-0">
+                      <Rocket className="w-4 h-4" />
+                      Get Started Free
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          </div>
+          )}
         </div>
       </section>
 
