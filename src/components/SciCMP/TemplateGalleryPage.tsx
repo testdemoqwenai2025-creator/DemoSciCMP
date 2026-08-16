@@ -2193,6 +2193,25 @@ export default function TemplateGalleryPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'papers' | 'presets' | 'community' | 'practices'>('overview');
   const [filterTier, setFilterTier] = useState<'all' | 'free' | 'freemium' | 'premium'>('all');
   const [filterDifficulty, setFilterDifficulty] = useState<'all' | TemplateData['difficulty']>('all');
+  
+  // Accordion state for bottom sections
+  const [expandedSections, setExpandedSections] = useState<{
+    'quick-start': boolean;
+    'teaching-training': boolean;
+    'standardization': boolean;
+  }>({
+    'quick-start': false,
+    'teaching-training': false,
+    'standardization': false,
+  });
+  
+  // Toggle section expansion
+  const toggleSection = useCallback((sectionId: 'quick-start' | 'teaching-training' | 'standardization') => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [sectionId]: !prev[sectionId]
+    }));
+  }, []);
 
   // Scroll handler - uses SCROLL_THRESHOLD_PX constant for consistency
   const handleScroll = useCallback(() => {
@@ -3152,23 +3171,41 @@ export default function TemplateGalleryPage() {
       )}
 
       {/* ================================================================== */}
-      {/* QUICK START PROJECTS SECTION - Interactive Cards */}
+      {/* QUICK START PROJECTS SECTION - Interactive Accordion */}
       {/* ================================================================== */}
-      <section className="py-16 bg-card/50" id="quick-start">
+      <section className="py-8 bg-card/50" id="quick-start">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4">
-              <Rocket className="w-4 h-4 text-emerald-500" />
+          {/* Clickable Section Header */}
+          <div 
+            onClick={() => toggleSection('quick-start')}
+            className="text-center mb-8 cursor-pointer group select-none"
+            role="button"
+            tabIndex={0}
+            aria-expanded={expandedSections['quick-start']}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleSection('quick-start'); }}}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4 group-hover:bg-emerald-500/20 transition-colors">
+              <Rocket className={`w-4 h-4 text-emerald-500 transition-transform duration-300 ${expandedSections['quick-start'] ? 'rotate-90' : ''}`} />
               <span className="text-sm font-medium text-emerald-500">For Beginners</span>
+              <ChevronDown className={`w-4 h-4 text-emerald-500 transition-transform duration-300 ${expandedSections['quick-start'] ? 'rotate-180' : ''}`} />
             </div>
             
-            <h2 className="text-3xl font-bold mb-4">Quick Start Projects</h2>
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <h2 className="text-3xl font-bold group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Quick Start Projects</h2>
+              <ChevronDown className={`w-6 h-6 text-muted-foreground group-hover:text-emerald-500 transition-all duration-300 ${expandedSections['quick-start'] ? 'rotate-180' : ''}`} />
+            </div>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
               Get up and running in minutes with these beginner-friendly templates. 
               Perfect for learning, teaching, or first-time scientific computing projects.
             </p>
+            <div className="mt-3 text-sm text-emerald-600 dark:text-emerald-400 font-medium">
+              {expandedSections['quick-start'] ? '▲ Click to collapse' : '▼ Click to expand'}
+            </div>
           </div>
 
+          {/* Expandable Content */}
+          {expandedSections['quick-start'] && (
+          <div className="animate-in slide-in-from-top-4 duration-300">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {templates
               .filter(t => t.difficulty === 'beginner' && t.oneClickSetup)
@@ -3228,27 +3265,47 @@ export default function TemplateGalleryPage() {
               <ArrowRight className="w-4 h-4" />
             </Button>
           </div>
+          </div>
+          )}
         </div>
       </section>
 
       {/* ================================================================== */}
-      {/* TEACHING & TRAINING RESOURCES */}
+      {/* TEACHING & TRAINING RESOURCES - Interactive Accordion */}
       {/* ================================================================== */}
-      <section className="py-16" id="teaching-training">
+      <section className="py-8" id="teaching-training">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 mb-4">
-              <BookOpen className="w-4 h-4 text-violet-500" />
+          {/* Clickable Section Header */}
+          <div 
+            onClick={() => toggleSection('teaching-training')}
+            className="text-center mb-8 cursor-pointer group select-none"
+            role="button"
+            tabIndex={0}
+            aria-expanded={expandedSections['teaching-training']}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleSection('teaching-training'); }}}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 mb-4 group-hover:bg-violet-500/20 transition-colors">
+              <BookOpen className={`w-4 h-4 text-violet-500 transition-transform duration-300 ${expandedSections['teaching-training'] ? 'rotate-90' : ''}`} />
               <span className="text-sm font-medium text-violet-500">Educational Resources</span>
+              <ChevronDown className={`w-4 h-4 text-violet-500 transition-transform duration-300 ${expandedSections['teaching-training'] ? 'rotate-180' : ''}`} />
             </div>
             
-            <h2 className="text-3xl font-bold mb-4">Teaching & Training</h2>
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <h2 className="text-3xl font-bold group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">Teaching & Training</h2>
+              <ChevronDown className={`w-6 h-6 text-muted-foreground group-hover:text-violet-500 transition-all duration-300 ${expandedSections['teaching-training'] ? 'rotate-180' : ''}`} />
+            </div>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
               Comprehensive educational materials, tutorials, and curriculum resources 
               for instructors and self-paced learners.
             </p>
+            <div className="mt-3 text-sm text-violet-600 dark:text-violet-400 font-medium">
+              {expandedSections['teaching-training'] ? '▲ Click to collapse' : '▼ Click to expand'}
+            </div>
           </div>
 
+          {/* Expandable Content */}
+          {expandedSections['teaching-training'] && (
+          <div className="animate-in slide-in-from-top-4 duration-300">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Column - Tutorials */}
             <div className="space-y-6">
@@ -3431,27 +3488,47 @@ export default function TemplateGalleryPage() {
               </div>
             </div>
           </div>
+          </div>
+          )}
         </div>
       </section>
 
       {/* ================================================================== */}
-      {/* STANDARDIZATION ACROSS LABS */}
+      {/* STANDARDIZATION ACROSS LABS - Interactive Accordion */}
       {/* ================================================================== */}
-      <section className="py-16 bg-amber-500/5" id="standardization">
+      <section className="py-8 bg-amber-500/5" id="standardization">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 mb-4">
-              <Shield className="w-4 h-4 text-amber-600" />
+          {/* Clickable Section Header */}
+          <div 
+            onClick={() => toggleSection('standardization')}
+            className="text-center mb-8 cursor-pointer group select-none"
+            role="button"
+            tabIndex={0}
+            aria-expanded={expandedSections['standardization']}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleSection('standardization'); }}}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 mb-4 group-hover:bg-amber-500/20 transition-colors">
+              <Shield className={`w-4 h-4 text-amber-600 transition-transform duration-300 ${expandedSections['standardization'] ? 'rotate-90' : ''}`} />
               <span className="text-sm font-medium text-amber-600">Reproducible Science</span>
+              <ChevronDown className={`w-4 h-4 text-amber-600 transition-transform duration-300 ${expandedSections['standardization'] ? 'rotate-180' : ''}`} />
             </div>
             
-            <h2 className="text-3xl font-bold mb-4">Standardization Across Labs</h2>
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <h2 className="text-3xl font-bold group-hover:text-amber-700 dark:group-hover:text-amber-500 transition-colors">Standardization Across Labs</h2>
+              <ChevronDown className={`w-6 h-6 text-muted-foreground group-hover:text-amber-600 transition-all duration-300 ${expandedSections['standardization'] ? 'rotate-180' : ''}`} />
+            </div>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
               Standard operating procedures, protocol templates, and quality control measures 
               to ensure reproducible research across different laboratories worldwide.
             </p>
+            <div className="mt-3 text-sm text-amber-700 dark:text-amber-500 font-medium">
+              {expandedSections['standardization'] ? '▲ Click to collapse' : '▼ Click to expand'}
+            </div>
           </div>
 
+          {/* Expandable Content */}
+          {expandedSections['standardization'] && (
+          <div className="animate-in slide-in-from-top-4 duration-300">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* SOP Templates */}
             <div className="p-6 rounded-xl border bg-card hover:shadow-lg transition-shadow">
@@ -3622,6 +3699,8 @@ export default function TemplateGalleryPage() {
               <ArrowRight className="w-4 h-4" />
             </Button>
           </div>
+          </div>
+          )}
         </div>
       </section>
 
