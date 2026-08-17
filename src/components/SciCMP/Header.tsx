@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { useAuthStore } from '@/lib/auth-store';
+import UserMenu from './UserMenu';
 import { 
   Menu, 
   X, 
@@ -13,7 +15,8 @@ import {
   Twitter,
   Code2,
   ArrowUp,
-  Home
+  Home,
+  LogIn
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -23,6 +26,7 @@ interface HeaderProps {
   onToggleDarkMode: () => void;
   isMobileMenuOpen: boolean;
   onToggleMobileMenu: () => void;
+  onOpenLoginModal: () => void;
 }
 
 const navItems = [
@@ -43,7 +47,9 @@ export default function Header({
   onToggleDarkMode,
   isMobileMenuOpen,
   onToggleMobileMenu,
+  onOpenLoginModal,
 }: HeaderProps) {
+  const { isAuthenticated } = useAuthStore();
   const [isScrolled, setIsScrolled] = useState(false);
 
   // Handle scroll effect
@@ -104,20 +110,38 @@ export default function Header({
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-2">
-            {/* Theme Toggle */}
+            {/* Theme Toggle - Enhanced */}
             <Button
               variant="ghost"
               size="icon"
               onClick={onToggleDarkMode}
-              className="rounded-full"
-              aria-label="Toggle theme"
+              className="rounded-full relative overflow-hidden group hover:bg-accent transition-all duration-300"
+              aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
+              title={`${isDarkMode ? 'Light' : 'Dark'} Mode (Ctrl+D)`}
             >
-              {isDarkMode ? (
-                <Sun className="h-5 w-5 text-yellow-400" />
-              ) : (
-                <Moon className="h-5 w-5 text-slate-700" />
-              )}
+              <div className={`relative w-5 h-5 transition-transform duration-300 ${isDarkMode ? 'rotate-0' : 'rotate-180'}`}>
+                {isDarkMode ? (
+                  <Sun className="h-5 w-5 text-yellow-400 group-hover:scale-110 transition-transform" />
+                ) : (
+                  <Moon className="h-5 w-5 text-slate-700 group-hover:scale-110 transition-transform" />
+                )}
+              </div>
             </Button>
+
+            {/* Auth Section: User Menu or Login Button */}
+            {isAuthenticated ? (
+              <UserMenu />
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onOpenLoginModal}
+                className="hidden sm:flex gap-2 rounded-full border-primary/30 hover:bg-primary/10 hover:text-primary hover:border-primary/50 transition-all duration-200"
+              >
+                <LogIn className="h-4 w-4" />
+                Sign In
+              </Button>
+            )}
 
             {/* GitHub Link */}
             <Button
@@ -189,12 +213,28 @@ export default function Header({
                   {item.label}
                 </button>
               ))}
-              <div className="border-t mt-2 pt-2">
+              <div className="border-t mt-2 pt-2 space-y-2">
+                {!isAuthenticated && (
+                  <Button
+                    variant="outline"
+                    className="w-full rounded-lg border-primary/30 hover:bg-primary/10 hover:text-primary"
+                    onClick={() => {
+                      onOpenLoginModal();
+                      onToggleMobileMenu();
+                    }}
+                  >
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Sign In
+                  </Button>
+                )}
                 <Button
-                  className="w-full gradient-bg text-white border-0 rounded-lg"
-                  onClick={() => onNavigate('pricing')}
+                  className={`w-full ${isAuthenticated ? 'gradient-bg text-white border-0' : 'gradient-bg text-white border-0'}`}
+                  onClick={() => {
+                    onNavigate('pricing');
+                    onToggleMobileMenu();
+                  }}
                 >
-                  Get Started Free
+                  {isAuthenticated ? 'Upgrade Plan' : 'Get Started Free'}
                 </Button>
               </div>
             </nav>

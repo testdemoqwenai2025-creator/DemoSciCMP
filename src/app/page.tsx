@@ -4,6 +4,8 @@ import { useState, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import SciCMPHeader from '@/components/SciCMP/Header';
 import SciCMPFooter from '@/components/SciCMP/Footer';
+import LoginModal from '@/components/SciCMP/LoginModal';
+import { useAuthStore } from '@/lib/auth-store';
 
 // Dynamic imports for code splitting
 const LandingPage = dynamic(() => import('@/components/SciCMP/LandingPage'), {
@@ -44,9 +46,18 @@ type PageId = 'landing' | 'dashboard' | 'features' | 'template-gallery' | 'ml-re
 
 export default function HomePage() {
   const [currentPage, setCurrentPage] = useState<PageId>('landing');
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  // Initialize dark mode from localStorage or default to dark
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('scicmp-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      return savedTheme ? savedTheme === 'dark' : prefersDark || true;
+    }
+    return true; // Default to dark for SSR
+  });
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { setShowLoginModal } = useAuthStore();
 
   const handleNavigate = useCallback((pageId: string) => {
     if (pageId === currentPage) return;
@@ -63,16 +74,21 @@ export default function HomePage() {
   }, [currentPage]);
 
   const toggleDarkMode = useCallback(() => {
-    setIsDarkMode(!isDarkMode);
-    if (typeof window !== 'undefined') {
-      document.documentElement.classList.toggle('dark', !isDarkMode);
-    }
-  }, [isDarkMode]);
-
-  // Initialize dark mode
-  useEffect(() => {
-    document.documentElement.classList.add('dark');
+    setIsDarkMode(prev => {
+      const newValue = !prev;
+      // Persist theme preference
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('scicmp-theme', newValue ? 'dark' : 'light');
+        document.documentElement.classList.toggle('dark', newValue);
+      }
+      return newValue;
+    });
   }, []);
+
+  // Apply dark mode class to document on mount and when theme changes
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDarkMode);
+  }, [isDarkMode]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -86,6 +102,10 @@ export default function HomePage() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [toggleDarkMode]);
+
+  const handleOpenLoginModal = useCallback(() => {
+    setShowLoginModal(true);
+  }, [setShowLoginModal]);
 
   const renderCurrentPage = () => {
     switch (currentPage) {
@@ -121,6 +141,7 @@ export default function HomePage() {
           onToggleDarkMode={toggleDarkMode}
           isMobileMenuOpen={isMobileMenuOpen}
           onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          onOpenLoginModal={handleOpenLoginModal}
         />
 
         {/* Main Content Area */}
@@ -137,6 +158,9 @@ export default function HomePage() {
         onNavigate={handleNavigate}
         showStudioIDE={true}
       />
+
+      {/* Login Modal - Global */}
+      <LoginModal />
 
       {/* Page Transition Overlay */}
       {isTransitioning && (
