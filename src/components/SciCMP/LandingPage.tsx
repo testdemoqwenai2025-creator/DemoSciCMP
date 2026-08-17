@@ -136,6 +136,15 @@ export default function LandingPage({ onNavigate }: LandingPageProps) {
             <Button
               size="lg"
               variant="outline"
+              className="rounded-full px-8 py-6 text-lg border-cyan-500/30 text-cyan-600 hover:bg-cyan-500/10 hover:text-cyan-700 transition-all"
+              onClick={() => window.open('/DemoSciCMP/studio.html', '_blank', 'noopener,noreferrer')}
+            >
+              <Code2 className="mr-2 h-5 w-5" />
+              Open in Studio IDE
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
               className="rounded-full px-8 py-6 text-lg"
               onClick={() => onNavigate('features')}
             >

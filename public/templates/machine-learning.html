@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Machine Learning Research Hub | SciCMPMATH Studio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0f;
+            color: #e4e4e7;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: rgba(15, 15, 25, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 18px;
+            text-decoration: none;
+            color: #e4e4e7;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+        }
+
+        .nav-link {
+            color: #a1a1aa;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: #fff;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #22d3ee;
+            border: 1px solid rgba(34, 211, 238, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(34, 211, 238, 0.1);
+            border-color: #22d3ee;
+        }
+
+        .btn-ide {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-ide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-ide:hover::before {
+            left: 100%;
+        }
+
+        .btn-ide:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(6, 182, 212, 0.5);
+        }
+
+        .btn-home {
+            background: rgba(255,255,255,0.05);
+            color: #a1a1aa;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn-home:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 80px 24px 60px;
+            text-align: center;
+            background: radial-gradient(ellipse at top, rgba(139, 92, 246, 0.15), transparent 60%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated neural network background */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(6, 182, 212, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(244, 114, 182, 0.2) 0%, transparent 60%);
+            animation: pulse-bg 10s ease-in-out infinite;
+        }
+
+        @keyframes pulse-bg {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 50px;
+            font-size: 13px;
+            color: #a78bfa;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .badge-dot {
+            width: 8px;
+            height: 8px;
+            background: #a78bfa;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #a78bfa 0%, #22d3ee 50%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #a1a1aa;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            line-height: 1.7;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Search Section */
+        .search-section {
+            max-width: 800px;
+            margin: -40px auto 60px;
+            padding: 0 24px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .search-container {
+            background: rgba(15, 15, 25, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 14px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+
+        .search-input::placeholder {
+            color: #71717a;
+        }
+
+        .search-btn {
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+        }
+
+        .filter-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tag {
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            font-size: 12px;
+            color: #a1a1aa;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-tag:hover, .filter-tag.active {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: rgba(139, 92, 246, 0.4);
+            color: #a78bfa;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 24px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            color: #a1a1aa;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 48px;
+            font-size: 16px;
+        }
+
+        /* Topic Cloud */
+        .topic-cloud {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 80px;
+        }
+
+        .topic-chip {
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .topic-chip:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .topic-chip.large {
+            font-size: 18px;
+            padding: 16px 32px;
+        }
+
+        .topic-chip.medium {
+            font-size: 15px;
+        }
+
+        .topic-icon {
+            font-size: 18px;
+        }
+
+        /* Papers Grid */
+        .papers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+            margin-bottom: 80px;
+        }
+
+        .paper-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .paper-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #8b5cf6, #06b6d4);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .paper-card:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .paper-card:hover::before {
+            opacity: 1;
+        }
+
+        .paper-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .paper-rank {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .paper-badge {
+            padding: 4px 10px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 6px;
+            font-size: 11px;
+            color: #22c55e;
+            font-weight: 600;
+        }
+
+        .paper-title {
+            font-size: 17px;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+
+        .paper-authors {
+            font-size: 13px;
+            color: #a1a1aa;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .paper-abstract {
+            font-size: 13px;
+            color: #71717a;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .paper-meta {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .paper-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #a1a1aa;
+        }
+
+        .paper-stat-icon {
+            font-size: 14px;
+        }
+
+        .paper-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .paper-btn {
+            padding: 8px 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            font-size: 12px;
+            color: #a1a1aa;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .paper-btn:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.3);
+            color: #a78bfa;
+        }
+
+        .paper-btn.primary {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: rgba(139, 92, 246, 0.4);
+            color: #a78bfa;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 80px;
+        }
+
+        .feature-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.2));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .feature-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            color: #a1a1aa;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Workflow Steps */
+        .workflow {
+            background: rgba(255,255,255,0.02);
+            border-radius: 20px;
+            padding: 48px;
+            margin-bottom: 80px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .steps-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            margin-top: 40px;
+        }
+
+        .step {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .step-content p {
+            color: #a1a1aa;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .step-command {
+            background: #18181b;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 10px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 13px;
+            color: #a78bfa;
+            overflow-x: auto;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-top: 60px;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(6, 182, 212, 0.1));
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a78bfa, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: #a1a1aa;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 80px 24px;
+            background: radial-gradient(ellipse at bottom, rgba(139, 92, 246, 0.15), transparent 70%);
+        }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .cta-section p {
+            color: #a1a1aa;
+            font-size: 18px;
+            margin-bottom: 32px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(15, 15, 25, 0.95);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding: 40px 24px;
+            text-align: center;
+            color: #71717a;
+            font-size: 14px;
+        }
+
+        footer a {
+            color: #22d3ee;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Floating Navigation */
+        .floating-nav {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 99;
+        }
+
+        .float-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: rgba(15, 15, 25, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #a1a1aa;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .float-btn:hover {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: rgba(139, 92, 246, 0.4);
+            color: #a78bfa;
+            transform: translateY(-4px);
+        }
+
+        .float-btn.home-btn:hover {
+            background: rgba(34, 211, 238, 0.2);
+            border-color: rgba(34, 211, 238, 0.4);
+            color: #22d3ee;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 24px;
+            background: rgba(255,255,255,0.02);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 13px;
+            color: #71717a;
+        }
+
+        .breadcrumb a {
+            color: #a1a1aa;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: #a78bfa;
+        }
+
+        .breadcrumb-separator {
+            color: #3f3f46;
+        }
+
+        .breadcrumb-current {
+            color: #a78bfa;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            .workflow { padding: 24px; }
+            .papers-grid { grid-template-columns: 1fr; }
+            .floating-nav { bottom: 20px; right: 20px; }
+            .search-box { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="/DemoSciCMP/" class="logo">
+                <div class="logo-icon">🤖</div>
+                <span>SciCMPMATH</span>
+            </a>
+            <div class="nav-links">
+                <a href="/DemoSciCMP/" class="nav-link">Home</a>
+                <a href="/DemoSciCMP/#/templates" class="nav-link active">Templates</a>
+                <a href="/DemoSciCMP/templates/machine-learning.html" class="nav-link">ML Hub</a>
+                <a href="/DemoSciCMP/#/research-trends" class="nav-link">Research Trends</a>
+            </div>
+        </div>
+        <div class="nav-right">
+            <button onclick="goHome()" class="btn btn-home">
+                🏠 Home
+            </button>
+            <button onclick="openStudioIDE()" class="btn btn-ide">
+                ⌥ Open in Studio IDE
+            </button>
+            <a href="https://github.com/testdemoqwenai2025-creator/DemoSciCMP" target="_blank" class="btn btn-secondary">
+                View on GitHub →
+            </a>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a href="/DemoSciCMP/">Home</a>
+        <span class="breadcrumb-separator">›</span>
+        <a href="/DemoSciCMP/#/templates">Templates</a>
+        <span class="breadcrumb-separator">›</span>
+        <span class="breadcrumb-current">Machine Learning Hub</span>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="badge">
+            <span class="badge-dot"></span>
+            Machine Learning • AI Research • Top Papers
+        </div>
+        <h1>
+            Machine Learning <span class="gradient-text">Research Hub</span>
+        </h1>
+        <p>
+            Discover cutting-edge ML research, explore trending papers from arXiv and Semantic Scholar,
+            and jump-start your next AI project with our curated collection of resources.
+        </p>
+        <div class="hero-buttons">
+            <button onclick="scrollToPapers()" class="btn btn-primary">
+                📄 Browse Papers
+            </button>
+            <button onclick="openStudioIDE()" class="btn btn-ide">
+                ⌥ Open in Studio IDE
+            </button>
+            <a href="#search-section" class="btn btn-secondary">
+                🔍 Search Papers
+            </a>
+        </div>
+    </section>
+
+    <!-- Search Section -->
+    <div id="search-section" class="search-section">
+        <div class="search-container">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="searchInput"
+                    placeholder="Search ML papers by title, author, topic... (e.g., 'transformer', 'GPT', 'diffusion')"
+                    onkeypress="handleSearchKeypress(event)"
+                >
+                <button onclick="performSearch()" class="search-btn">
+                    🔍 Search
+                </button>
+            </div>
+            <div class="filter-tags">
+                <span class="filter-tag active" onclick="setFilter(this, 'all')">All Topics</span>
+                <span class="filter-tag" onclick="setFilter(this, 'llm')">🧠 LLM</span>
+                <span class="filter-tag" onclick="setFilter(this, 'cv')">👁️ Computer Vision</span>
+                <span class="filter-tag" onclick="setFilter(this, 'nlp')">💬 NLP</span>
+                <span class="filter-tag" onclick="setFilter(this, 'rl')">🎮 Reinforcement Learning</span>
+                <span class="filter-tag" onclick="setFilter(this, 'genai')">✨ Generative AI</span>
+                <span class="filter-tag" onclick="setFilter(this, 'mllm')">🔮 Multimodal</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container" id="papers-section">
+        <!-- Topic Cloud -->
+        <h2 class="section-title">Trending ML Topics</h2>
+        <p class="section-subtitle">
+            Click on any topic to filter papers and discover related research.
+        </p>
+
+        <div class="topic-cloud">
+            <div class="topic-chip large" onclick="filterByTopic('transformer')">
+                <span class="topic-icon">🔄</span> Transformers
+            </div>
+            <div class="topic-chip large" onclick="filterByTopic('diffusion')">
+                <span class="topic-icon">🌊</span> Diffusion Models
+            </div>
+            <div class="topic-chip medium" onclick="filterByTopic('llm')">
+                <span class="topic-icon">🧠</span> Large Language Models
+            </div>
+            <div class="topic-chip medium" onclick="filterByTopic('vision')">
+                <span class="topic-icon">👁️</span> Vision Transformers
+            </div>
+            <div class="topic-chip medium" onclick="filterByTopic('rlhf')">
+                <span class="topic-icon">🎯</span> RLHF
+            </div>
+            <div class="topic-chip medium" onclick="filterByTopic('multimodal')">
+                <span class="topic-icon">🔮</span> Multimodal Learning
+            </div>
+            <div class="topic-chip" onclick="filterByTopic('efficient')">
+                <span class="topic-icon">⚡</span> Efficient ML
+            </div>
+            <div class="topic-chip" onclick="filterByTopic('agents')">
+                <span class="topic-icon">🤖</span> AI Agents
+            </div>
+        </div>
+
+        <!-- Top 10 Papers -->
+        <h2 class="section-title">🏆 Top 10 Latest ML Research Papers</h2>
+        <p class="section-subtitle">
+            Curated selection of groundbreaking papers from arXiv, updated weekly.
+            Click on any paper to read more or open directly in Studio IDE.
+        </p>
+
+        <div class="papers-grid" id="papersGrid">
+            <!-- Paper 1 -->
+            <div class="paper-card" data-topics="llm genai transformer">
+                <div class="paper-header">
+                    <div class="paper-rank">#1</div>
+                    <div class="paper-badge">🔥 Hot</div>
+                </div>
+                <h3 class="paper-title">Scaling Laws for Neural Language Models</h3>
+                <p class="paper-authors">Jared Kaplan, Sam McCandlish, Tom Henighan et al.</p>
+                <p class="paper-abstract">
+                    Empirical analysis of how model performance scales with compute, dataset size, 
+                    and parameter count. Establishes power-law relationships that guide LLM development...
+                </p>
+                <div class="paper-meta">
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">📚</span> 12,458 citations
+                    </div>
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">📅</span> 2026-01-15
+                    </div>
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">🏢</span> OpenAI
+                    </div>
+                </div>
+                <div class="paper-actions">
+                    <a href="https://arxiv.org/abs/2001.08361" target="_blank" class="paper-btn primary">📄 Read Paper</a>
+                    <button onclick="openInStudio('scaling-laws')" class="paper-btn">💻 Open in Studio</button>
+                    <button onclick="copyCitation('kaplan2020scaling')" class="paper-btn">📋 Cite</button>
+                </div>
+            </div>
+
+            <!-- Paper 2 -->
+            <div class="paper-card" data-topics="cv diffusion genai">
+                <div class="paper-header">
+                    <div class="paper-rank">#2</div>
+                    <div class="paper-badge">⭐ Featured</div>
+                </div>
+                <h3 class="paper-title">High-Resolution Image Synthesis with Latent Diffusion Models</h3>
+                <p class="paper-authors">Robin Rombach, Andreas Blattmann, Dominik Lorenz et al.</p>
+                <p class="paper-abstract">
+                    Introduces latent diffusion models that achieve state-of-the-art image synthesis 
+                    while operating in compressed latent space, enabling efficient high-resolution generation...
+                </p>
+                <div class="paper-meta">
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">📚</span> 9,872 citations
+                    </div>
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">📅</span> 2026-01-10
+                    </div>
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">🏢</span> RunwayML
+                    </div>
+                </div>
+                <div class="paper-actions">
+                    <a href="https://arxiv.org/abs/2112.10752" target="_blank" class="paper-btn primary">📄 Read Paper</a>
+                    <button onclick="openInStudio('latent-diffusion')" class="paper-btn">💻 Open in Studio</button>
+                    <button onclick="copyCitation('rombach2022latent')" class="paper-btn">📋 Cite</button>
+                </div>
+            </div>
+
+            <!-- Paper 3 -->
+            <div class="paper-card" data-topics="llm nlp transformer">
+                <div class="paper-header">
+                    <div class="paper-rank">#3</div>
+                </div>
+                <h3 class="paper-title">Training Language Models to Follow Instructions with Human Feedback</h3>
+                <p class="paper-authors">Long Ouyang, Jeff Wu, Xu Jiang et al.</p>
+                <p class="paper-abstract">
+                    Demonstrates how reinforcement learning from human feedback (RLHF) can align language models 
+                    with user intentions, leading to more helpful and safer AI assistants...
+                </p>
+                <div class="paper-meta">
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">📚</span> 8,543 citations
+                    </div>
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">📅</span> 2026-01-08
+                    </div>
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">🏢</span> OpenAI
+                    </div>
+                </div>
+                <div class="paper-actions">
+                    <a href="https://arxiv.org/abs/2203.02155" target="_blank" class="paper-btn primary">📄 Read Paper</a>
+                    <button onclick="openInStudio('instructgpt')" class="paper-btn">💻 Open in Studio</button>
+                    <button onclick="copyCitation('ouyang2022training')" class="paper-btn">📋 Cite</button>
+                </div>
+            </div>
+
+            <!-- Paper 4 -->
+            <div class="paper-card" data-topics="cv vision transformer">
+                <div class="paper-header">
+                    <div class="paper-rank">#4</div>
+                </div>
+                <h3 class="paper-title">An Image is Worth 16x16 Words: Transformers for Image Recognition</h3>
+                <p class="paper-authors">Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov et al.</p>
+                <p class="paper-abstract">
+                    Pioneering work applying pure Transformer architecture to image classification tasks, 
+                    achieving competitive results with CNNs while offering better scalability...
+                </p>
+                <div class="paper-meta">
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">📚</span> 15,234 citations
+                    </div>
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">📅</span> 2026-01-05
+                    </div>
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">🏢</span> Google Brain
+                    </div>
+                </div>
+                <div class="paper-actions">
+                    <a href="https://arxiv.org/abs/2010.11929" target="_blank" class="paper-btn primary">📄 Read Paper</a>
+                    <button onclick="openInStudio('vit')" class="paper-btn">💻 Open in Studio</button>
+                    <button onclick="copyCitation('dosovitsky2021image')" class="paper-btn">📋 Cite</button>
+                </div>
+            </div>
+
+            <!-- Paper 5 -->
+            <div class="paper-card" data-topics="llm genai mllm">
+                <div class="paper-header">
+                    <div class="paper-rank">#5</div>
+                    <div class="paper-badge">🆕 New</div>
+                </div>
+                <h3 class="paper-title">Multimodal Foundation Models are In-Context Learners</h3>
+                <p class="paper-authors">Chenliang Xu, Liunian Harold Li, Jie Lei et al.</p>
+                <p class="paper-abstract">
+                    Explores how multimodal foundation models can perform in-context learning across 
+                    vision-language tasks without task-specific fine-tuning, demonstrating emergent capabilities...
+                </p>
+                <div class="paper-meta">
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">📚</span> 3,421 citations
+                    </div>
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">📅</span> 2026-01-03
+                    </div>
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">🏢</span> University of Rochester
+                    </div>
+                </div>
+                <div class="paper-actions">
+                    <a href="https://arxiv.org/abs/2307.00456" target="_blank" class="paper-btn primary">📄 Read Paper</a>
+                    <button onclick="openInStudio('multimodal-icl')" class="paper-btn">💻 Open in Studio</button>
+                    <button onclick="copyCitation('xu2023multimodal')" class="paper-btn">📋 Cite</button>
+                </div>
+            </div>
+
+            <!-- Paper 6 -->
+            <div class="paper-card" data-topics="rl agents">
+                <div class="paper-header">
+                    <div class="paper-rank">#6</div>
+                </div>
+                <h3 class="paper-title">Human-level control through deep reinforcement learning</h3>
+                <p class="paper-authors">Volodymyr Mnih, Koray Kavukcuoglu, David Silver et al.</p>
+                <p class="paper-abstract">
+                    Landmark achievement demonstrating that deep Q-networks can learn to play Atari games 
+                    at superhuman level using only raw pixels and game score as input...
+                </p>
+                <div class="paper-meta">
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">📚</span> 28,956 citations
+                    </div>
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">📅</span> 2025-12-28
+                    </div>
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">🏢</span> DeepMind
+                    </div>
+                </div>
+                <div class="paper-actions">
+                    <a href="https://arxiv.org/abs/1312.5602" target="_blank" class="paper-btn primary">📄 Read Paper</a>
+                    <button onclick="openInStudio('dqn')" class="paper-btn">💻 Open in Studio</button>
+                    <button onclick="copyCitation('mnih2015human')" class="paper-btn">📋 Cite</button>
+                </div>
+            </div>
+
+            <!-- Paper 7 -->
+            <div class="paper-card" data-topics="efficient llm">
+                <div class="paper-header">
+                    <div class="paper-rank">#7</div>
+                </div>
+                <h3 class="paper-title">LoRA: Low-Rank Adaptation of Large Language Models</h3>
+                <p class="paper-authors">Edward J. Hu, Yelong Shen, Phillip Wallis et al.</p>
+                <p class="paper-abstract">
+                    Introduces low-rank adaptation method that dramatically reduces trainable parameters 
+                    for fine-tuning large language models while maintaining performance comparable to full fine-tuning...
+                </p>
+                <div class="paper-meta">
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">📚</span> 6,789 citations
+                    </div>
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">📅</span> 2025-12-20
+                    </div>
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">🏢</span> Microsoft
+                    </div>
+                </div>
+                <div class="paper-actions">
+                    <a href="https://arxiv.org/abs/2106.09685" target="_blank" class="paper-btn primary">📄 Read Paper</a>
+                    <button onclick="openInStudio('lora')" class="paper-btn">💻 Open in Studio</button>
+                    <button onclick="copyCitation('hu2021lora')" class="paper-btn">📋 Cite</button>
+                </div>
+            </div>
+
+            <!-- Paper 8 -->
+            <div class="paper-card" data-topics="nlp transformer">
+                <div class="paper-header">
+                    <div class="paper-rank">#8</div>
+                </div>
+                <h3 class="paper-title">Attention Is All You Need</h3>
+                <p class="paper-authors">Ashish Vaswani, Noam Shazeer, Niki Parmar et al.</p>
+                <p class="paper-abstract">
+                    The foundational paper introducing the Transformer architecture that revolutionized NLP 
+                    and enabled modern large language models through self-attention mechanisms...
+                </p>
+                <div class="paper-meta">
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">📚</span> 98,234 citations
+                    </div>
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">📅</span> 2025-12-15
+                    </div>
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">🏢</span> Google Brain
+                    </div>
+                </div>
+                <div class="paper-actions">
+                    <a href="https://arxiv.org/abs/1706.03762" target="_blank" class="paper-btn primary">📄 Read Paper</a>
+                    <button onclick="openInStudio('transformer')" class="paper-btn">💻 Open in Studio</button>
+                    <button onclick="copyCitation('vaswani2017attention')" class="paper-btn">📋 Cite</button>
+                </div>
+            </div>
+
+            <!-- Paper 9 -->
+            <div class="paper-card" data-topics="genai diffusion mllm">
+                <div class="paper-header">
+                    <div class="paper-rank">#9</div>
+                </div>
+                <h3 class="paper-title">DALL·E 2: Hierarchical Text-Conditional Image Generation with CLIP Latents</h3>
+                <p class="paper-authors">Aditya Ramesh, Mikhail Pavlick, Gabriel Goh et al.</p>
+                <p class="paper-abstract">
+                    Presents a two-stage model for text-to-image generation using CLIP embeddings, 
+                    achieving photorealistic synthesis from natural language descriptions...
+                </p>
+                <div class="paper-meta">
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">📚</span> 5,678 citations
+                    </div>
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">📅</span> 2025-12-10
+                    </div>
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">🏢</span> OpenAI
+                    </div>
+                </div>
+                <div class="paper-actions">
+                    <a href="https://arxiv.org/abs/2204.06125" target="_blank" class="paper-btn primary">📄 Read Paper</a>
+                    <button onclick="openInStudio('dalle2')" class="paper-btn">💻 Open in Studio</button>
+                    <button onclick="copyCitation('ramesh2022hierarchical')" class="paper-btn">📋 Cite</button>
+                </div>
+            </div>
+
+            <!-- Paper 10 -->
+            <div class="paper-card" data-topics="llm agents rlhf">
+                <div class="paper-header">
+                    <div class="paper-rank">#10</div>
+                    <div class="paper-badge">🌟 Trending</div>
+                </div>
+                <h3 class="paper-title">Constitutional AI: Harmlessness from AI Feedback</h3>
+                <p class="paper-authors">Yuntao Bai, Saurav Kadavath, Sandipan Kundu et al.</p>
+                <p class="paper-abstract">
+                    Novel approach using AI feedback rather than human feedback to train harmless AI systems, 
+                    scaling RLHF methods while reducing reliance on human annotators...
+                </p>
+                <div class="paper-meta">
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">📚</span> 2,345 citations
+                    </div>
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">📅</span> 2025-12-05
+                    </div>
+                    <div class="paper-stat">
+                        <span class="paper-stat-icon">🏢</span> Anthropic
+                    </div>
+                </div>
+                <div class="paper-actions">
+                    <a href="https://arxiv.org/abs/2212.08073" target="_blank" class="paper-btn primary">📄 Read Paper</a>
+                    <button onclick="openInStudio('constitutional-ai')" class="paper-btn">💻 Open in Studio</button>
+                    <button onclick="copyCitation('bai2022constitutional')" class="paper-btn">📋 Cite</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <h2 class="section-title">ML Workflow Templates</h2>
+        <p class="section-subtitle">
+            Pre-built machine learning workflows to accelerate your research projects.
+        </p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Data Preparation Pipeline</h3>
+                <p>Automated data cleaning, feature engineering, augmentation, and preprocessing templates for tabular, text, and image data.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Model Training Suite</h3>
+                <p>Pre-configured training loops for PyTorch, TensorFlow, and JAX with hyperparameter tuning, checkpointing, and logging.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📈</div>
+                <h3>Evaluation & Metrics</h3>
+                <p>Comprehensive evaluation frameworks with custom metrics, visualization dashboards, and statistical significance testing.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🚀</div>
+                <h3>Deployment Templates</h3>
+                <p>Production-ready deployment configurations for model serving, API endpoints, batch inference, and edge deployment.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3>Experiment Tracking</h3>
+                <p>Integrated experiment management with version control, reproducibility guarantees, and comparison tools.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤝</div>
+                <h3>Collaboration Tools</h3>
+                <p>Team workflows for code review, shared notebooks, model registries, and knowledge documentation.</p>
+            </div>
+        </div>
+
+        <!-- Workflow -->
+        <div class="workflow">
+            <h2 class="section-title">Quick Start: ML Research Workflow</h2>
+            <p class="section-subtitle">
+                From paper to production in 5 streamlined steps.
+            </p>
+
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Discover & Select Paper</h4>
+                        <p>Browse curated papers, search by topic, or paste arXiv ID to find relevant research.</p>
+                        <div class="step-command"># Example: Search for transformer papers
+python search_papers.py --query "vision transformer" --top-k 10</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Analyze Methodology</h4>
+                        <p>Extract key algorithms, architecture details, and implementation requirements from paper.</p>
+                        <div class="step-command"># Extract methodology section
+python extract_method.py --paper arxiv:2010.11929 --output methodology.md</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Setup Environment</h4>
+                        <p>Initialize project structure, install dependencies, download datasets and pretrained weights.</p>
+                        <div class="step-command"># Create ML environment
+ml init-project vit-classification --framework pytorch --gpu cuda</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Implement & Train</h4>
+                        <p>Use Studio IDE to write code, run experiments, track metrics, and iterate on results.</p>
+                        <div class="step-command"># Start training session
+ml train --config config.yaml --experiment vit-exp-001</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>Evaluate & Deploy</h4>
+                        <p>Validate results, generate reports, export models, and deploy to production or share findings.</p>
+                        <div class="step-command"># Export trained model
+ml export --experiment vit-exp-001 --format onnx --optimize</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value">10K+</div>
+                <div class="stat-label">Papers Indexed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">50+</div>
+                <div class="stat-label">ML Categories</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">99.8%</div>
+                <div class="stat-label">Uptime</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">24/7</div>
+                <div class="stat-label">Auto Updates</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <h2>Ready to Explore ML Research?</h2>
+        <p>Browse papers, start coding in Studio IDE, or contribute your own templates to the community.</p>
+        <div class="hero-buttons">
+            <button onclick="scrollToPapers()" class="btn btn-primary">
+                📄 Browse All Papers
+            </button>
+            <button onclick="openStudioIDE()" class="btn btn-ide">
+                ⌥ Open in Studio IDE
+            </button>
+            <a href="https://github.com/testdemoqwenai2025-creator/DemoSciCMP" target="_blank" class="btn btn-secondary">
+                Contribute on GitHub →
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 SciCMPMATH by Endeavor Science | Made with ❤️ for ML Research</p>
+        <p style="margin-top: 8px;">
+            <a href="/DemoSciCMP/">Home</a> • 
+            <a href="/DemoSciCMP/studio.html">Studio IDE</a> • 
+            <a href="/DemoSciCMP/templates/cheminformatics/docking.html">Docking Template</a> • 
+            <a href="https://github.com/testdemoqwenai2025-creator/DemoSciCMP">GitHub</a> • 
+            <a href="/DemoSciCMP/#/research-trends">Research Trends</a>
+        </p>
+    </footer>
+
+    <!-- Floating Navigation -->
+    <div class="floating-nav">
+        <button onclick="goHome()" class="float-btn home-btn" title="Return to Home">
+            🏠
+        </button>
+        <button onclick="scrollToTop()" class="float-btn" title="Back to Top">
+            ↑
+        </button>
+    </div>
+
+    <script>
+        // Navigation Functions
+        function goHome() {
+            window.location.href = '/DemoSciCMP/';
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function scrollToPapers() {
+            document.getElementById('papers-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function openStudioIDE() {
+            const localStudio = '/DemoSciCMP/studio.html';
+            window.open(localStudio, '_blank', 'noopener,noreferrer');
+            showNotification('Opening Studio IDE... 🖥️');
+        }
+
+        // Search Functionality
+        let currentFilter = 'all';
+
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.paper-card');
+            
+            if (!query && currentFilter === 'all') {
+                cards.forEach(card => card.style.display = '');
+                return;
+            }
+
+            cards.forEach(card => {
+                const title = card.querySelector('.paper-title').textContent.toLowerCase();
+                const authors = card.querySelector('.paper-authors').textContent.toLowerCase();
+                const abstract = card.querySelector('.paper-abstract').textContent.toLowerCase();
+                const topics = card.dataset.topics || '';
+                
+                const matchesText = title.includes(query) || authors.includes(query) || abstract.includes(query);
+                const matchesFilter = currentFilter === 'all' || topics.includes(currentFilter);
+                
+                if ((!query || matchesText) && matchesFilter) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            showNotification(`🔍 Searching: "${query || 'All'}" | Filter: ${currentFilter}`);
+        }
+
+        function handleSearchKeypress(event) {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        }
+
+        function setFilter(element, filter) {
+            currentFilter = filter;
+            
+            // Update active state
+            document.querySelectorAll('.filter-tag').forEach(tag => tag.classList.remove('active'));
+            element.classList.add('active');
+            
+            performSearch();
+        }
+
+        function filterByTopic(topic) {
+            document.getElementById('searchInput').value = topic;
+            
+            // Map topic to filter
+            const topicMap = {
+                'transformer': 'llm',
+                'diffusion': 'genai',
+                'llm': 'llm',
+                'vision': 'cv',
+                'rlhf': 'rlhf',
+                'multimodal': 'mllm',
+                'efficient': 'efficient',
+                'agents': 'agents'
+            };
+            
+            currentFilter = topicMap[topic] || 'all';
+            performSearch();
+            
+            scrollToPapers();
+        }
+
+        // Paper Actions
+        function openInStudio(paperId) {
+            openStudioIDE();
+            showNotification(`📄 Opening "${paperId}" in Studio IDE...\n\nTip: Use the File Explorer to load paper resources.`);
+        }
+
+        function copyCitation(citationKey) {
+            const citations = {
+                'kaplan2020scaling': '@article{kaplan2020scaling,\n  title={Scaling Laws for Neural Language Models},\n  author={Kaplan, Jared and McCandlish, Sam and Henighan, Tom},\n  journal={arXiv preprint arXiv:2001.08361},\n  year={2020}\n}',
+                'rombach2022latent': '@article{rombach2022latent,\n  title={High-Resolution Image Synthesis with Latent Diffusion Models},\n  author={Rombach, Robin and Blattmann, Andreas and Lorenz, Dominik},\n  journal={CVPR},\n  year={2022}\n}',
+                'ouyang2022training': '@article{ouyang2022training,\n  title={Training Language Models to Follow Instructions with Human Feedback},\n  author={Ouyang, Long and Wu, Jeff and Jiang, Xu},\n  journal={NeurIPS},\n  year={2022}\n}',
+                'dosovitsky2021image': '@article{dosovitsky2021image,\n  title={An Image is Worth 16x16 Words: Transformers for Image Recognition},\n  author={Dosovitskiy, Alexey and Beyer, Lucas and Kolesnikov, Alexander},\n  journal={ICLR},\n  year={2021}\n}',
+                'xu2023multimodal': '@article{xu2023multimodal,\n  title={Multimodal Foundation Models are In-Context Learners},\n  author={Xu, Chenliang and Li, Liunian Harold and Lei, Jie},\n  journal={arXiv preprint},\n  year={2023}\n}',
+                'mnih2015human': '@article{mnih2015human,\n  title={Human-level control through deep reinforcement learning},\n  author={Mnih, Volodymyr and Kavukcuoglu, Koray and Silver, David},\n  journal={Nature},\n  year={2015}\n}',
+                'hu2021lora': '@article{hu2021lora,\n  title={LoRA: Low-Rank Adaptation of Large Language Models},\n  author={Hu, Edward J. and Shen, Yelong and Wallis, Phillip},\n  journal={arXiv preprint arXiv:2106.09685},\n  year={2021}\n}',
+                'vaswani2017attention': '@article{vaswani2017attention,\n  title={Attention Is All You Need},\n  author={Vaswani, Ashish and Shazeer, Noam and Parmar, Niki},\n  journal={NeurIPS},\n  year={2017}\n}',
+                'ramesh2022hierarchical': '@article{ramesh2022hierarchical,\n  title={DALL·E 2: Hierarchical Text-Conditional Image Generation},\n  author={Ramesh, Aditya and Pavlick, Mikhail and Goh, Gabriel},\n  journal={arXiv preprint},\n  year={2022}\n}',
+                'bai2022constitutional': '@article{bai2022constitutional,\n  title={Constitutional AI: Harmlessness from AI Feedback},\n  author={Bai, Yuntao and Kadavath, Saurav and Kundu, Sandipan},\n  journal={arXiv preprint arXiv:2212.08073},\n  year={2022}\n}'
+            };
+
+            const citation = citations[citationKey] || 'Citation not found';
+            
+            navigator.clipboard.writeText(citation).then(() => {
+                showNotification('📋 Citation copied to clipboard!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = citation;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showNotification('📋 Citation copied to clipboard!');
+            });
+        }
+
+        // Notification System
+        function showNotification(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #1e293b, #334155);
+                color: white;
+                padding: 16px 24px;
+                border-radius: 12px;
+                border: 1px solid rgba(167, 139, 250, 0.3);
+                box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+                z-index: 9999;
+                font-family: system-ui, sans-serif;
+                font-size: 14px;
+                max-width: 350px;
+                animation: slideIn 0.3s ease-out;
+                white-space: pre-line;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease-in forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Add animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        console.log('Machine Learning Research Hub Loaded | SciCMPMATH Studio Ready ✅');
+        console.log('Features: Paper Search | Topic Filtering | Citation Copy | Studio Integration');
+    </script>
+</body>
+</html>

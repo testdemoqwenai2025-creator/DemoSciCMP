@@ -468,6 +468,9 @@
             </div>
         </div>
         <div class="title-bar-right">
+            <button class="title-btn btn-secondary" onclick="goHome()">
+                🏠 Home
+            </button>
             <button class="title-btn btn-secondary" onclick="refreshPreview()">
                 ↻ Refresh
             </button>
@@ -703,6 +706,11 @@
     </div>
 
     <script>
+        // Navigation
+        function goHome() {
+            window.location.href = '/DemoSciCMP/';
+        }
+
         // Toggle folder expand/collapse
         function toggleFolder(element) {
             const icon = element.querySelector('.folder-icon');
