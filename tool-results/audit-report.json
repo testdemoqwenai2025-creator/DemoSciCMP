@@ -1,0 +1,616 @@
+{
+  "timestamp": "2026-08-17T08:07:36.646518",
+  "summary": {
+    "total_files": 59,
+    "total_issues": 67,
+    "by_severity": {
+      "WARNING": 35,
+      "INFO": 32
+    }
+  },
+  "issues": [
+    {
+      "severity": "WARNING",
+      "file": "components/ui/sidebar.tsx",
+      "line": 264,
+      "component": "useSidebar",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/ui/calendar.tsx",
+      "line": 189,
+      "component": "Calendar",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/ui/carousel.tsx",
+      "line": 184,
+      "component": "useCarousel",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/ui/carousel.tsx",
+      "line": 214,
+      "component": "useCarousel",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 436,
+      "component": "to",
+      "type": "DEBUG_CODE",
+      "message": "console.log statement found",
+      "suggestion": "Remove or replace with proper logging"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 446,
+      "component": "to",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 555,
+      "component": "to",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 620,
+      "component": "to",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 714,
+      "component": "to",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 726,
+      "component": "to",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 743,
+      "component": "to",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 755,
+      "component": "to",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 772,
+      "component": "to",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 784,
+      "component": "to",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 957,
+      "component": "to",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 966,
+      "component": "to",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 1088,
+      "component": "to",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 1097,
+      "component": "to",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/ResearchTrendsPage.tsx",
+      "line": 1106,
+      "component": "to",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/AboutPage.tsx",
+      "line": 247,
+      "component": "AboutPage",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/AboutPage.tsx",
+      "line": 321,
+      "component": "AboutPage",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/AboutPage.tsx",
+      "line": 332,
+      "component": "AboutPage",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/TemplateGalleryPage.tsx",
+      "line": 276,
+      "component": "prediction",
+      "type": "TODO_FOUND",
+      "message": "description: 'AutoDock Vina docking pipeline with ligand preparation, receptor setup, binding pose analysis, and scoring visualization.',",
+      "suggestion": "Address this TODO before production"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/TemplateGalleryPage.tsx",
+      "line": 281,
+      "component": "prediction",
+      "type": "TODO_FOUND",
+      "message": "tags: ['chemistry', 'docking', 'drug-discovery', 'AutoDock'],",
+      "suggestion": "Address this TODO before production"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/TemplateGalleryPage.tsx",
+      "line": 345,
+      "component": "prediction",
+      "type": "TODO_FOUND",
+      "message": "{ step: 4, title: 'Run Docking', action: 'Execute AutoDock Vina with selected preset', command: 'vina --receptor rec.pdbqt --ligand lig.pdbqt --config config.txt', estimatedTime: '10-60 min' },",
+      "suggestion": "Address this TODO before production"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/TemplateGalleryPage.tsx",
+      "line": 830,
+      "component": "prediction",
+      "type": "TODO_FOUND",
+      "message": "description: 'AutoDock Vina with pre-configured scenarios for common targets. Includes sample receptor-ligand pairs.',",
+      "suggestion": "Address this TODO before production"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/TemplateGalleryPage.tsx",
+      "line": 1429,
+      "component": "prediction",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/TemplateGalleryPage.tsx",
+      "line": 2088,
+      "component": "prediction",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/TemplateGalleryPage.tsx",
+      "line": 2124,
+      "component": "prediction",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/TemplateGalleryPage.tsx",
+      "line": 2238,
+      "component": "prediction",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/TemplateGalleryPage.tsx",
+      "line": 2295,
+      "component": "prediction",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/TemplateGalleryPage.tsx",
+      "line": 2328,
+      "component": "prediction",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/TemplateGalleryPage.tsx",
+      "line": 2453,
+      "component": "prediction",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/Header.tsx",
+      "line": 119,
+      "component": "Header",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/PricingPage.tsx",
+      "line": 207,
+      "component": "PricingPage",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/PricingPage.tsx",
+      "line": 253,
+      "component": "PricingPage",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/PricingPage.tsx",
+      "line": 256,
+      "component": "PricingPage",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/PricingPage.tsx",
+      "line": 280,
+      "component": "PricingPage",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 476,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 527,
+      "component": "TierBadge",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 599,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 603,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 612,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 616,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 625,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 629,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 721,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 726,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 862,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 866,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 882,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 886,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 897,
+      "component": "TierBadge",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 921,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 936,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 958,
+      "component": "TierBadge",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 1005,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 1009,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 1013,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 1027,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 1035,
+      "component": "TierBadge",
+      "type": "POTENTIALLY_INTERACTIVE",
+      "message": "Element with cursor-pointer but no visible onClick",
+      "suggestion": "Verify this should be clickable"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 1052,
+      "component": "TierBadge",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/DashboardPage.tsx",
+      "line": 1070,
+      "component": "TierBadge",
+      "type": "TODO_FOUND",
+      "message": "{ title: 'Start Docking', desc: 'Virtual screening with Glide/AutoDock', icon: <Cpu className=\"w-5 h-5\" />, color: 'from-green-500 to-green-600' },",
+      "suggestion": "Address this TODO before production"
+    },
+    {
+      "severity": "INFO",
+      "file": "components/SciCMP/FeaturesPage.tsx",
+      "line": 118,
+      "component": "FeaturesPage",
+      "type": "TODO_FOUND",
+      "message": "{ name: 'Cheminformatics', icon: <Atom className=\"w-8 h-8\" />, tools: 'RDKit, OpenBabel, Schr\u00f6dinger, AutoDock' },",
+      "suggestion": "Address this TODO before production"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/FeaturesPage.tsx",
+      "line": 230,
+      "component": "FeaturesPage",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/FeaturesPage.tsx",
+      "line": 271,
+      "component": "FeaturesPage",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    },
+    {
+      "severity": "WARNING",
+      "file": "components/SciCMP/FeaturesPage.tsx",
+      "line": 275,
+      "component": "FeaturesPage",
+      "type": "MISSING_HANDLER",
+      "message": "<Button> component without onClick handler",
+      "suggestion": "Add onClick prop for interactivity"
+    }
+  ]
+}
