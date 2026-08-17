@@ -46,7 +46,12 @@ import {
   MessageSquare,
   Eye,
   Bell,
-  Play
+  Play,
+  
+  // IDE & Development Icons
+  Terminal,
+  Monitor,
+  FolderOpen
 } from 'lucide-react';
 
 // ============================================================================
@@ -78,7 +83,10 @@ const URL_CONFIG = {
   
   // Premium/Pricing
   pricingPage: '/DemoSciCMP/#/pricing',
-  upgradePro: 'https://checkout.scicmppath.org/pro'
+  upgradePro: 'https://checkout.scicmppath.org/pro',
+  
+  // IDE Studio
+  ideStudio: 'https://github.com/testdemoqwenai2025-creator/DemoSciCMP/tree/main/download'
 };
 
 // Helper function to open URL with error handling
@@ -895,6 +903,13 @@ export default function ResearchTrendsPage() {
     );
   };
 
+  const handleOpenIdeStudio = () => {
+    openUrl(
+      URL_CONFIG.ideStudio,
+      '💻 IDE Studio - File Explorer\n\nOpening SciCMP IDE Studio with:\n\n📁 download/ folder containing:\n   • research-trends-hero.png (503 KB)\n   • research-trends-page.png (1.2 MB)\n   • source-analysis-tab.png (15 KB)\n   • feature-request-alert.png (25 KB)\n   • ide-studio-view.html (Interactive IDE)\n\n🖥️ Features: File tree, code preview, screenshot viewer\n\nStatus: Opening GitHub File Explorer... 🚀'
+    );
+  };
+
   const handleUpgrade = (tier: string, featureName: string) => {
     if (tier === 'premium') {
       openUrl(
@@ -968,6 +983,15 @@ export default function ResearchTrendsPage() {
               >
                 <ExternalLink className="w-5 h-5" />
                 View Source Analysis
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="gap-2 text-emerald-400 border-emerald-400/40 hover:bg-emerald-400/10 hover:text-emerald-300 px-8 h-12 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                onClick={handleOpenIdeStudio}
+              >
+                <Terminal className="w-5 h-5" />
+                Open IDE Studio
               </Button>
             </div>
 
