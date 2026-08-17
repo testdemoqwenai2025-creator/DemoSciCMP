@@ -2075,27 +2075,24 @@ print("✅ Analysis complete!")`}
               return (
                 <div
                   key={capability.id}
-                  className="bg-slate-900 rounded-xl border border-slate-700 overflow-hidden hover:border-violet-500/50 transition-all"
+                  className="bg-slate-900 rounded-xl border border-slate-700 overflow-hidden hover:border-violet-500/50 transition-all cursor-pointer group/cap"
+                  onClick={() => toggleCapability(capability.id)}
                 >
-                  <button
-                    onClick={() => toggleCapability(capability.id)}
-                    className="w-full p-6 text-left focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-inset"
-                  >
+                  <div className="p-6">
                     <div className="flex items-start justify-between mb-3">
-                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-violet-500/20 to-cyan-500/20 flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-violet-500/20 to-cyan-500/20 flex items-center justify-center group-hover/cap:from-violet-500/30 group-hover/cap:to-cyan-500/30 transition-all">
                         <Icon className="w-6 h-6 text-violet-400" />
                       </div>
                       {isExpanded ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
                     </div>
                     
-                    <h3 className="text-lg font-semibold mb-2 text-white">{capability.title}</h3>
-                    <p className="text-slate-400 text-sm mb-3">{capability.description}</p>
+                    <h3 className="text-lg font-semibold mb-2 text-white group-hover/cap:text-violet-300 transition-colors">{capability.title}</h3>
+                    <p className="text-slate-400 text-sm mb-4">{capability.description}</p>
                     
-                    {/* Action Button */}
+                    {/* Action Button — opens the unique modal/wizard for each capability */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        // Each capability has UNIQUE interactivity
                         if (capability.id === 'one-click-setup') {
                           triggerOneClickSetup(templates[0]);
                         } else if (capability.id === 'parameter-presets') {
@@ -2113,11 +2110,11 @@ print("✅ Analysis complete!")`}
                           setTimeout(() => setActiveTab('presets'), 100);
                         }
                       }}
-                      className="text-violet-400 hover:text-violet-300 text-sm font-medium flex items-center gap-1"
+                      className="cursor-pointer text-violet-400 hover:text-white text-sm font-medium flex items-center gap-1.5 px-4 py-2 bg-violet-500/10 hover:bg-violet-500/25 rounded-lg transition-all border border-violet-500/20 hover:border-violet-500/50"
                     >
                       {capability.actionLabel}
                     </button>
-                  </button>
+                  </div>
                   
                   {isExpanded && (
                     <div className="px-6 pb-6 border-t border-slate-700 pt-4">
@@ -2226,13 +2223,16 @@ print("✅ Analysis complete!")`}
               return (
                 <div
                   key={useCase.id}
-                  className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-6 border border-slate-700 hover:border-yellow-500/50 transition-all"
+                  className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-6 border border-slate-700 hover:border-yellow-500/50 transition-all cursor-pointer group/uc"
+                  onClick={() => {
+                    openUseCaseWizard(useCase.id);
+                  }}
                 >
-                  <div className="w-14 h-14 rounded-lg bg-yellow-500/10 flex items-center justify-center mb-4">
+                  <div className="w-14 h-14 rounded-lg bg-yellow-500/10 flex items-center justify-center mb-4 group-hover/uc:bg-yellow-500/20 transition-all">
                     <Icon className="w-7 h-7 text-yellow-400" />
                   </div>
                   
-                  <h3 className="text-xl font-semibold mb-2 text-white">{useCase.title}</h3>
+                  <h3 className="text-xl font-semibold mb-2 text-white group-hover/uc:text-yellow-300 transition-colors">{useCase.title}</h3>
                   <p className="text-slate-400 text-sm mb-4">{useCase.description}</p>
                   
                   {/* Audience Badge */}
@@ -2273,15 +2273,13 @@ print("✅ Analysis complete!")`}
                     </div>
                   )}
                   
-                  {/* CTA Button */}
+                  {/* CTA Button — opens the guided wizard */}
                   <button
-                    onClick={() => {
-                      // Open use case wizard with detailed workflow
+                    onClick={(e) => {
+                      e.stopPropagation();
                       openUseCaseWizard(useCase.id);
-                      // Also scroll to top of page for modal view
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className="w-full py-2 bg-yellow-600 hover:bg-yellow-700 rounded-lg text-sm font-medium flex items-center justify-center gap-1 transition-colors"
+                    className="cursor-pointer w-full py-2.5 bg-yellow-600 hover:bg-yellow-500 rounded-lg text-sm font-semibold flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-yellow-600/20 hover:shadow-yellow-500/30 border border-yellow-500/30"
                   >
                     Launch Wizard <ArrowRight className="w-4 h-4" />
                   </button>
