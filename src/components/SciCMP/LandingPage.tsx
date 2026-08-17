@@ -13,7 +13,11 @@ import {
   FlaskConical,
   Users,
   Star,
-  ChevronRight
+  ChevronRight,
+  Code2,
+  ExternalLink,
+  Atom,
+  Target
 } from 'lucide-react';
 
 interface LandingPageProps {
@@ -309,6 +313,105 @@ export default function LandingPage({ onNavigate }: LandingPageProps) {
                   <span>10K+ researchers trust us</span>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Template Section - Direct Link to Docking */}
+      <section className="py-20 bg-gradient-to-b from-primary/5 to-transparent">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20 mb-4">
+                <Atom className="w-4 h-4 text-cyan-500" />
+                <span className="text-sm font-medium text-cyan-600 dark:text-cyan-400">Featured Template</span>
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+                Try Our Most Popular Template
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Molecular Docking Workflow — AutoDock Vina pipeline for drug discovery research.
+                One-click setup with pre-configured parameters.
+              </p>
+            </div>
+
+            {/* Template Card */}
+            <div className="bg-card border rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+              <div className="flex flex-col md:flex-row items-start gap-6">
+                {/* Icon & Info */}
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center text-white text-2xl shadow-lg">
+                      🧬
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold">Molecular Docking Workflow</h3>
+                      <p className="text-muted-foreground">Chemo-informatics • Advanced • AutoDock Vina</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 my-6">
+                    <div className="bg-muted/50 rounded-lg p-3 text-center">
+                      <div className="text-lg font-bold text-cyan-600">10K+</div>
+                      <div className="text-xs text-muted-foreground">Compounds</div>
+                    </div>
+                    <div className="bg-muted/50 rounded-lg p-3 text-center">
+                      <div className="text-lg font-bold text-cyan-600">&lt;3min</div>
+                      <div className="text-xs text-muted-foreground">Avg Time</div>
+                    </div>
+                    <div className="bg-muted/50 rounded-lg p-3 text-center">
+                      <div className="text-lg font-bold text-cyan-600">99.2%</div>
+                      <div className="text-xs text-muted-foreground">Reproducible</div>
+                    </div>
+                    <div className="bg-muted/50 rounded-lg p-3 text-center">
+                      <div className="text-lg font-bold text-cyan-600">150+</div>
+                      <div className="text-xs text-muted-foreground">Citations</div>
+                    </div>
+                  </div>
+
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    AutoDock Vina docking pipeline with ligand preparation, receptor setup, 
+                    binding pose analysis, and scoring visualization for drug discovery research.
+                  </p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-3 min-w-[200px]">
+                  <Button
+                    onClick={() => window.open('/DemoSciCMP/templates/cheminformatics/docking.html', '_blank', 'noopener,noreferrer')}
+                    className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white border-0 shadow-lg hover:shadow-xl transition-all"
+                  >
+                    <Target className="mr-2 h-4 w-4" />
+                    Open Template
+                    <ExternalLink className="ml-2 h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => window.open('/DemoSciCMP/studio.html', '_blank', 'noopener,noreferrer')}
+                    className="w-full border-cyan-500/30 text-cyan-600 hover:bg-cyan-500/10 hover:text-cyan-700 transition-all"
+                  >
+                    <Code2 className="mr-2 h-4 w-4" />
+                    Open in Studio IDE
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => onNavigate('template-gallery')}
+                    className="w-full text-muted-foreground hover:text-foreground"
+                  >
+                    View All Templates →
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Path indicator */}
+            <div className="mt-6 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <span>Main Page</span>
+              <ChevronRight className="w-4 h-4" />
+              <span className="text-cyan-600 font-medium">Molecular Docking Template</span>
+              <ChevronRight className="w-4 h-4" />
+              <span>Studio IDE</span>
             </div>
           </div>
         </div>
