@@ -308,7 +308,7 @@ export default function AboutPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <div className="rounded-3xl overflow-hidden gradient-bg p-12 text-center text-white relative">
-              <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+              <div className="absolute inset-0 bg-slate-900 opacity-10" />
               <div className="relative">
                 <h2 className="text-3xl sm:text-4xl font-bold mb-4">
                   Let's Build the Future of Science Together

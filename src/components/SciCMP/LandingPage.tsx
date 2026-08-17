@@ -260,7 +260,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps) {
           <div className="relative rounded-3xl overflow-hidden">
             {/* Background */}
             <div className="absolute inset-0 gradient-bg opacity-90" />
-            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+            <div className="absolute inset-0 bg-slate-900 opacity-10" />
             
             <div className="relative px-8 py-16 sm:px-16 sm:py-20 text-center text-white">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
