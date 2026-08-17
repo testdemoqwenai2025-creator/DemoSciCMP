@@ -3,952 +3,477 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Research Portfolio Shorts — SciCMP</title>
+<title>SciCMP — Voice Narrated Research Clips</title>
 <style>
-  :root {
-    --hud: #ffffff;
-    --hud-dim: rgba(255,255,255,0.6);
-    --accent: #00d4aa;
-    --voice-uk: #6366f1;
-    --voice-us: #f59e0b;
-    --mono: 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
-    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  }
-  
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  
-  html, body {
-    width: 100%;
-    height: 100%;
-    background: #000;
-    overflow: hidden;
-    font-family: var(--mono);
-    color: var(--hud);
-  }
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:#0a0a0f;
+  color:#fff;
+  min-height:100vh;
+  overflow-x:hidden;
+}
 
-  .app {
-    width: 100vw;
-    height: 100vh;
-    position: relative;
-    overflow: hidden;
-  }
+.container{
+  max-width:900px;
+  margin:0 auto;
+  padding:40px 20px;
+}
 
-  /* ========== MAIN DISPLAY ========== */
-  .display {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px;
-    text-align: center;
-    transition: opacity 0.4s ease, background 0.6s ease;
-  }
+.header{
+  text-align:center;
+  margin-bottom:50px;
+}
+.header h1{
+  font-size:2rem;
+  font-weight:700;
+  margin-bottom:8px;
+  background:linear-gradient(135deg,#00d4aa,#6366f1);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.header p{
+  color:#888;
+  font-size:1rem;
+}
 
-  .display.helios { background: radial-gradient(ellipse at 30% 30%, rgba(255,180,50,0.15) 0%, transparent 60%), #0a0a12; }
-  .display.lattice { background: radial-gradient(ellipse at 70% 30%, rgba(99,102,241,0.15) 0%, transparent 60%), #08081a; }
-  .display.carbon { background: radial-gradient(ellipse at 50% 70%, rgba(16,185,129,0.15) 0%, transparent 60%), #0a120e; }
-  .display.solid { background: radial-gradient(ellipse at 60% 40%, rgba(245,158,11,0.15) 0%, transparent 60%), #120e08; }
-  .display.hydrogen { background: radial-gradient(ellipse at 40% 60%, rgba(56,189,248,0.15) 0%, transparent 60%), #080e14; }
-  .display.tmd { background: radial-gradient(ellipse at 50% 50%, rgba(236,72,153,0.15) 0%, transparent 60%), #140810; }
-  .display.atomic { background: radial-gradient(ellipse at 70% 60%, rgba(139,92,246,0.15) 0%, transparent 60%), #0c0814; }
+.clips-grid{
+  display:grid;
+  gap:24px;
+}
 
-  .icon {
-    font-size: 80px;
-    margin-bottom: 24px;
-    animation: float 3s ease-in-out infinite;
-  }
+.clip-card{
+  background:linear-gradient(135deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02));
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:16px;
+  padding:28px;
+  transition:all 0.3s ease;
+}
+.clip-card:hover{
+  border-color:rgba(255,255,255,0.2);
+  transform:translateY(-2px);
+  box-shadow:0 10px 40px rgba(0,0,0,0.3);
+}
+.clip-card.active{
+  border-color:#00d4aa;
+  box-shadow:0 0 30px rgba(0,212,170,0.15);
+}
 
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-12px); }
-  }
+.clip-header{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  margin-bottom:16px;
+}
+.clip-icon{
+  font-size:2.5rem;
+}
+.clip-info h2{
+  font-size:1.3rem;
+  font-weight:600;
+  margin-bottom:4px;
+}
+.clip-id{
+  font-size:0.85rem;
+  color:#666;
+  font-family:'SF Mono',Monaco,monospace;
+}
 
-  .title {
-    font-family: var(--sans);
-    font-size: clamp(28px, 5vw, 48px);
-    font-weight: 700;
-    margin-bottom: 16px;
-    letter-spacing: -0.02em;
-  }
+.voice-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 14px;
+  border-radius:20px;
+  font-size:0.8rem;
+  font-weight:600;
+  margin-top:12px;
+}
+.voice-tag.uk{
+  background:rgba(99,102,241,0.15);
+  color:#818cf8;
+  border:1px solid rgba(99,102,241,0.3);
+}
+.voice-tag.us{
+  background:rgba(245,158,11,0.15);
+  color:#fbbf24;
+  border:1px solid rgba(245,158,11,0.3);
+}
+.voice-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  animation:pulse 2s infinite;
+}
+.voice-tag.uk .voice-dot{background:#818cf8}
+.voice-tag.us .voice-dot{background:#fbbf24}
 
-  .subtitle {
-    font-family: var(--sans);
-    font-size: clamp(14px, 2vw, 17px);
-    color: var(--hud-dim);
-    max-width: 580px;
-    line-height: 1.65;
-    margin-bottom: 32px;
-  }
+@keyframes pulse{
+  0%,100%{opacity:1}
+  50%{opacity:0.5}
+}
 
-  /* Voice Badge - Shows accent type clearly */
-  .voice-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 20px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 24px;
-    font-size: 13px;
-    font-weight: 500;
-  }
+.clip-desc{
+  color:#aaa;
+  font-size:0.95rem;
+  line-height:1.6;
+  margin-bottom:20px;
+}
 
-  .dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .dot.uk { background: var(--voice-uk); box-shadow: 0 0 14px var(--voice-uk); }
-  .dot.us { background: var(--voice-us); box-shadow: 0 0 14px var(--voice-us); }
-  .dot.playing { animation: pulse 0.8s infinite; }
+.audio-controls{
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
 
-  @keyframes pulse { 
-    0%, 100% { opacity: 1; transform: scale(1); } 
-    50% { opacity: 0.5; transform: scale(0.9); } 
-  }
+.play-btn{
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  border:none;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:all 0.2s;
+  flex-shrink:0;
+}
+.play-btn.primary{
+  background:#00d4aa;
+  box-shadow:0 4px 20px rgba(0,212,170,0.4);
+}
+.play-btn.primary:hover{
+  transform:scale(1.08);
+  box-shadow:0 6px 28px rgba(0,212,170,0.5);
+}
+.play-btn.primary svg{fill:#000;width:22px;height:22px;margin-left:3px}
+.play-btn.primary.playing svg{margin-left:0}
 
-  .voice-accent {
-    font-weight: 600;
-  }
-  .voice-uk-text { color: var(--voice-uk); }
-  .voice-us-text { color: var(--voice-us); }
+.progress-wrap{
+  flex:1;
+}
+.progress-bar{
+  width:100%;
+  height:8px;
+  background:rgba(255,255,255,0.1);
+  border-radius:4px;
+  cursor:pointer;
+  overflow:hidden;
+}
+.progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,#00d4aa,#00ff88);
+  border-radius:4px;
+  width:0%;
+  transition:width 0.1s linear;
+}
+.time-display{
+  display:flex;
+  justify-content:space-between;
+  font-size:0.75rem;
+  color:#666;
+  margin-top:6px;
+  font-family:'SF Mono',Monaco,monospace;
+}
 
-  /* ========== CONTROLS BAR ========== */
-  .controls {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 24px 32px 32px;
-    background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, transparent 100%);
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    z-index: 20;
-  }
+.status{
+  font-size:0.8rem;
+  padding:6px 12px;
+  border-radius:6px;
+  min-width:80px;
+  text-align:center;
+}
+.status.ready{background:rgba(0,212,170,0.1);color:#00d4aa}
+.status.playing{background:rgba(239,68,68,0.1);color:#ef4444;animation:pulse 1s infinite}
+.status.error{background:rgba(239,68,68,0.2);color:#ef4444}
 
-  .play-btn {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: var(--accent);
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 4px 24px rgba(0,212,170,0.5);
-  }
+.footer{
+  text-align:center;
+  margin-top:50px;
+  padding:30px;
+  border-top:1px solid rgba(255,255,255,0.05);
+  color:#555;
+  font-size:0.85rem;
+}
 
-  .play-btn:hover { transform: scale(1.08); }
-  .play-btn:active { transform: scale(0.95); }
-  .play-btn svg { width: 22px; height: 22px; fill: #000; margin-left: 3px; }
-  .play-btn.playing svg { margin-left: 0; }
-
-  .progress-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .progress-bar {
-    width: 100%;
-    height: 6px;
-    background: rgba(255,255,255,0.15);
-    border-radius: 3px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 3px;
-    width: 0%;
-    transition: width 0.1s linear;
-  }
-
-  .time-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 12px;
-    color: var(--hud-dim);
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* ========== HUD ELEMENTS ========== */
-  .hud-top {
-    position: absolute;
-    top: 20px;
-    left: 24px;
-    right: 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 20;
-    font-size: 12px;
-  }
-
-  .badge {
-    padding: 6px 12px;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 500;
-  }
-
-  .status-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 8px;
-    background: rgba(255,255,255,0.05);
-    color: var(--hud);
-    cursor: pointer;
-    font-family: var(--mono);
-    font-size: 11px;
-    transition: all 0.2s;
-  }
-
-  .status-btn:hover { background: rgba(255,255,255,0.1); }
-
-  .status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--accent);
-  }
-  .status-dot.active { 
-    background: #ff3b30; 
-    animation: pulse 1s infinite; 
-  }
-
-  /* ========== CLIP NAVIGATION ========== */
-  .nav-left, .nav-right {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 20;
-  }
-
-  .nav-left { left: 20px; }
-  .nav-right { right: 20px; }
-
-  .nav-btn {
-    width: 44px;
-    height: 44px;
-    background: rgba(0,0,0,0.6);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 12px;
-    color: var(--hud-dim);
-    cursor: pointer;
-    font-size: 20px;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .nav-btn:hover { 
-    background: rgba(0,212,170,0.2); 
-    border-color: var(--accent); 
-    color: var(--accent); 
-  }
-
-  /* ========== CLIP DOTS ========== */
-  .clip-dots {
-    position: absolute;
-    bottom: 120px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 12px;
-    z-index: 20;
-  }
-
-  .clip-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.3);
-    cursor: pointer;
-    transition: all 0.3s;
-    border: none;
-  }
-
-  .clip-dot:hover { transform: scale(1.4); background: rgba(255,255,255,0.5); }
-  .clip-dot.active { 
-    background: var(--accent); 
-    box-shadow: 0 0 14px var(--accent);
-    transform: scale(1.25);
-  }
-
-  /* ========== NOW PLAYING BAR ========== */
-  .now-playing {
-    position: fixed;
-    top: 70px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-20px);
-    opacity: 0;
-    background: rgba(18,18,28,0.95);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 12px;
-    padding: 12px 24px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    z-index: 100;
-    transition: all 0.4s cubic-bezier(.2,.8,.2,1);
-    pointer-events: none;
-  }
-
-  .now-playing.visible {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-    pointer-events: auto;
-  }
-
-  .np-label {
-    font-size: 9px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--hud-dim);
-  }
-
-  .np-title {
-    font-family: var(--sans);
-    font-size: 14px;
-    font-weight: 600;
-  }
-
-  .np-voice {
-    font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-weight: 500;
-  }
-  .np-voice.uk { background: rgba(99,102,241,0.2); color: var(--voice-uk); }
-  .np-voice.us { background: rgba(245,158,11,0.2); color: var(--voice-us); }
-
-  /* ========== LOADING ========== */
-  .loading-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.85);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 200;
-    transition: opacity 0.4s;
-  }
-
-  .loading-overlay.hidden {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .loader {
-    width: 44px;
-    height: 44px;
-    border: 3px solid rgba(255,255,255,0.15);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin-bottom: 20px;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .loading-text { 
-    font-size: 12px; 
-    color: var(--hud-dim); 
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-  }
-
-  /* ========== ERROR STATE ========== */
-  .error-msg {
-    position: fixed;
-    top: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(220,38,38,0.9);
-    color: white;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 13px;
-    z-index: 300;
-    display: none;
-  }
-
-  .error-msg.show { display: block; animation: shake 0.4s; }
-
-  @keyframes shake {
-    0%, 100% { transform: translateX(-50%); }
-    25% { transform: translateX(calc(-50% + 8px)); }
-    75% { transform: translateX(calc(-50% - 8px)); }
-  }
-
-  /* ========== HELP TIP ========== */
-  .help-tip {
-    position: absolute;
-    bottom: 180px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 11px;
-    color: var(--hud-dim);
-    letter-spacing: 0.1em;
-    opacity: 0;
-    transition: opacity 0.6s;
-    white-space: nowrap;
-  }
-
-  .help-tip.show { opacity: 1; }
-
-  .help-tip kbd {
-    display: inline-block;
-    padding: 3px 8px;
-    border: 1px solid var(--hud-dim);
-    border-radius: 4px;
-    font-size: 10px;
-    margin: 0 3px;
-    font-family: var(--mono);
-  }
-
-  @media (max-width: 600px) {
-    .controls { padding: 20px 24px 28px; gap: 14px; }
-    .play-btn { width: 48px; height: 48px; }
-    .icon { font-size: 64px; }
-    .nav-btn { width: 38px; height: 38px; }
-    .subtitle { max-width: 90%; }
-    .now-playing { left: 16px; right: 16px; transform: translateY(-20px); }
-    .now-playing.visible { transform: translateY(0); }
-  }
+@media(max-width:600px){
+  .container{padding:24px 16px}
+  .clip-card{padding:20px}
+  .clip-header{flex-direction-column;align-items:flex-start}
+  .play-btn{width:48px;height:48px}
+}
 </style>
 </head>
 <body>
 
-<div class="app" id="app">
-
-  <!-- Loading Overlay -->
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="loader"></div>
-    <div class="loading-text">Loading Voice Narration</div>
+<div class="container">
+  <div class="header">
+    <h1>🎙️ SciCMP Portfolio Shorts</h1>
+    <p>Research paper clips with native voice narrations — British RP & American accents</p>
   </div>
 
-  <!-- Error Message -->
-  <div class="error-msg" id="errorMsg"></div>
+  <div class="clips-grid" id="clipsGrid"></div>
 
-  <!-- Main Display -->
-  <div class="display helios" id="display">
-    <div class="icon" id="icon">☀️</div>
-    <h1 class="title" id="title">Helios Tandem</h1>
-    <p class="subtitle" id="subtitle">Advanced photovoltaic tandem cell architecture achieving record efficiency through novel materials integration.</p>
-    <div class="voice-badge" id="voiceBadge">
-      <span class="dot uk" id="voiceDot"></span>
-      <span id="voiceLabel"><span class="voice-accent voice-uk-text">British RP</span> · jam</span>
-    </div>
+  <div class="footer">
+    Click PLAY on any clip to hear the voice narration<br>
+    🇬🇧 British RP (jam) · 🇺🇸 American Standard (kazi)
   </div>
-
-  <!-- HUD Top -->
-  <div class="hud-top">
-    <div style="display:flex;gap:10px;align-items:center;">
-      <span class="badge" style="background:rgba(0,212,170,0.15);color:var(--accent);border-color:var(--accent);">SciCMP</span>
-      <span class="badge" id="idBadge">P12</span>
-      <span style="font-size:11px;color:var(--hud-dim);" id="counter">1 / 7</span>
-    </div>
-    <button class="status-btn" id="statusBtn" onclick="togglePlay()">
-      <span class="status-dot" id="statusDot"></span>
-      <span id="statusLabel">PLAY</span>
-    </button>
-  </div>
-
-  <!-- Navigation -->
-  <div class="nav-left"><button class="nav-btn" onclick="prevClip()" aria-label="Previous clip">‹</button></div>
-  <div class="nav-right"><button class="nav-btn" onclick="nextClip()" aria-label="Next clip">›</button></div>
-
-  <!-- Clip Dots -->
-  <div class="clip-dots" id="dots"></div>
-
-  <!-- Now Playing Bar -->
-  <div class="now-playing" id="nowPlaying">
-    <div>
-      <div class="np-label">Now Playing — Voice Narration</div>
-      <div class="np-title" id="npTitle">Helios Tandem</div>
-    </div>
-    <div class="np-voice uk" id="npVoice">British RP</div>
-  </div>
-
-  <!-- Controls -->
-  <div class="controls">
-    <button class="play-btn" id="mainPlayBtn" onclick="togglePlay()" aria-label="Play/Pause">
-      <svg viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>
-    </button>
-    <div class="progress-container">
-      <div class="progress-bar" id="progressBar" onclick="seek(event)">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
-      <div class="time-row">
-        <span id="curTime">0:00</span>
-        <span id="durTime">0:00</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Help Tip -->
-  <div class="help-tip" id="helpTip">
-    <kbd>←</kbd><kbd>→</kbd> Navigate &nbsp;|&nbsp; <kbd>Space</kbd> Play/Pause Voice
-  </div>
-
 </div>
 
-<!-- Audio Element for Voice Narration Playback -->
-<audio id="audioPlayer" preload="auto" crossorigin="anonymous"></audio>
+<audio id="mainAudio" preload="auto" style="display:none"></audio>
 
 <script>
-// ============================================================
-// RESEARCH CLIPS WITH NATIVE VOICE NARRATIONS
-// Audio files contain REAL British RP and American voices
-// ============================================================
-
 const BASE = '/DemoSciCMP';
 
-const clips = [
+// All clips with their voice narrations
+const CLIPS = [
   {
     id: 'P12',
-    name: 'Helios Tandem',
-    desc: 'Advanced photovoltaic tandem cell architecture achieving record efficiency through novel materials integration.',
+    name: 'Helios Tandem Photovoltaics',
     icon: '☀️',
-    bgClass: 'helios',
+    desc: 'Advanced photovoltaic tandem cell architecture achieving record efficiency through novel materials integration and multi-junction design optimization.',
     voiceType: 'uk',
-    voiceAccent: 'British RP',
-    voiceArtist: 'jam',
-    audio: `${BASE}/audio/portfolio-shorts/P12_jam.wav`
+    voiceLabel: 'British RP',
+    artist: 'jam',
+    audioUrl: `${BASE}/audio/portfolio-shorts/P12_jam.wav`
   },
   {
     id: 'P-AI',
-    name: 'Lattice Forge',
-    desc: 'AI-accelerated discovery of next-generation lattice materials for quantum computing applications.',
+    name: 'Lattice Forge — AI Materials Discovery',
     icon: '🔬',
-    bgClass: 'lattice',
+    desc: 'AI-accelerated discovery of next-generation lattice materials for quantum computing applications using deep learning models.',
     voiceType: 'us',
-    voiceAccent: 'American Standard',
-    voiceArtist: 'kazi',
-    audio: `${BASE}/audio/portfolio-shorts/P-ai-materials_kazi.wav`
+    voiceLabel: 'American Standard',
+    artist: 'kazi',
+    audioUrl: `${BASE}/audio/portfolio-shorts/P-ai-materials_kazi.wav`
   },
   {
     id: 'P11',
-    name: 'Carbon Sink',
-    desc: 'Novel carbon capture methodology using bio-engineered microorganisms for industrial emissions reduction.',
+    name: 'Carbon Sink Bioengineering',
     icon: '🌿',
-    bgClass: 'carbon',
+    desc: 'Novel carbon capture methodology using bio-engineered microorganisms for industrial emissions reduction at scale.',
     voiceType: 'us',
-    voiceAccent: 'American Natural',
-    voiceArtist: 'douji',
-    audio: `${BASE}/audio/portfolio-shorts/P11_douji.wav`
+    voiceLabel: 'American Natural',
+    artist: 'douji',
+    audioUrl: `${BASE}/audio/portfolio-shorts/P11_douji.wav`
   },
   {
     id: 'P3',
-    name: 'Solid State Labs',
-    desc: 'Breakthrough in solid-state electrolyte conductivity enabling next-gen battery performance.',
+    name: 'Solid State Battery Labs',
     icon: '🔋',
-    bgClass: 'solid',
+    desc: 'Breakthrough in solid-state electrolyte conductivity enabling next-generation battery performance and safety improvements.',
     voiceType: 'us',
-    voiceAccent: 'American Standard',
-    voiceArtist: 'kazi',
-    audio: `${BASE}/audio/portfolio-shorts/P3_kazi.wav`
+    voiceLabel: 'American Standard',
+    artist: 'kazi',
+    audioUrl: `${BASE}/audio/portfolio-shorts/P3_kazi.wav`
   },
   {
     id: 'P5',
-    name: 'Hydrogen Forge',
-    desc: 'Green hydrogen production via photocatalytic water splitting at industrial scale feasibility.',
+    name: 'Hydrogen Forge Production',
     icon: '💧',
-    bgClass: 'hydrogen',
+    desc: 'Green hydrogen production via photocatalytic water splitting at industrial scale feasibility with novel catalyst designs.',
     voiceType: 'uk',
-    voiceAccent: 'British RP',
-    voiceArtist: 'jam',
-    audio: `${BASE}/audio/portfolio-shorts/P5_jam.wav`
+    voiceLabel: 'British RP',
+    artist: 'jam',
+    audioUrl: `${BASE}/audio/portfolio-shorts/P5_jam.wav`
   },
   {
     id: 'P9',
-    name: 'TMD Logic',
-    desc: 'Transition metal dichalcogenide logic gates for post-silicon computing architectures.',
+    name: 'TMD Logic Gates',
     icon: '💻',
-    bgClass: 'tmd',
+    desc: 'Transition metal dichalcogenide logic gates for post-silicon computing architectures with ultra-low power consumption.',
     voiceType: 'uk',
-    voiceAccent: 'British RP',
-    voiceArtist: 'jam',
-    audio: `${BASE}/audio/portfolio-shorts/P9_jam.wav`
+    voiceLabel: 'British RP',
+    artist: 'jam',
+    audioUrl: `${BASE}/audio/portfolio-shorts/P9_jam.wav`
   },
   {
     id: 'P-CMOS',
-    name: 'Atomic Gate Systems',
-    desc: 'Sub-2nm CMOS transistor design overcoming quantum tunneling limitations.',
+    name: 'Atomic Gate CMOS Systems',
     icon: '⚛️',
-    bgClass: 'atomic',
+    desc: 'Sub-2nm CMOS transistor design overcoming quantum tunneling limitations through novel gate architecture.',
     voiceType: 'us',
-    voiceAccent: 'American Standard',
-    voiceArtist: 'kazi',
-    audio: `${BASE}/audio/portfolio-shorts/P-cmos-2nm_kazi.wav`
+    voiceLabel: 'American Standard',
+    artist: 'kazi',
+    audioUrl: `${BASE}/audio/portfolio-shorts/P-cmos-2nm_kazi.wav`
   }
 ];
 
-// ============================================================
-// STATE
-// ============================================================
-
-let current = 0;
+let currentClipIndex = -1;
 let isPlaying = false;
 let progressInterval = null;
 
-// DOM Elements
-const audioPlayer = document.getElementById('audioPlayer');
-const display = document.getElementById('display');
-const mainPlayBtn = document.getElementById('mainPlayBtn');
-const progressFill = document.getElementById('progressFill');
-const loadingOverlay = document.getElementById('loadingOverlay');
-const nowPlayingBar = document.getElementById('nowPlaying');
+const audioEl = document.getElementById('mainAudio');
+const grid = document.getElementById('clipsGrid');
 
-// ============================================================
-// INITIALIZATION
-// ============================================================
-
+// Initialize
 function init() {
-  console.log('🎙️ SciCMP Portfolio Shorts — Voice Narration Player');
-  console.log('📁 Audio base path:', BASE);
-  console.log('🎬 Total clips:', clips.length);
+  renderClips();
   
-  initDots();
-  goToClip(0);
-  
-  // Hide loading after initial setup
-  setTimeout(() => {
-    loadingOverlay.classList.add('hidden');
-  }, 800);
-  
-  // Show help tip briefly
-  setTimeout(() => {
-    document.getElementById('helpTip').classList.add('show');
-  }, 1200);
-  setTimeout(() => {
-    document.getElementById('helpTip').classList.remove('show');
-  }, 5000);
-}
-
-// ============================================================
-// DOT NAVIGATION
-// ============================================================
-
-function initDots() {
-  const container = document.getElementById('dots');
-  container.innerHTML = '';
-  clips.forEach((clip, i) => {
-    const dot = document.createElement('button');
-    dot.className = `clip-dot${i === 0 ? ' active' : ''}`;
-    dot.title = `${clip.name} (${clip.voiceAccent})`;
-    dot.onclick = () => goToClip(i);
-    dot.setAttribute('aria-label', `Go to ${clip.name}`);
-    container.appendChild(dot);
-  });
-}
-
-// ============================================================
-// CLIP NAVIGATION
-// ============================================================
-
-function goToClip(idx) {
-  if (idx < 0 || idx >= clips.length) return;
-  
-  const wasPlaying = isPlaying;
-  
-  // Stop current audio
-  stopAudio();
-  
-  // Fade out transition
-  display.style.opacity = '0';
-  
-  setTimeout(() => {
-    current = idx;
-    const clip = clips[idx];
-    
-    // Update visual content
-    updateDisplay(clip, idx);
-    
-    // Fade in
-    display.style.opacity = '1';
-    
-    // Load and optionally play audio
-    loadAudio(clip.audio, wasPlaying);
-    
-  }, 300);
-}
-
-function updateDisplay(clip, idx) {
-  // Text content
-  document.getElementById('icon').textContent = clip.icon;
-  document.getElementById('title').textContent = clip.name;
-  document.getElementById('subtitle').textContent = clip.desc;
-  document.getElementById('idBadge').textContent = clip.id;
-  document.getElementById('counter').textContent = `${idx + 1} / ${clips.length}`;
-  
-  // Voice badge with accent coloring
-  const voiceDot = document.getElementById('voiceDot');
-  voiceDot.className = `dot ${clip.voiceType}`;
-  
-  const voiceLabel = document.getElementById('voiceLabel');
-  const accentClass = clip.voiceType === 'uk' ? 'voice-uk-text' : 'voice-us-text';
-  voiceLabel.innerHTML = `<span class="voice-accent ${accentClass}">${clip.voiceAccent}</span> · ${clip.voiceArtist}`;
-  
-  // Background theme
-  display.className = `display ${clip.bgClass}`;
-  
-  // Update dots
-  document.querySelectorAll('.clip-dot').forEach((d, i) => {
-    d.classList.toggle('active', i === idx);
+  audioEl.addEventListener('ended', () => {
+    setPlayState(false);
   });
   
-  // Update now playing bar
-  document.getElementById('npTitle').textContent = clip.name;
-  const npVoice = document.getElementById('npVoice');
-  npVoice.textContent = clip.voiceAccent;
-  npVoice.className = `np-voice ${clip.voiceType}`;
+  audioEl.addEventListener('timeupdate', updateProgress);
+  audioEl.addEventListener('canplaythrough', () => {
+    if(currentClipIndex >= 0) updateStatus(currentClipIndex, 'ready');
+  });
+  audioEl.addEventListener('error', (e) => {
+    console.error('Audio error:', e);
+    if(currentClipIndex >= 0) updateStatus(currentClipIndex, 'error');
+  });
+  
+  console.log('✅ Voice Narration Player loaded');
+  console.log(`📦 ${CLIPS.length} clips available`);
 }
 
-function nextClip() { goToClip((current + 1) % clips.length); }
-function prevClip() { goToClip((current - 1 + clips.length) % clips.length); }
-
-// ============================================================
-// AUDIO PLAYBACK
-// ============================================================
-
-function loadAudio(url, autoPlay = false) {
-  console.log('🔊 Loading audio:', url);
-  
-  // Show brief loading state
-  showLoading(true);
-  
-  // Reset progress
-  progressFill.style.width = '0%';
-  document.getElementById('curTime').textContent = '0:00';
-  document.getElementById('durTime').textContent = '0:00';
-  
-  // Set new source
-  audioPlayer.src = url;
-  audioPlayer.load();
-  
-  audioPlayer.oncanplaythrough = () => {
-    console.log('✅ Audio ready:', url);
-    console.log('   Duration:', audioPlayer.duration, 'seconds');
-    showLoading(false);
-    document.getElementById('durTime').textContent = formatTime(audioPlayer.duration);
-    
-    if (autoPlay) {
-      playAudio();
-    }
-  };
-  
-  audioPlayer.onerror = (e) => {
-    console.error('❌ Audio load error:', e);
-    console.error('   Code:', audioPlayer.error?.code);
-    console.error('   Message:', audioPlayer.error?.message);
-    showError(`Failed to load audio: ${audioPlayer.error?.message || 'Unknown error'}`);
-    showLoading(false);
-  };
+function renderClips() {
+  grid.innerHTML = CLIPS.map((clip, i) => `
+    <div class="clip-card" data-index="${i}" id="card-${i}">
+      <div class="clip-header">
+        <div class="clip-icon">${clip.icon}</div>
+        <div class="clip-info">
+          <h2>${clip.name}</h2>
+          <span class="clip-id">${clip.id}</span>
+        </div>
+      </div>
+      <p class="clip-desc">${clip.desc}</p>
+      <div class="voice-tag ${clip.voiceType}">
+        <span class="voice-dot"></span>
+        ${clip.voiceType === 'uk' ? '🇬🇧' : '🇺🇸'} ${clip.voiceLabel} · ${clip.artist}
+      </div>
+      <div class="audio-controls" style="margin-top:18px">
+        <button class="play-btn primary" onclick="togglePlayback(${i})" aria-label="Play">
+          <svg viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>
+        </button>
+        <div class="progress-wrap">
+          <div class="progress-bar" onclick="seekAudio(event, ${i})">
+            <div class="progress-fill" id="progress-${i}"></div>
+          </div>
+          <div class="time-display">
+            <span id="time-${i}">0:00</span>
+            <span id="dur-${i}">--:--</span>
+          </div>
+        </div>
+        <div class="status ready" id="status-${i}">Ready</div>
+      </div>
+    </div>
+  `).join('');
 }
 
-function togglePlay() {
-  if (!audioPlayer.src || audioPlayer.src === window.location.href) {
-    showError('No audio loaded. Please select a clip.');
+function togglePlayback(index) {
+  // If clicking same clip that's playing, pause it
+  if(index === currentClipIndex && isPlaying) {
+    pauseAudio();
     return;
   }
   
-  if (isPlaying) {
-    pauseAudio();
-  } else {
-    playAudio();
+  // If different clip, load new one
+  if(index !== currentClipIndex) {
+    // Reset previous card
+    if(currentClipIndex >= 0) {
+      document.querySelector(`#card-${currentClipIndex}`).classList.remove('active');
+      const prevBtn = document.querySelector(`#card-${currentClipIndex} .play-btn`);
+      prevBtn.classList.remove('playing');
+      prevBtn.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>';
+    }
+    
+    currentClipIndex = index;
+    const clip = CLIPS[index];
+    
+    console.log(`🎵 Loading: ${clip.name}`);
+    console.log(`   Voice: ${clip.voiceLabel} (${clip.artist})`);
+    console.log(`   URL: ${clip.audioUrl}`);
+    
+    audioEl.src = clip.audioUrl;
+    audioEl.load();
+    
+    // Highlight card
+    document.querySelectorAll('.clip-card').forEach(c => c.classList.remove('active'));
+    document.getElementById(`card-${index}`).classList.add('active');
   }
+  
+  // Play
+  playAudio();
 }
 
 function playAudio() {
-  const promise = audioPlayer.play();
+  const promise = audioEl.play();
   
-  if (promise !== undefined) {
+  if(promise !== undefined) {
     promise.then(() => {
-      console.log('▶️ Playing:', clips[current].name);
-      setPlayingState(true);
+      setPlayState(true);
+      console.log('▶️ Playing:', CLIPS[currentClipIndex].name);
     }).catch(err => {
-      console.error('⚠️ Play prevented:', err.name, err.message);
-      if (err.name === 'NotAllowedError') {
-        showError('Click PLAY to enable audio playback');
-      } else {
-        showError(`Playback error: ${err.message}`);
-      }
+      console.warn('Autoplay blocked, click button again:', err.name);
     });
   }
 }
 
 function pauseAudio() {
-  audioPlayer.pause();
-  setPlayingState(false);
-  console.log('⏸ Paused');
+  audioEl.pause();
+  setPlayState(false);
 }
 
-function stopAudio() {
-  audioPlayer.pause();
-  audioPlayer.currentTime = 0;
-  setPlayingState(false);
-}
-
-function setPlayingState(playing) {
+function setPlayState(playing) {
   isPlaying = playing;
   
-  // Update play button
-  mainPlayBtn.classList.toggle('playing', playing);
-  mainPlayBtn.innerHTML = playing
-    ? '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>'
-    : '<svg viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>';
+  if(currentClipIndex < 0) return;
   
-  // Update status button
-  const statusDot = document.getElementById('statusDot');
-  const statusLabel = document.getElementById('statusLabel');
-  
-  if (playing) {
-    statusDot.classList.add('active');
-    statusLabel.textContent = 'REC';
-    document.getElementById('voiceDot').classList.add('playing');
-    nowPlayingBar.classList.add('visible');
-    startProgressTracking();
+  const btn = document.querySelector(`#card-${currentClipIndex} .play-btn`);
+  if(playing) {
+    btn.classList.add('playing');
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+    updateStatus(currentClipIndex, 'playing');
   } else {
-    statusDot.classList.remove('active');
-    statusLabel.textContent = 'PLAY';
-    document.getElementById('voiceDot').classList.remove('playing');
-    nowPlayingBar.classList.remove('visible');
-    stopProgressTracking();
+    btn.classList.remove('playing');
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>';
+    updateStatus(currentClipIndex, 'ready');
   }
 }
 
-// ============================================================
-// PROGRESS TRACKING
-// ============================================================
-
-function startProgressTracking() {
-  stopProgressTracking();
-  progressInterval = setInterval(updateProgress, 100);
-}
-
-function stopProgressTracking() {
-  if (progressInterval) {
-    clearInterval(progressInterval);
-    progressInterval = null;
-  }
+function updateStatus(index, state) {
+  const el = document.getElementById(`status-${index}`);
+  if(!el) return;
+  el.className = `status ${state}`;
+  el.textContent = state.charAt(0).toUpperCase() + state.slice(1);
 }
 
 function updateProgress() {
-  if (audioPlayer.duration && !isNaN(audioPlayer.duration)) {
-    const pct = (audioPlayer.currentTime / audioPlayer.duration) * 100;
-    progressFill.style.width = `${pct}%`;
-    document.getElementById('curTime').textContent = formatTime(audioPlayer.currentTime);
-  }
+  if(currentClipIndex < 0 || !audioEl.duration) return;
+  
+  const pct = (audioEl.currentTime / audioEl.duration) * 100;
+  const fill = document.getElementById(`progress-${currentClipIndex}`);
+  const timeEl = document.getElementById(`time-${currentClipIndex}`);
+  const durEl = document.getElementById(`dur-${currentClipIndex}`);
+  
+  if(fill) fill.style.width = `${pct}%`;
+  if(timeEl) timeEl.textContent = formatTime(audioEl.currentTime);
+  if(durEl && audioEl.duration) durEl.textContent = formatTime(audioEl.duration);
 }
 
-function seek(e) {
-  const bar = document.getElementById('progressBar');
+function seekAudio(e, index) {
+  if(index !== currentClipIndex) togglePlayback(index);
+  
+  const bar = e.currentTarget;
   const rect = bar.getBoundingClientRect();
   const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
   
-  if (audioPlayer.duration && !isNaN(audioPlayer.duration)) {
-    audioPlayer.currentTime = pct * audioPlayer.duration;
-    progressFill.style.width = `${pct * 100}%`;
+  if(audioEl.duration) {
+    audioEl.currentTime = pct * audioEl.duration;
   }
 }
 
-// ============================================================
-// TIME FORMATTING
-// ============================================================
-
-function formatTime(seconds) {
-  if (!seconds || isNaN(seconds)) return '0:00';
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, '0')}`;
+function formatTime(s) {
+  if(!s || isNaN(s)) return '0:00';
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return `${m}:${sec.toString().padStart(2,'0')}`;
 }
 
-// ============================================================
-// UI HELPERS
-// ============================================================
-
-function showLoading(show) {
-  if (show) {
-    loadingOverlay.classList.remove('hidden');
-  } else {
-    loadingOverlay.classList.add('hidden');
-  }
-}
-
-function showError(msg) {
-  const el = document.getElementById('errorMsg');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 4000);
-}
-
-// ============================================================
-// KEYBOARD CONTROLS
-// ============================================================
-
-document.addEventListener('keydown', e => {
-  switch(e.key) {
-    case 'ArrowLeft':
-      e.preventDefault();
-      prevClip();
-      break;
-    case 'ArrowRight':
-      e.preventDefault();
-      nextClip();
-      break;
-    case ' ':
-      e.preventDefault();
-      togglePlay();
-      break;
-  }
-});
-
-// ============================================================
-// AUDIO EVENTS
-// ============================================================
-
-audioPlayer.addEventListener('ended', () => {
-  console.log('🏁 Clip ended, advancing...');
-  setPlayingState(false);
-  setTimeout(nextClip, 800);
-});
-
-audioPlayer.addEventListener('timeupdate', () => {
-  // Additional timeupdate handling if needed
-});
-
-// ============================================================
-// START APPLICATION
-// ============================================================
-
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
-
+// Start
+init();
 </script>
+
 </body>
 </html>
