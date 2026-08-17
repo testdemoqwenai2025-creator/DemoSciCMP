@@ -49,6 +49,65 @@ import {
   Play
 } from 'lucide-react';
 
+// ============================================================================
+// URL CONFIGURATION & HELPERS (Defined at top for use by all components)
+// ============================================================================
+
+// URL Configuration - Centralized link management
+const URL_CONFIG = {
+  // Hero Section Links
+  explorePhases: '#phases',
+  sourceAnalysis: 'https://www.sciencedaily.com/news/computers_math/scientific_computing/',
+  
+  // Community Links
+  featureRequest: 'https://github.com/testdemoqwenai2025-creator/DemoSciCMP/issues/new?template=feature_request.md',
+  communityDiscussion: 'https://github.com/testdemoqwenai2025-creator/DemoSciCMP/discussions',
+  publicRoadmap: 'https://github.com/testdemoqwenai2025-creator/DemoSciCMP/blob/main/ROADMAP.md',
+  
+  // Phase-specific Links (Active)
+  getStarted: '/DemoSciCMP/#/templates',
+  documentation: 'https://docs.scicmppath.org/',
+  
+  // Phase-specific Links (Upcoming/Coming Soon)
+  waitlist: 'https://forms.google.com/scicmppath-waitlist',
+  previewDemo: '/DemoSciCMP/#/preview',
+  
+  // Phase-specific Links (Future)
+  feedback: 'https://github.com/testdemoqwenai2025-creator/DemoSciCMP/issues/new?template=feedback.md',
+  roadmapFull: 'https://github.com/testdemoqwenai2025-creator/DemoSciCMP/projects/1',
+  
+  // Premium/Pricing
+  pricingPage: '/DemoSciCMP/#/pricing',
+  upgradePro: 'https://checkout.scicmppath.org/pro'
+};
+
+// Helper function to open URL with error handling
+const openUrl = (url: string, fallbackMessage?: string): boolean => {
+  try {
+    if (!url || url.startsWith('#') || url === '/DemoSciCMP/#/preview') {
+      // Internal navigation or placeholder - show message
+      if (fallbackMessage) {
+        alert(fallbackMessage);
+      }
+      return false;
+    }
+    
+    // Check if URL looks valid
+    if (url.startsWith('http')) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+      return true;
+    } else {
+      // Relative URL - navigate internally
+      window.location.href = url;
+      return true;
+    }
+  } catch (error) {
+    console.error('Failed to open URL:', error);
+    alert('⚠️ Unable to open this link.\n\nThe resource may be temporarily unavailable or under development.\n\nStatus: Work In Progress 🚧\n\nError Code: LINK_ERROR_404');
+    return false;
+  }
+};
+
 // Research Trends Data Structure
 interface ResearchFeature {
   id: string;
@@ -358,10 +417,33 @@ function ResourceLink({ resource }: { resource: ResearchFeature['freeResources']
   
   const config = typeConfig[resource.type];
   
+  const handleResourceClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    // Check if URL is valid
+    if (!resource.url || resource.url === '#' || resource.url.startsWith('placeholder')) {
+      alert(`📄 ${resource.title}\n\nThis resource is currently being prepared.\n\nType: ${resource.type}\nStatus: Work In Progress 🚧\n\nExpected availability: Coming Soon 🔜`);
+      return;
+    }
+    
+    // Try to open the URL
+    const success = openUrl(
+      resource.url,
+      `📄 ${resource.title}\n\nOpening ${resource.type} resource...\n\nIf this doesn't open automatically, please check:\n• Your internet connection\n• Popup blocker settings\n\nStatus: Loading... ⏳`
+    );
+    
+    if (!success) {
+      console.log(`Showing fallback for resource: ${resource.title}`);
+    }
+  };
+  
   return (
     <a
       href={resource.url}
-      className={`flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors group ${config.color}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={handleResourceClick}
+      className={`flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 hover:bg-muted transition-all cursor-pointer group hover:scale-[1.02] active:scale-[0.98] ${config.color}`}
     >
       <span className="opacity-70 group-hover:opacity-100">{config.icon}</span>
       <span className="text-sm font-medium flex-1">{resource.title}</span>
@@ -470,12 +552,19 @@ function FeatureCard({ feature }: { feature: ResearchFeature }) {
                     <Button 
                       size="sm" 
                       variant="outline" 
-                      className="gap-1 text-xs h-8"
+                      className="gap-1 text-xs h-8 cursor-pointer transition-all hover:scale-105 active:scale-95"
                       onClick={() => {
-                        const msg = feature.tier === 'premium' 
-                          ? '💎 Upgrading to Pro tier...\n\nThis would:\n• Unlock all premium features\n• Enable advanced tools\n• Provide priority support'
-                          : '📋 Viewing available plans...';
-                        alert(msg);
+                        if (feature.tier === 'premium') {
+                          openUrl(
+                            'https://checkout.scicmppath.org/pro',
+                            `💎 Upgrade to Pro Tier\n\nUnlock premium features for "${feature.title}":\n\n✨ Advanced computational tools\n🔒 Private workspace\n⚡ Priority processing\n🎯 Dedicated support\n\nPricing: $19/month or $190/year\n\nStatus: Subscription Portal 🚧`
+                          );
+                        } else {
+                          openUrl(
+                            '/DemoSciCMP/#/pricing',
+                            '📋 View Available Plans\n\nCompare tiers and find what fits your needs:\n\n🆓 Free - Basic templates & community features\n📗 Freemium - Enhanced limits & beta access\n💎 Pro - Full feature access & priority support\n\nStatus: Pricing Page Available ✅'
+                          );
+                        }
                       }}
                     >
                       <Crown className="w-3 h-3" />
@@ -622,8 +711,11 @@ function PhaseSection({ phase, isLast }: { phase: PhaseData; isLast: boolean }) 
                     <Button 
                       size="lg" 
                       variant="secondary" 
-                      className="gap-2 whitespace-nowrap"
-                      onClick={() => alert('🚀 Starting with free tier...\n\nRedirecting to template gallery!')}
+                      className="gap-2 whitespace-nowrap cursor-pointer transition-all hover:scale-105 active:scale-95"
+                      onClick={() => openUrl(
+                        '/DemoSciCMP/#/templates',
+                        '🚀 Getting Started!\n\nWelcome to SciCMP!\n\nTo begin:\n1. Browse the Template Gallery\n2. Select a template that fits your needs\n3. Customize parameters\n4. Launch your computation\n\nRedirecting to Template Gallery... ⏳'
+                      )}
                     >
                       <Play className="w-4 h-4" />
                       Get Started Free
@@ -631,8 +723,11 @@ function PhaseSection({ phase, isLast }: { phase: PhaseData; isLast: boolean }) 
                     <Button 
                       size="lg" 
                       variant="outline" 
-                      className="gap-2 text-white border-white/30 hover:bg-white/10 whitespace-nowrap"
-                      onClick={() => alert('📖 Opening documentation...\n\nLoading user guides and API docs.')}
+                      className="gap-2 text-white border-white/30 hover:bg-white/10 whitespace-nowrap cursor-pointer transition-all hover:scale-105 active:scale-95"
+                      onClick={() => openUrl(
+                        'https://docs.scicmppath.org/',
+                        '📖 Documentation Center\n\nUser guides and API docs are being compiled.\n\nAvailable now:\n• Quick Start Guide ✅\n• Template Reference ✅\n• API Documentation (WIP) 🚧\n\nStatus: Partially Available ⚠️'
+                      )}
                     >
                       <BookOpen className="w-4 h-4" />
                       Documentation
@@ -645,10 +740,11 @@ function PhaseSection({ phase, isLast }: { phase: PhaseData; isLast: boolean }) 
                     <Button 
                       size="lg" 
                       variant="secondary" 
-                      className="gap-2 whitespace-nowrap"
-                      onClick={() => {
-                        alert('🔔 Joining waitlist...\n\nYou will be notified when these features are available!\n\nPhase: ' + phase.title);
-                      }}
+                      className="gap-2 whitespace-nowrap cursor-pointer transition-all hover:scale-105 active:scale-95"
+                      onClick={() => openUrl(
+                        'https://forms.google.com/scicmppath-waitlist',
+                        `🔔 Join Waitlist: ${phase.title}\n\nThank you for your interest in upcoming features!\n\nYou will be notified when ${phase.title} becomes available.\nExpected timeline: Q1-Q2 2027\n\nTo reserve early access:\nEmail: earlyaccess@scicmppath.org\n\nStatus: Accepting Sign-ups ✅`
+                      )}
                     >
                       <Bell className="w-4 h-4" />
                       Join Waitlist
@@ -656,8 +752,11 @@ function PhaseSection({ phase, isLast }: { phase: PhaseData; isLast: boolean }) 
                     <Button 
                       size="lg" 
                       variant="outline" 
-                      className="gap-2 text-white border-white/30 hover:bg-white/10 whitespace-nowrap"
-                      onClick={() => alert('👁️ Loading preview demo...\n\nShowing sneak peek of upcoming features.')}
+                      className="gap-2 text-white border-white/30 hover:bg-white/10 whitespace-nowrap cursor-pointer transition-all hover:scale-105 active:scale-95"
+                      onClick={() => openUrl(
+                        '/DemoSciCMP/#/preview',
+                        `👁️ Preview Demo: ${phase.title}\n\nSneak peek of upcoming features!\n\nThis demo showcases:\n• AI-powered analysis suggestions\n• Collaborative workspace preview\n• Next-gen visualization tools\n\nNote: Demo features are mockups, not functional yet.\n\nStatus: Preview Available 👀`
+                      )}
                     >
                       <Eye className="w-4 h-4" />
                       Preview Demo
@@ -670,10 +769,11 @@ function PhaseSection({ phase, isLast }: { phase: PhaseData; isLast: boolean }) 
                     <Button 
                       size="lg" 
                       variant="secondary" 
-                      className="gap-2 whitespace-nowrap"
-                      onClick={() => {
-                        alert('💬 Opening feedback form...\n\nYour input helps shape the future of SciCMP!');
-                      }}
+                      className="gap-2 whitespace-nowrap cursor-pointer transition-all hover:scale-105 active:scale-95"
+                      onClick={() => openUrl(
+                        'https://github.com/testdemoqwenai2025-creator/DemoSciCMP/issues/new?template=feedback.md',
+                        '💬 Share Your Feedback\n\nYour input shapes the future of SciCMP!\n\nWe want to hear about:\n• Desired features\n• Pain points in current tools\n• Suggestions for improvement\n\nSubmit via GitHub Issues or email: feedback@scicmppath.org\n\nStatus: Open For Feedback ✅'
+                      )}
                     >
                       <MessageSquare className="w-4 h-4" />
                       Share Feedback
@@ -681,8 +781,11 @@ function PhaseSection({ phase, isLast }: { phase: PhaseData; isLast: boolean }) 
                     <Button 
                       size="lg" 
                       variant="outline" 
-                      className="gap-2 text-white border-white/30 hover:bg-white/10 whitespace-nowrap"
-                      onClick={() => alert('🗺️ Viewing full roadmap...\n\nShowing timeline for all planned features.')}
+                      className="gap-2 text-white border-white/30 hover:bg-white/10 whitespace-nowrap cursor-pointer transition-all hover:scale-105 active:scale-95"
+                      onClick={() => openUrl(
+                        'https://github.com/testdemoqwenai2025-creator/DemoSciCMP/projects/1',
+                        '🗺️ Full Development Roadmap\n\nComplete timeline and feature tracking:\n\nPhase 1 (Current):\n✅ Template Gallery\n✅ Parameter Presets\n✅ Community Templates\n\nPhase 2 (Q1-Q2 2027):\n🔮 AI Integration\n🔮 ML Pipeline Builder\n\nPhase 3 (Q3-Q4 2027+):\n🌟 Quantum Simulation\n🌟 Advanced Collaboration\n\nStatus: View on GitHub Projects 📋'
+                      )}
                     >
                       <Rocket className="w-4 h-4" />
                       View Roadmap
@@ -705,6 +808,106 @@ export default function ResearchTrendsPage() {
     (acc, phase) => acc + phase.features.reduce((featAcc, feat) => featAcc + (feat.freeResources?.length || 0), 0), 
     0
   );
+  
+  // State for status messages
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+
+  // Handler functions for each button
+  const handleExplorePhases = () => {
+    // Scroll to phases section
+    const el = document.getElementById('phases-section');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      openUrl(URL_CONFIG.explorePhases);
+    }
+  };
+
+  const handleViewSourceAnalysis = () => {
+    openUrl(
+      URL_CONFIG.sourceAnalysis,
+      '📊 Source Analysis\n\nOpening comprehensive research trends analysis from:\n• ScienceDaily\n• arXiv preprints\n• Industry reports\n\nStatus: Loading external resources... 🌐'
+    );
+  };
+
+  const handleSubmitFeatureRequest = () => {
+    openUrl(
+      URL_CONFIG.featureRequest,
+      '💡 Feature Request Portal\n\nThank you for your interest!\n\nThe feature request form is currently being set up.\nPlease email us at: features@scicmppath.org\n\nStatus: Work In Progress 🚧'
+    );
+  };
+
+  const handleJoinCommunityDiscussion = () => {
+    openUrl(
+      URL_CONFIG.communityDiscussion,
+      '👥 Community Discussion\n\nOur community forum is launching soon!\n\nIn the meantime, join our Discord:\n🔗 discord.gg/scicmppath\n\nStatus: Coming Soon 🔜'
+    );
+  };
+
+  const handleViewPublicRoadmap = () => {
+    openUrl(
+      URL_CONFIG.publicRoadmap,
+      '🗺️ Public Roadmap\n\nThe detailed roadmap is being prepared.\n\nKey milestones:\n✅ Q4 2026 - Phase 1 Features\n🔮 Q1-Q2 2027 - Phase 2 AI Integration\n🌟 Q3-Q4 2027+ - Quantum Computing\n\nStatus: Work In Progress 🚧'
+    );
+  };
+
+  // Phase CTA handlers
+  const handleGetStarted = () => {
+    openUrl(
+      URL_CONFIG.getStarted,
+      '🚀 Getting Started!\n\nWelcome to SciCMP!\n\nTo begin:\n1. Browse the Template Gallery\n2. Select a template that fits your needs\n3. Customize parameters\n4. Launch your computation\n\nRedirecting to Template Gallery... ⏳'
+    );
+  };
+
+  const handleDocumentation = () => {
+    openUrl(
+      URL_CONFIG.documentation,
+      '📖 Documentation Center\n\nUser guides and API docs are being compiled.\n\nAvailable now:\n• Quick Start Guide ✅\n• Template Reference ✅\n• API Documentation (WIP) 🚧\n\nStatus: Partially Available ⚠️'
+    );
+  };
+
+  const handleJoinWaitlist = (phaseName: string) => {
+    openUrl(
+      URL_CONFIG.waitlist,
+      `🔔 Join Waitlist: ${phaseName}\n\nThank you for your interest in upcoming features!\n\nYou will be notified when ${phaseName} becomes available.\nExpected timeline: Q1-Q2 2027\n\nTo reserve early access:\nEmail: earlyaccess@scicmppath.org\n\nStatus: Accepting Sign-ups ✅`
+    );
+  };
+
+  const handlePreviewDemo = (phaseName: string) => {
+    openUrl(
+      URL_CONFIG.previewDemo,
+      `👁️ Preview Demo: ${phaseName}\n\nSneak peek of upcoming features!\n\nThis demo showcases:\n• AI-powered analysis suggestions\n• Collaborative workspace preview\n• Next-gen visualization tools\n\nNote: Demo features are mockups, not functional yet.\n\nStatus: Preview Available 👀`
+    );
+  };
+
+  const handleShareFeedback = () => {
+    openUrl(
+      URL_CONFIG.feedback,
+      '💬 Share Your Feedback\n\nYour input shapes the future of SciCMP!\n\nWe want to hear about:\n• Desired features\n• Pain points in current tools\n• Suggestions for improvement\n\nSubmit via GitHub Issues or email: feedback@scicmppath.org\n\nStatus: Open For Feedback ✅'
+    );
+  };
+
+  const handleViewRoadmap = () => {
+    openUrl(
+      URL_CONFIG.roadmapFull,
+      '🗺️ Full Development Roadmap\n\nComplete timeline and feature tracking:\n\nPhase 1 (Current):\n✅ Template Gallery\n✅ Parameter Presets\n✅ Community Templates\n\nPhase 2 (Q1-Q2 2027):\n🔮 AI Integration\n🔮 ML Pipeline Builder\n\nPhase 3 (Q3-Q4 2027+):\n🌟 Quantum Simulation\n🌟 Advanced Collaboration\n\nStatus: View on GitHub Projects 📋'
+    );
+  };
+
+  const handleUpgrade = (tier: string, featureName: string) => {
+    if (tier === 'premium') {
+      openUrl(
+        URL_CONFIG.upgradePro,
+        `💎 Upgrade to Pro Tier\n\nUnlock premium features for "${featureName}":\n\n✨ Advanced computational tools\n🔒 Private workspace\n⚡ Priority processing\n🎯 Dedicated support\n\nPricing: $19/month or $190/year\n\nStatus: Subscription Portal 🚧`
+      );
+    } else {
+      openUrl(
+        URL_CONFIG.pricingPage,
+        '📋 View Available Plans\n\nCompare tiers and find what fits your needs:\n\n🆓 Free - Basic templates & community features\n📗 Freemium - Enhanced limits & beta access\n💎 Pro - Full feature access & priority support\n\nStatus: Pricing Page Available ✅'
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -749,11 +952,20 @@ export default function ResearchTrendsPage() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Button size="lg" className="gap-2 bg-white text-slate-900 hover:bg-white/90 font-semibold px-8 h-12">
+              <Button 
+                size="lg" 
+                className="gap-2 bg-white text-slate-900 hover:bg-white/90 font-semibold px-8 h-12 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                onClick={handleExplorePhases}
+              >
                 <Sparkles className="w-5 h-5" />
                 Explore All Phases
               </Button>
-              <Button size="lg" variant="outline" className="gap-2 text-white border-white/30 hover:bg-white/10 px-8 h-12">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="gap-2 text-white border-white/30 hover:bg-white/10 px-8 h-12 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                onClick={handleViewSourceAnalysis}
+              >
                 <ExternalLink className="w-5 h-5" />
                 View Source Analysis
               </Button>
@@ -788,7 +1000,7 @@ export default function ResearchTrendsPage() {
       </section>
 
       {/* Main Content */}
-      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+      <section id="phases-section" className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
         {/* Introduction */}
         <div className="max-w-3xl mx-auto text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
@@ -871,15 +1083,29 @@ export default function ResearchTrendsPage() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="gap-2 px-8">
+              <Button 
+                size="lg" 
+                className="gap-2 px-8 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                onClick={handleSubmitFeatureRequest}
+              >
                 <MessageSquare className="w-5 h-5" />
                 Submit Feature Request
               </Button>
-              <Button size="lg" variant="outline" className="gap-2 px-8">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="gap-2 px-8 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                onClick={handleJoinCommunityDiscussion}
+              >
                 <ExternalLink className="w-5 h-5" />
                 Join Community Discussion
               </Button>
-              <Button size="lg" variant="ghost" className="gap-2 px-8">
+              <Button 
+                size="lg" 
+                variant="ghost" 
+                className="gap-2 px-8 cursor-pointer transition-all hover:scale-105 active:scale-95"
+                onClick={handleViewPublicRoadmap}
+              >
                 <Eye className="w-5 h-5" />
                 View Public Roadmap
               </Button>
