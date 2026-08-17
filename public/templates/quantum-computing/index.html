@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Computing Lab | SciCMPMATH Studio</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0f; color: #e4e4e7; min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(15, 15, 25, 0.95); backdrop-filter: blur(20px);
+            padding: 12px 24px; display: flex; justify-content: space-between;
+            align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .nav-left { display: flex; align-items: center; gap: 32px; }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; text-decoration: none; color: #e4e4e7; }
+        .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .nav-links { display: flex; gap: 28px; }
+        .nav-link { color: #a1a1aa; text-decoration: none; font-size: 14px; transition: color 0.2s; }
+        .nav-link:hover, .nav-link.active { color: #fff; }
+        .nav-right { display: flex; align-items: center; gap: 16px; }
+
+        .btn {
+            padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 500;
+            cursor: pointer; transition: all 0.2s; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px; border: none;
+        }
+        .btn-primary { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4); }
+        .btn-secondary { background: transparent; color: #22d3ee; border: 1px solid rgba(34, 211, 238, 0.3); }
+        .btn-secondary:hover { background: rgba(34, 211, 238, 0.1); border-color: #22d3ee; }
+        .btn-ide { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); color: white; position: relative; overflow: hidden; }
+        .btn-ide::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s; }
+        .btn-ide:hover::before { left: 100%; }
+        .btn-ide:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 10px 30px rgba(6, 182, 212, 0.5); }
+        .btn-home { background: rgba(255,255,255,0.05); color: #a1a1aa; border: 1px solid rgba(255,255,255,0.1); }
+        .btn-home:hover { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.2); }
+
+        .hero { padding: 80px 24px 60px; text-align: center; background: radial-gradient(ellipse at top, rgba(139, 92, 246, 0.15), transparent 60%); position: relative; overflow: hidden; }
+        .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle at 25% 35%, rgba(139, 92, 246, 0.3) 0%, transparent 50%), radial-gradient(circle at 75% 65%, rgba(124, 58, 237, 0.3) 0%, transparent 50%); animation: pulse-bg 10s ease-in-out infinite; }
+        @keyframes pulse-bg { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        
+        .badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.2); border-radius: 50px; font-size: 13px; color: #a78bfa; margin-bottom: 24px; position: relative; z-index: 1; }
+        .badge-dot { width: 8px; height: 8px; background: #a78bfa; border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } }
+        
+        .hero h1 { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800; margin-bottom: 20px; line-height: 1.1; position: relative; z-index: 1; }
+        .gradient-text { background: linear-gradient(135deg, #a78bfa 0%, #22d3ee 50%, #f472b6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero p { font-size: 18px; color: #a1a1aa; max-width: 700px; margin: 0 auto 40px; line-height: 1.7; position: relative; z-index: 1; }
+        .hero-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 60px 24px; }
+        .section-title { font-size: 2rem; font-weight: 700; margin-bottom: 16px; text-align: center; }
+        .section-subtitle { color: #a1a1aa; text-align: center; max-width: 600px; margin: 0 auto 48px; font-size: 16px; }
+
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 80px; }
+        .feature-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 28px; transition: all 0.3s; }
+        .feature-card:hover { background: rgba(255,255,255,0.05); border-color: rgba(139, 92, 246, 0.3); transform: translateY(-4px); }
+        .feature-icon { width: 48px; height: 48px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(124, 58, 237, 0.2)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 16px; }
+        .feature-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 10px; }
+        .feature-card p { color: #a1a1aa; font-size: 14px; line-height: 1.6; }
+
+        .workflow { background: rgba(255,255,255,0.02); border-radius: 20px; padding: 48px; margin-bottom: 80px; border: 1px solid rgba(255,255,255,0.08); }
+        .steps-container { display: flex; flex-direction: column; gap: 24px; margin-top: 40px; }
+        .step { display: flex; gap: 20px; align-items: flex-start; }
+        .step-number { width: 44px; height: 44px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; flex-shrink: 0; }
+        .step-content h4 { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+        .step-content p { color: #a1a1aa; font-size: 14px; line-height: 1.6; }
+        .step-command { background: #18181b; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px 16px; margin-top: 10px; font-family: 'Monaco', 'Consolas', monospace; font-size: 13px; color: #a78bfa; overflow-x: auto; }
+
+        .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 60px; padding: 40px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(124, 58, 237, 0.1)); border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #a78bfa, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .stat-label { color: #a1a1aa; font-size: 14px; margin-top: 4px; }
+
+        .cta-section { text-align: center; padding: 80px 24px; background: radial-gradient(ellipse at bottom, rgba(139, 92, 246, 0.15), transparent 70%); }
+        .cta-section h2 { font-size: 2.5rem; font-weight: 700; margin-bottom: 16px; }
+        .cta-section p { color: #a1a1aa; font-size: 18px; margin-bottom: 32px; max-width: 500px; margin-left: auto; margin-right: auto; }
+
+        footer { background: rgba(15, 15, 25, 0.95); border-top: 1px solid rgba(255,255,255,0.08); padding: 40px 24px; text-align: center; color: #71717a; font-size: 14px; }
+        footer a { color: #22d3ee; text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        .breadcrumb { display: flex; align-items: center; gap: 8px; padding: 16px 24px; background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; color: #71717a; }
+        .breadcrumb a { color: #a1a1aa; text-decoration: none; transition: color 0.2s; }
+        .breadcrumb a:hover { color: #a78bfa; }
+        .breadcrumb-separator { color: #3f3f46; }
+        .breadcrumb-current { color: #a78bfa; font-weight: 500; }
+
+        .floating-nav { position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; gap: 12px; z-index: 99; }
+        .float-btn { width: 56px; height: 56px; border-radius: 16px; background: rgba(15, 15, 25, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); color: #a1a1aa; font-size: 20px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+        .float-btn:hover { background: rgba(139, 92, 246, 0.2); border-color: rgba(139, 92, 246, 0.4); color: #a78bfa; transform: translateY(-4px); }
+
+        @media (max-width: 768px) { .nav-links { display: none; } .stats-bar { grid-template-columns: repeat(2, 1fr); } .workflow { padding: 24px; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="/DemoSciCMP/" class="logo"><div class="logo-icon">🔬</div><span>SciCMPMATH</span></a>
+            <div class="nav-links">
+                <a href="/DemoSciCMP/" class="nav-link">Home</a>
+                <a href="/DemoSciCMP/#/templates" class="nav-link active">Templates</a>
+                <a href="/DemoSciCMP/templates/quantum-computing/index.html" class="nav-link">Quantum</a>
+                <a href="/DemoSciCMP/templates/machine-learning.html" class="nav-link">ML Hub</a>
+            </div>
+        </div>
+        <div class="nav-right">
+            <button onclick="goHome()" class="btn btn-home">🏠 Home</button>
+            <button onclick="openStudioIDE()" class="btn btn-ide">⌥ Open in Studio IDE</button>
+            <a href="https://github.com/testdemoqwenai2025-creator/DemoSciCMP" target="_blank" class="btn btn-secondary">GitHub →</a>
+        </div>
+    </nav>
+
+    <div class="breadcrumb">
+        <a href="/DemoSciCMP/">Home</a><span class="breadcrumb-separator">›</span>
+        <a href="/DemoSciCMP/#/templates">Templates</a><span class="breadcrumb-separator">›</span>
+        <span class="breadcrumb-current">Quantum Computing Lab</span>
+    </div>
+
+    <section class="hero">
+        <div class="badge"><span class="badge-dot"></span>Quantum Computing • Qubits • Algorithms</div>
+        <h1>Quantum Computing <span class="gradient-text">Lab</span></h1>
+        <p>Explore quantum algorithms, simulate qubit behavior, and design quantum circuits. From Grover's search to Shor's factoring with interactive visualizations.</p>
+        <div class="hero-buttons">
+            <button onclick="launchTemplate('qubit')" class="btn btn-primary">⚛️ Qubit Simulator</button>
+            <button onclick="launchTemplate('circuit')" class="btn btn-primary">🔌 Circuit Designer</button>
+            <button onclick="launchTemplate('algorithm')" class="btn btn-primary">🧮 Algorithm Library</button>
+            <button onclick="openStudioIDE()" class="btn btn-ide">⌥ Studio IDE</button>
+        </div>
+    </section>
+
+    <main class="container">
+        <h2 class="section-title">Quantum Computing Workflows</h2>
+        <p class="section-subtitle">Simulate and explore quantum phenomena with professional-grade tools.</p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">⚛️</div>
+                <h3>Qubit Simulator</h3>
+                <p>Full state-vector simulation of quantum systems. Visualize Bloch spheres, measure superposition states, and track decoherence.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔌</div>
+                <h3>Circuit Designer</h3>
+                <p>Visual quantum circuit builder with drag-and-drop gates. Export to QASM, OpenQASM, or connect to real hardware via Qiskit.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🧮</div>
+                <h3>Algorithm Library</h3>
+                <p>Pre-built implementations of Grover, Shor, VQE, QAOA, and more. Step-by-step execution with intermediate state visualization.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Noise Modeling</h3>
+                <p>Realistic noise simulation including depolarizing, amplitude damping, and gate errors for near-term device emulation.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔗</div>
+                <h3>Hardware Integration</h3>
+                <p>Connect to IBM Quantum, Rigetti, IonQ, or AWS Braket. Job submission, queue monitoring, and result retrieval.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📚</div>
+                <h3>Educational Modules</h3>
+                <p>Interactive tutorials on quantum mechanics basics, entanglement, teleportation, and quantum error correction.</p>
+            </div>
+        </div>
+
+        <div class="workflow">
+            <h2 class="section-title">Quick Start: Quantum Algorithm Workflow</h2>
+            <p class="section-subtitle">From concept to results in 5 quantum steps.</p>
+
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Initialize Quantum Circuit</h4>
+                        <p>Create qubit registers, define classical bits for measurement, set up the quantum backend.</p>
+                        <div class="step-command"># Initialize circuit with Qiskit
+from qiskit import QuantumCircuit, Aer, execute
+qc = QuantumCircuit(2, 2)  # 2 qubits, 2 classical bits
+# Circuit initialized in |00⟩ state</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Apply Quantum Gates</h4>
+                        <p>Add Hadamard, CNOT, phase rotation, and custom unitary operations to create quantum algorithms.</p>
+                        <div class="step-command"># Create Bell State
+qc.h(0)           # Hadamard on qubit 0
+qc.cx(0, 1)        # CNOT: control=0, target=1
+# Result: |Φ⁺⟩ = (|00⟩ + |11⟩)/√2</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Visualize Circuit</h4>
+                        <p>Generate circuit diagram, check gate count and depth, verify connectivity constraints.</p>
+                        <div class="step-command"># Visualize the circuit
+print(qc.draw())
+# Output:
+#      ┌───┐     
+# q_0: ┤ H ├──■──
+#      └───┘┌─┴─┐
+# q_1: ─────┤ X ├
+#           └───┘</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Execute & Measure</h4>
+                        <p>Run on simulator or real quantum hardware. Configure shots, add measurement error mitigation.</p>
+                        <div class="step-command"># Execute simulation
+qc.measure([0, 1], [0, 1])
+backend = Aer.get_backend('qasm_simulator')
+job = execute(qc, backend, shots=1024)
+result = job.result()
+counts = result.get_counts()</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>Analyze Results</h4>
+                        <p>Process measurement statistics, calculate probabilities, visualize on Bloch sphere or histogram.</p>
+                        <div class="step-command"># Analyze results
+from qiskit.visualization import plot_histogram
+plot_histogram(counts)
+# Expected: {'00': ~512, '11': ~512}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item"><div class="stat-value">100+</div><div class="stat-label">Gate Types</div></div>
+            <div class="stat-item"><div class="stat-value">&lt;1min</div><div class="stat-label">Simulation Time</div></div>
+            <div class="stat-item"><div class="stat-value">99%</div><div class="stat-label">Fidelity</div></div>
+            <div class="stat-item"><div class="stat-value">4</div><div class="stat-label">Hardware Backends</div></div>
+        </div>
+    </main>
+
+    <section class="cta-section">
+        <h2>Ready to Explore Quantum Computing?</h2>
+        <p>Launch any quantum workflow or explore our full template gallery.</p>
+        <div class="hero-buttons">
+            <button onclick="openStudioIDE()" class="btn btn-primary">🚀 Launch in Studio IDE</button>
+            <a href="/DemoSciCMP/templates/data-science/index.html" class="btn btn-secondary">View Data Science Templates →</a>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 SciCMPMATH by Endeavor Science | Made with ⚛️ for Quantum Research</p>
+        <p style="margin-top: 8px;">
+            <a href="/DemoSciCMP/">Home</a> • 
+            <a href="/DemoSciCMP/studio.html">Studio IDE</a> • 
+            <a href="/DemoSciCMP/templates/data-science/index.html">Data Science</a> • 
+            <a href="https://github.com/testdemoqwenai2025-creator/DemoSciCMP">GitHub</a>
+        </p>
+    </footer>
+
+    <div class="floating-nav">
+        <button onclick="goHome()" class="float-btn" title="Return to Home">🏠</button>
+        <button onclick="scrollToTop()" class="float-btn" title="Back to Top">↑</button>
+    </div>
+
+    <script>
+        function goHome() { window.location.href = '/DemoSciCMP/'; }
+        function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function openStudioIDE() { window.open('/DemoSciCMP/studio.html', '_blank', 'noopener,noreferrer'); showNotification('Opening Studio IDE... 🖥️'); }
+        function launchTemplate(type) { showNotification(`🚀 Launching ${type} template...\n\nStatus: Ready to configure in Studio IDE`); }
+        
+        function showNotification(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, #1e293b, #334155); color: white; padding: 16px 24px; border-radius: 12px; border: 1px solid rgba(167, 139, 250, 0.3); box-shadow: 0 10px 40px rgba(0,0,0,0.3); z-index: 9999; font-family: system-ui, sans-serif; font-size: 14px; max-width: 350px; animation: slideIn 0.3s ease-out; white-space: pre-line;`;
+            toast.textContent = message; document.body.appendChild(toast);
+            setTimeout(() => { toast.style.animation = 'slideOut 0.3s ease-in forwards'; setTimeout(() => toast.remove(), 300); }, 4000);
+        }
+        const style = document.createElement('style');
+        style.textContent = `@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } } @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }`;
+        document.head.appendChild(style);
+        console.log('Quantum Computing Lab Loaded | SciCMPMATH Studio Ready ✅');
+    </script>
+</body>
+</html>
