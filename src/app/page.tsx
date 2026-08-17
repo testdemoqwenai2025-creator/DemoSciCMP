@@ -6,6 +6,7 @@ import SciCMPHeader from '@/components/SciCMP/Header';
 import SciCMPFooter from '@/components/SciCMP/Footer';
 import LoginModal from '@/components/SciCMP/LoginModal';
 import { useAuthStore } from '@/lib/auth-store';
+import { useThemeStore } from '@/lib/theme-store';
 
 // Dynamic imports for code splitting
 const LandingPage = dynamic(() => import('@/components/SciCMP/LandingPage'), {
@@ -46,18 +47,10 @@ type PageId = 'landing' | 'dashboard' | 'features' | 'template-gallery' | 'ml-re
 
 export default function HomePage() {
   const [currentPage, setCurrentPage] = useState<PageId>('landing');
-  // Initialize dark mode from localStorage or default to dark
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('scicmp-theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      return savedTheme ? savedTheme === 'dark' : prefersDark || true;
-    }
-    return true; // Default to dark for SSR
-  });
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { setShowLoginModal } = useAuthStore();
+  const { setShowLoginModal, handleGithubCallback } = useAuthStore();
+  const { themeMode, resolvedTheme, setThemeMode } = useThemeStore();
 
   const handleNavigate = useCallback((pageId: string) => {
     if (pageId === currentPage) return;
@@ -73,35 +66,50 @@ export default function HomePage() {
     }, 150);
   }, [currentPage]);
 
-  const toggleDarkMode = useCallback(() => {
-    setIsDarkMode(prev => {
-      const newValue = !prev;
-      // Persist theme preference
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('scicmp-theme', newValue ? 'dark' : 'light');
-        document.documentElement.classList.toggle('dark', newValue);
-      }
-      return newValue;
-    });
-  }, []);
-
-  // Apply dark mode class to document on mount and when theme changes
+  // Handle GitHub OAuth callback on mount
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', isDarkMode);
-  }, [isDarkMode]);
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('code') && urlParams.has('state')) {
+      // We have an OAuth callback - process it
+      handleGithubCallback().then((success) => {
+        if (!success) {
+          console.warn('GitHub OAuth callback handling failed or was cancelled');
+        }
+      });
+    }
+  }, [handleGithubCallback]);
 
-  // Keyboard navigation
+  // Listen for system theme changes when in 'auto' mode
+  useEffect(() => {
+    if (themeMode !== 'auto') return;
+    
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const handleChange = () => {
+      setThemeMode('auto'); // Re-resolve and apply
+    };
+    
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [themeMode, setThemeMode]);
+
+  // Apply theme to document on mount and when theme changes
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', resolvedTheme);
+  }, [resolvedTheme]);
+
+  // Keyboard navigation for theme cycling
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'd') {
         e.preventDefault();
-        toggleDarkMode();
+        useThemeStore.getState().cycleTheme();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [toggleDarkMode]);
+  }, []);
 
   const handleOpenLoginModal = useCallback(() => {
     setShowLoginModal(true);
@@ -131,14 +139,12 @@ export default function HomePage() {
   };
 
   return (
-    <div className={`${isDarkMode ? 'dark' : ''}`}>
+    <div className={`${resolvedTheme ? 'dark' : ''}`}>
       <div className="min-h-screen bg-background text-foreground flex flex-col">
         {/* Header */}
         <SciCMPHeader 
           currentPage={currentPage}
           onNavigate={handleNavigate}
-          isDarkMode={isDarkMode}
-          onToggleDarkMode={toggleDarkMode}
           isMobileMenuOpen={isMobileMenuOpen}
           onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           onOpenLoginModal={handleOpenLoginModal}

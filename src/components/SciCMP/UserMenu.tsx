@@ -20,6 +20,7 @@ import {
   Building2,
   ChevronDown,
   Shield,
+  Github,
 } from 'lucide-react';
 
 export default function UserMenu() {
@@ -120,7 +121,13 @@ export default function UserMenu() {
               <p className="text-xs text-muted-foreground truncate">{user.email}</p>
               <div className="flex items-center gap-2 mt-1.5">
                 {getPlanBadge(user.plan)}
-                {user.institution && (
+                {user.githubLogin && (
+                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-muted text-xs font-medium text-muted-foreground">
+                    <Github className="w-3 h-3" />
+                    @{user.githubLogin}
+                  </span>
+                )}
+                {user.institution && !user.githubLogin && (
                   <span className="text-xs text-muted-foreground truncate">
                     {user.institution}
                   </span>

@@ -1,5 +1,17 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import {
+  generatePKCE,
+  buildAuthUrl,
+  storeOAuthData,
+  getOAuthData,
+  clearOAuthData,
+  parseOAuthCallback,
+  exchangeCodeForToken,
+  fetchGitHubUser,
+  fetchGitHubEmails,
+  GITHUB_OAUTH_CONFIG
+} from './github-oauth';
 
 export interface User {
   id: string;
@@ -10,12 +22,17 @@ export interface User {
   institution?: string;
   plan: 'free' | 'pro' | 'enterprise';
   joinedAt: Date;
+  // GitHub-specific fields
+  githubId?: number;
+  githubLogin?: string;
+  accessToken?: string;
 }
 
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isGithubLoading: boolean;
   showLoginModal: boolean;
   
   // Actions
@@ -23,6 +40,10 @@ interface AuthState {
   logout: () => void;
   setShowLoginModal: (show: boolean) => void;
   updateProfile: (data: Partial<User>) => void;
+  
+  // GitHub OAuth Actions
+  initiateGithubLogin: () => Promise<void>;
+  handleGithubCallback: () => Promise<boolean>;
 }
 
 // Demo users for testing
@@ -61,6 +82,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
       isLoading: false,
+      isGithubLoading: false,
       showLoginModal: false,
 
       login: async (email: string, password: string): Promise<boolean> => {
@@ -86,6 +108,8 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
+        // Clear GitHub OAuth data on logout
+        clearOAuthData();
         set({
           user: null,
           isAuthenticated: false,
@@ -100,6 +124,114 @@ export const useAuthStore = create<AuthState>()(
         const currentUser = get().user;
         if (currentUser) {
           set({ user: { ...currentUser, ...data } });
+        }
+      },
+
+      /**
+       * Initiate GitHub OAuth Login Flow
+       * Uses PKCE for security - no server required
+       */
+      initiateGithubLogin: async () => {
+        set({ isGithubLoading: true });
+        
+        try {
+          // Generate PKCE pair
+          const { codeVerifier, codeChallenge } = await generatePKCE();
+          
+          // Generate state parameter for CSRF protection
+          const state = crypto.randomUUID();
+          
+          // Store in sessionStorage for callback verification
+          storeOAuthData(GITHUB_OAUTH_CONFIG.STORAGE_KEYS.CODE_VERIFIER, codeVerifier);
+          storeOAuthData(GITHUB_OAUTH_CONFIG.STORAGE_KEYS.STATE, state);
+          
+          // Build and redirect to GitHub authorization URL
+          const authUrl = buildAuthUrl(codeChallenge, state);
+          window.location.href = authUrl;
+        } catch (error) {
+          console.error('GitHub OAuth initiation failed:', error);
+          set({ isGithubLoading: false });
+          throw error;
+        }
+      },
+
+      /**
+       * Handle GitHub OAuth Callback
+       * Called when user returns from GitHub authorization
+       */
+      handleGithubCallback: async (): Promise<boolean> => {
+        const { code, state, error } = parseOAuthCallback(window.location.href);
+        
+        // Check for errors
+        if (error) {
+          console.error('OAuth error:', error);
+          set({ isGithubLoading: false });
+          return false;
+        }
+        
+        if (!code || !state) {
+          set({ isGithubLoading: false });
+          return false;
+        }
+        
+        // Verify state matches (CSRF protection)
+        const storedState = getOAuthData(GITHUB_OAUTH_CONFIG.STORAGE_KEYS.STATE);
+        if (state !== storedState) {
+          console.error('State mismatch - possible CSRF attack');
+          set({ isGithubLoading: false });
+          return false;
+        }
+        
+        // Get stored code verifier
+        const codeVerifier = getOAuthData(GITHUB_OAUTH_CONFIG.STORAGE_KEYS.CODE_VERIFIER);
+        if (!codeVerifier) {
+          console.error('Code verifier not found');
+          set({ isGithubLoading: false });
+          return false;
+        }
+        
+        try {
+          // Exchange code for access token
+          const accessToken = await exchangeCodeForToken(code, codeVerifier);
+          
+          // Fetch user profile from GitHub
+          const githubUser = await fetchGitHubUser(accessToken);
+          const email = await fetchGitHubEmails(accessToken);
+          
+          // Create user object from GitHub data
+          const user: User = {
+            id: `github_${githubUser.id}`,
+            email: email || `${githubUser.login}@users.noreply.github.com`,
+            name: githubUser.name || githubUser.login,
+            avatar: githubUser.avatar_url,
+            role: 'user', // Default role, can be upgraded
+            institution: githubUser.company || undefined,
+            plan: 'free', // Free tier by default
+            joinedAt: new Date(),
+            githubId: githubUser.id,
+            githubLogin: githubUser.login,
+            accessToken: accessToken, // Store for API calls
+          };
+          
+          // Update state with authenticated user
+          set({
+            user,
+            isAuthenticated: true,
+            isGithubLoading: false,
+            showLoginModal: false,
+          });
+          
+          // Clean up OAuth data
+          clearOAuthData();
+          
+          // Clean URL (remove code and state params)
+          window.history.replaceState({}, document.title, window.location.pathname);
+          
+          return true;
+        } catch (error) {
+          console.error('GitHub callback handling failed:', error);
+          set({ isGithubLoading: false });
+          return false;
         }
       },
     }),

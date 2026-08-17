@@ -22,7 +22,8 @@ import {
   AlertCircle,
   CheckCircle,
   Github,
-  Chrome
+  Chrome,
+  ExternalLink
 } from 'lucide-react';
 
 export default function LoginModal() {
@@ -31,7 +32,9 @@ export default function LoginModal() {
     setShowLoginModal,
     login,
     isLoading,
+    isGithubLoading,
     isAuthenticated,
+    initiateGithubLogin,
   } = useAuthStore();
 
   // Form state - use a key to reset instead of useEffect
@@ -233,13 +236,26 @@ export default function LoginModal() {
               <Button
                 type="button"
                 variant="outline"
-                className="h-11"
-                onClick={() => {
-                  setError('GitHub Sign-In coming soon!');
+                className="h-11 relative"
+                onClick={async () => {
+                  try {
+                    setError('');
+                    await initiateGithubLogin();
+                  } catch (err) {
+                    setError('GitHub login failed. Please try again.');
+                  }
                 }}
+                disabled={isGithubLoading}
               >
-                <Github className="mr-2 h-5 w-5" />
-                GitHub
+                {isGithubLoading ? (
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                ) : (
+                  <Github className="mr-2 h-5 w-5" />
+                )}
+                {isGithubLoading ? 'Connecting...' : 'GitHub'}
+                {!isGithubLoading && (
+                  <ExternalLink className="ml-1 h-3 w-3 opacity-50" />
+                )}
               </Button>
             </div>
 

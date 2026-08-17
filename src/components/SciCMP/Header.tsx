@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/lib/auth-store';
+import { useThemeStore, type ThemeMode } from '@/lib/theme-store';
 import UserMenu from './UserMenu';
 import { 
   Menu, 
   X, 
   Sun, 
   Moon, 
+  Monitor,
   FlaskConical, 
   ChevronDown,
   Github,
@@ -22,8 +24,6 @@ import {
 interface HeaderProps {
   currentPage: string;
   onNavigate: (pageId: string) => void;
-  isDarkMode: boolean;
-  onToggleDarkMode: () => void;
   isMobileMenuOpen: boolean;
   onToggleMobileMenu: () => void;
   onOpenLoginModal: () => void;
@@ -43,13 +43,12 @@ const navItems = [
 export default function Header({
   currentPage,
   onNavigate,
-  isDarkMode,
-  onToggleDarkMode,
   isMobileMenuOpen,
   onToggleMobileMenu,
   onOpenLoginModal,
 }: HeaderProps) {
   const { isAuthenticated } = useAuthStore();
+  const { themeMode, cycleTheme, resolvedTheme } = useThemeStore();
   const [isScrolled, setIsScrolled] = useState(false);
 
   // Handle scroll effect
@@ -110,23 +109,39 @@ export default function Header({
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-2">
-            {/* Theme Toggle - Enhanced */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onToggleDarkMode}
-              className="rounded-full relative overflow-hidden group hover:bg-accent transition-all duration-300"
-              aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
-              title={`${isDarkMode ? 'Light' : 'Dark'} Mode (Ctrl+D)`}
-            >
-              <div className={`relative w-5 h-5 transition-transform duration-300 ${isDarkMode ? 'rotate-0' : 'rotate-180'}`}>
-                {isDarkMode ? (
-                  <Sun className="h-5 w-5 text-yellow-400 group-hover:scale-110 transition-transform" />
-                ) : (
-                  <Moon className="h-5 w-5 text-slate-700 group-hover:scale-110 transition-transform" />
-                )}
+            {/* Theme Toggle - 3-State (Light/Dark/Auto) */}
+            <div className="relative group">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={cycleTheme}
+                className="rounded-full relative overflow-hidden group hover:bg-accent transition-all duration-300"
+                aria-label={`Theme: ${themeMode}. Click to switch.`}
+                title={`Theme: ${themeMode.charAt(0).toUpperCase() + themeMode.slice(1)} mode (Ctrl+D to cycle)`}
+              >
+                <div className="relative w-5 h-5 transition-all duration-300">
+                  {themeMode === 'light' ? (
+                    <Sun className="h-5 w-5 text-amber-500 group-hover:scale-110 transition-transform" />
+                  ) : themeMode === 'dark' ? (
+                    <Moon className="h-5 w-5 text-indigo-400 group-hover:scale-110 transition-transform" />
+                  ) : (
+                    <Monitor className="h-5 w-5 text-emerald-500 group-hover:scale-110 transition-transform" />
+                  )}
+                </div>
+              </Button>
+              
+              {/* Tooltip showing current mode */}
+              <div className="absolute top-full right-0 mt-2 px-2 py-1 bg-popover border rounded-md shadow-lg text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                <span className={
+                  themeMode === 'light' ? 'text-amber-500' :
+                  themeMode === 'dark' ? 'text-indigo-400' : 'text-emerald-500'
+                }>
+                  {themeMode === 'auto' ? '🖥️ Auto (System)' : 
+                   themeMode === 'dark' ? '🌙 Dark Mode' : '☀️ Light Mode'}
+                </span>
+                <span className="text-muted-foreground ml-1">• Click to change</span>
               </div>
-            </Button>
+            </div>
 
             {/* Auth Section: User Menu or Login Button */}
             {isAuthenticated ? (
