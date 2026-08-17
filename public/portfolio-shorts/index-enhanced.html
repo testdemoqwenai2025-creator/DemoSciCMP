@@ -776,23 +776,26 @@ async function switchClip(index) {
   loadAudio(clip.file);
 }
 
-async function loadAudio(src) {
+function loadAudio(src) {
   loadingEl.classList.add('show');
   stopPlayback();
   
-  try {
-    audioPlayer.src = src;
-    await audioPlayer.load();
-    
-    audioPlayer.addEventListener('loadeddata', () => {
-      loadingEl.classList.remove('show');
-      totalTimeEl.textContent = formatTime(audioPlayer.duration);
-    }, { once: true });
-    
-  } catch (err) {
-    console.error('Audio load error:', err);
+  // Set source and load
+  audioPlayer.src = src;
+  audioPlayer.load();
+  
+  // Handle successful load
+  audioPlayer.oncanplaythrough = function() {
     loadingEl.classList.remove('show');
-  }
+    totalTimeEl.textContent = formatTime(audioPlayer.duration);
+    console.log('Audio loaded:', src);
+  };
+  
+  // Handle errors
+  audioPlayer.onerror = function(e) {
+    console.error('Audio error:', e, audioPlayer.error);
+    loadingEl.classList.remove('show');
+  };
 }
 
 // ============================================================
@@ -800,12 +803,24 @@ async function loadAudio(src) {
 // ============================================================
 
 function togglePlay() {
-  if (!audioPlayer.src) return;
+  if (!audioPlayer.src || audioPlayer.error) {
+    console.log('No audio source or error, reloading...');
+    const clip = clips[currentIndex];
+    if (clip && clip.file) {
+      loadAudio(clip.file);
+      // Try playing after a short delay
+      setTimeout(() => {
+        audioPlayer.play().then(() => startPlayback()).catch(e => console.error('Play error:', e));
+      }, 500);
+    }
+    return;
+  }
   
   if (isPlaying) {
     audioPlayer.pause();
+    stopPlayback();
   } else {
-    audioPlayer.play().catch(console.error);
+    audioPlayer.play().then(() => startPlayback()).catch(e => console.error('Play error:', e));
   }
 }
 
