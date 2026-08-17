@@ -6,14 +6,10 @@
 <title>Research Portfolio Shorts — SciCMP</title>
 <style>
   :root {
-    --bg: #0a0a0f;
-    --card: rgba(18, 18, 28, 0.9);
-    --border: rgba(255,255,255,0.1);
-    --text: #e8e8ed;
-    --text-dim: rgba(232,232,237,0.5);
-    --accent: #00d4aa;
-    --accent-dim: rgba(0,212,170,0.15);
+    --hud: #ffffff;
+    --hud-dim: rgba(255,255,255,0.45);
     --rec: #ff3b30;
+    --accent: #00d4aa;
     --voice-uk: #6366f1;
     --voice-us: #f59e0b;
     --mono: 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
@@ -25,81 +21,34 @@
   html, body {
     width: 100%;
     height: 100%;
-    background: var(--bg);
-    font-family: var(--sans);
-    color: var(--text);
-    overflow-x: hidden;
-  }
-
-  /* ========== Main Container ========== */
-  .app {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* ========== Header ========== */
-  .header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    padding: 16px 24px;
-    background: rgba(10,10,15,0.85);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-weight: 700;
-    font-size: 18px;
-    letter-spacing: -0.02em;
-  }
-  
-  .logo-icon {
-    width: 32px;
-    height: 32px;
-    background: linear-gradient(135deg, var(--accent), #00a080);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-  }
-  
-  .header-meta {
-    font-size: 12px;
-    color: var(--text-dim);
+    background: #000;
+    overflow: hidden;
     font-family: var(--mono);
+    color: var(--hud);
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
   }
 
-  /* ========== Hero / Player Section ========== */
-  .player-section {
+  /* ========== VIEWFINDER CONTAINER ========== */
+  .viewfinder {
     position: relative;
-    width: 100%;
-    aspect-ratio: 16/9;
-    max-height: 70vh;
+    width: 100vw;
+    height: 100vh;
     background: #000;
     overflow: hidden;
   }
 
-  .video-container {
-    width: 100%;
-    height: 100%;
-    position: relative;
+  /* ========== VIDEO STAGE ========== */
+  .stage {
+    position: absolute;
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0f 70%);
+    z-index: 1;
   }
 
-  /* Placeholder visual for research paper */
-  .paper-visual {
+  .clip-visual {
     width: 100%;
     height: 100%;
     display: flex;
@@ -108,546 +57,629 @@
     justify-content: center;
     padding: 40px;
     text-align: center;
-    transition: opacity 0.5s ease;
+    transition: all 0.8s cubic-bezier(.2,.8,.2,1);
+    opacity: 1;
   }
 
+  .clip-visual.changing {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  /* Animated background per clip */
+  .bg-helios {
+    background: radial-gradient(ellipse at 30% 20%, rgba(255,200,50,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(255,150,0,0.1) 0%, transparent 50%),
+                linear-gradient(180deg, #0a0a12 0%, #12121f 100%);
+  }
+
+  .bg-lattice {
+    background: radial-gradient(ellipse at 70% 30%, rgba(99,102,241,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 30% 70%, rgba(139,92,246,0.1) 0%, transparent 50%),
+                linear-gradient(180deg, #0a0812 0%, #10101f 100%);
+  }
+
+  /* Paper icon animation */
   .paper-icon {
-    width: 120px;
-    height: 120px;
-    border-radius: 20px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 48px;
-    margin-bottom: 24px;
+    font-size: 80px;
+    margin-bottom: 32px;
     animation: float 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 40px currentColor);
   }
 
   @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+    0%, 100% { transform: translateY(0) rotate(-5deg); }
+    50% { transform: translateY(-15px) rotate(5deg); }
   }
 
-  .paper-title-main {
-    font-size: clamp(20px, 4vw, 32px);
+  .clip-title {
+    font-family: var(--sans);
+    font-size: clamp(28px, 5vw, 48px);
     font-weight: 700;
     letter-spacing: -0.03em;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
+    text-shadow: 0 4px 30px rgba(0,0,0,0.5);
+  }
+
+  .clip-subtitle {
+    font-family: var(--sans);
+    font-size: clamp(14px, 2vw, 18px);
+    color: var(--hud-dim);
     max-width: 600px;
+    line-height: 1.7;
+    margin-bottom: 32px;
   }
 
-  .paper-subtitle {
-    font-size: 14px;
-    color: var(--text-dim);
-    max-width: 500px;
-    line-height: 1.6;
-  }
-
-  /* Voice indicator badge */
-  .voice-badge {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    display: flex;
+  /* Voice indicator */
+  .voice-indicator {
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    background: var(--card);
+    gap: 10px;
+    padding: 10px 20px;
+    background: rgba(255,255,255,0.08);
     backdrop-filter: blur(10px);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    font-size: 12px;
-    font-family: var(--mono);
-    z-index: 10;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 30px;
+    font-size: 13px;
   }
 
   .voice-dot {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    animation: pulse 2s infinite;
+    animation: pulse 1.5s infinite;
   }
 
-  .voice-dot.uk { background: var(--voice-uk); }
-  .voice-dot.us { background: var(--voice-us); }
+  .voice-dot.uk { background: var(--voice-uk); box-shadow: 0 0 12px var(--voice-uk); }
+  .voice-dot.us { background: var(--voice-us); box-shadow: 0 0 12px var(--voice-us); }
 
   @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(1.2); }
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.7; }
   }
 
-  /* Audio waveform visualization */
-  .waveform-container {
+  /* Playing state animation */
+  .voice-dot.playing {
+    animation: pulse-fast 0.4s infinite;
+  }
+
+  @keyframes pulse-fast {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.5); }
+  }
+
+  /* ========== HUD OVERLAY ========== */
+  .hud {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 80px;
-    padding: 16px 24px;
-    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+    color: var(--hud);
+    text-shadow: 0 0 8px rgba(0,0,0,0.8);
+  }
+
+  .hud-pad {
+    position: absolute;
+    inset: 24px 32px;
+  }
+
+  /* Frame corners */
+  .frame-corner {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+    border: 1.5px solid var(--hud);
+    opacity: 0.6;
+  }
+  .fc-tl { top: 0; left: 0; border-right: none; border-bottom: none; }
+  .fc-tr { top: 0; right: 0; border-left: none; border-bottom: none; }
+  .fc-bl { bottom: 0; left: 0; border-right: none; border-top: none; }
+  .fc-br { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+  /* Top bar */
+  .top-bar {
+    position: absolute;
+    top: 8px;
+    left: 72px;
+    right: 72px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+  }
+
+  .top-left, .top-right {
     display: flex;
     align-items: center;
     gap: 16px;
   }
 
-  .play-btn {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: var(--accent);
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.25s ease;
-  }
-
-  .play-btn:hover { transform: scale(1.08); }
-  .play-btn:active { transform: scale(0.95); }
-  .play-btn svg { width: 20px; height: 20px; fill: #000; margin-left: 2px; }
-  .play-btn.playing svg { margin-left: 0; }
-
-  .waveform-bars {
-    flex: 1;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    gap: 2px;
-  }
-
-  .bar {
-    flex: 1;
-    background: var(--text-dim);
-    border-radius: 2px;
-    min-height: 4px;
-    transition: background 0.15s ease;
-  }
-
-  .bar.active { background: var(--accent); }
-
-  .time-display {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--text-dim);
-    min-width: 80px;
-    text-align: right;
-  }
-
-  /* ========== Content Section ========== */
-  .content-section {
-    padding: 32px 24px;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-  }
-
-  .section-label {
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-bottom: 16px;
-    font-family: var(--mono);
-  }
-
-  /* ========== Research Papers Grid ========== */
-  .papers-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 20px;
-    margin-top: 24px;
-  }
-
-  .paper-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 24px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .paper-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--accent), transparent);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .paper-card:hover {
-    border-color: rgba(0,212,170,0.3);
-    transform: translateY(-4px);
-  }
-
-  .paper-card:hover::before { opacity: 1; }
-  .paper-card.active {
-    border-color: var(--accent);
-    box-shadow: 0 0 40px rgba(0,212,170,0.15);
-  }
-
-  .paper-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 16px;
-  }
-
-  .paper-id {
-    font-family: var(--mono);
-    font-size: 11px;
+  .badge {
     padding: 4px 10px;
-    background: var(--accent-dim);
+    border: 1px solid var(--hud);
+    border-radius: 4px;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
+
+  .badge-accent {
+    border-color: var(--accent);
     color: var(--accent);
-    border-radius: 6px;
-    font-weight: 600;
   }
 
-  .voice-tag {
-    font-size: 10px;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-family: var(--mono);
-    display: flex;
+  /* REC button */
+  .rec-btn {
+    display: inline-flex;
     align-items: center;
-    gap: 4px;
-  }
-
-  .voice-tag.uk { background: rgba(99,102,241,0.15); color: var(--voice-uk); }
-  .voice-tag.us { background: rgba(245,158,11,0.15); color: var(--voice-us); }
-
-  .paper-name {
-    font-size: 18px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    margin-bottom: 8px;
-  }
-
-  .paper-desc {
-    font-size: 14px;
-    color: var(--text-dim);
-    line-height: 1.6;
-    margin-bottom: 16px;
-  }
-
-  .paper-status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    color: var(--text-dim);
-  }
-
-  .status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-  }
-
-  .status-dot.ready { background: var(--accent); }
-  .status-dot.pending { background: #f59e0b; }
-  .status-dot.missing { background: #ef4444; }
-
-  /* ========== Info Panel (when playing) ========== */
-  .info-panel {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%) translateY(120%);
-    background: var(--card);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px 28px;
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    z-index: 200;
-    transition: transform 0.4s cubic-bezier(.2,.8,.2,1);
-    max-width: 90vw;
-    width: 500px;
-  }
-
-  .info-panel.show { transform: translateX(-50%) translateY(0); }
-
-  .info-close {
-    position: absolute;
-    top: 8px;
-    right: 12px;
-    width: 28px;
-    height: 28px;
+    gap: 6px;
     background: transparent;
-    border: none;
-    color: var(--text-dim);
+    border: 1.5px solid var(--hud);
+    color: var(--hud);
+    padding: 4px 12px;
+    font-family: var(--mono);
+    font-size: 12px;
     cursor: pointer;
-    font-size: 18px;
-    border-radius: 6px;
+    border-radius: 4px;
+    pointer-events: auto;
     transition: all 0.2s ease;
   }
 
-  .info-close:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+  .rec-btn:hover { background: rgba(255,255,255,0.1); }
 
-  .now-playing-label {
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    font-family: var(--mono);
+  .rec-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--rec);
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(255,59,48,0.7);
   }
 
-  .now-playing-title {
-    font-size: 16px;
-    font-weight: 600;
+  .rec-btn.playing .rec-dot {
+    animation: blink 1s steps(2, end) infinite;
   }
 
-  .mini-waveform {
+  @keyframes blink { 50% { opacity: 0.2; } }
+
+  /* Bottom bar */
+  .bottom-bar {
+    position: absolute;
+    bottom: 8px;
+    left: 72px;
+    right: 72px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+  }
+
+  .bottom-left, .bottom-right {
     display: flex;
     align-items: center;
-    gap: 2px;
-    height: 24px;
+    gap: 20px;
   }
 
-  .mini-bar {
-    width: 3px;
-    background: var(--accent);
-    border-radius: 2px;
-    animation: wave 0.5s ease-in-out infinite alternate;
+  .timecode {
+    font-size: 22px;
+    letter-spacing: 0.15em;
+    font-variant-numeric: tabular-nums;
   }
 
-  @keyframes wave {
-    from { height: 4px; }
-    to { height: 20px; }
+  .label {
+    font-size: 10px;
+    color: var(--hud-dim);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 4px;
   }
 
-  /* ========== Loading State ========== */
-  .loading-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(10,10,15,0.9);
+  .stack {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 2px;
+  }
+
+  /* Center reticle */
+  .reticle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 60px;
+    height: 60px;
+    transform: translate(-50%, -50%);
+    opacity: 0.3;
+  }
+
+  .reticle-bracket {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-color: var(--hud);
+    border-style: solid;
+  }
+
+  .rb-tl { top: 0; left: 0; border-width: 2px 0 0 2px; }
+  .rb-tr { top: 0; right: 0; border-width: 2px 2px 0 0; }
+  .rb-bl { bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+  .rb-br { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+  /* ========== WAVEFORM (Bottom Center) ========== */
+  .waveform-container {
+    position: absolute;
+    left: 50%;
+    bottom: 90px;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    z-index: 15;
+    pointer-events: auto;
+  }
+
+  .play-btn-large {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
     justify-content: center;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 20px rgba(0,212,170,0.4);
+  }
+
+  .play-btn-large:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 30px rgba(0,212,170,0.5);
+  }
+
+  .play-btn-large:active { transform: scale(0.95); }
+
+  .play-btn-large svg {
+    width: 22px;
+    height: 22px;
+    fill: #000;
+    margin-left: 3px;
+  }
+
+  .play-btn-large.playing svg { margin-left: 0; }
+
+  .waveform-bars {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    width: 300px;
+    height: 44px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 0 12px;
+  }
+
+  .wf-bar {
+    flex: 1;
+    background: var(--hud-dim);
+    border-radius: 2px;
+    min-height: 6px;
+    transition: all 0.1s ease;
+  }
+
+  .wf-bar.active {
+    background: var(--accent);
+    box-shadow: 0 0 8px rgba(0,212,170,0.5);
+  }
+
+  .time-display {
+    font-size: 14px;
+    min-width: 90px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ========== CLIP NAVIGATION (Side) ========== */
+  .clip-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 15;
+    pointer-events: auto;
+  }
+
+  .clip-nav.left { left: 20px; }
+  .clip-nav.right { right: 20px; }
+
+  .nav-btn {
+    width: 36px;
+    height: 36px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    color: var(--hud-dim);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.25s ease;
+  }
+
+  .nav-btn:hover {
+    background: rgba(0,212,170,0.15);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Clip indicators */
+  .clip-indicators {
+    position: absolute;
+    bottom: 160px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 15;
+  }
+
+  .clip-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--hud-dim);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+  }
+
+  .clip-dot:hover { transform: scale(1.3); }
+  .clip-dot.active {
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+    transform: scale(1.2);
+  }
+
+  /* ========== GRAIN EFFECT ========== */
+  .grain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.03) 0px,
+      transparent 1px,
+      transparent 3px
+    );
+    mix-blend-mode: overlay;
+    opacity: 0.6;
+  }
+
+  /* ========== HELP TOOLTIP ========== */
+  .help {
+    position: absolute;
+    left: 50%;
+    bottom: 220px;
+    transform: translateX(-50%);
+    pointer-events: none;
     z-index: 50;
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--hud-dim);
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(8px);
+    padding: 10px 18px;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    white-space: nowrap;
+  }
+
+  .help.show { opacity: 1; }
+
+  .help kbd {
+    display: inline-block;
+    padding: 2px 6px;
+    border: 1px solid var(--hud-dim);
+    border-radius: 3px;
+    font-family: var(--mono);
+    font-size: 10px;
+    margin: 0 3px;
+  }
+
+  /* ========== LOADING ========== */
+  .loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    text-align: center;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
   }
 
-  .loading-overlay.show { opacity: 1; pointer-events: auto; }
+  .loading.show { opacity: 1; }
 
   .spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid var(--border);
+    width: 36px;
+    height: 36px;
+    border: 2px solid var(--hud-dim);
     border-top-color: var(--accent);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
-    margin-bottom: 16px;
+    margin: 0 auto 12px;
   }
 
   @keyframes spin { to { transform: rotate(360deg); } }
 
   .loading-text {
-    font-size: 13px;
-    color: var(--text-dim);
-    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--hud-dim);
   }
 
-  /* ========== Responsive ========== */
-  @media (max-width: 768px) {
-    .header { padding: 12px 16px; }
-    .content-section { padding: 24px 16px; }
-    .papers-grid { grid-template-columns: 1fr; }
-    .paper-card { padding: 20px; }
-    .info-panel {
-      flex-direction: column;
-      padding: 16px 20px;
-      width: calc(100vw - 32px);
-      bottom: 16px;
-    }
-    .waveform-container { padding: 12px 16px; height: 70px; }
-    .play-btn { width: 42px; height: 42px; }
+  /* ========== RESPONSIVE ========== */
+  @media (max-width: 700px) {
+    .top-bar, .bottom-bar { left: 50px; right: 50px; font-size: 11px; }
+    .timecode { font-size: 18px; }
+    .frame-corner { width: 36px; height: 36px; }
+    .waveform-container { bottom: 70px; }
+    .waveform-bars { width: 180px; }
+    .clip-icon { font-size: 60px; }
+    .clip-title { font-size: 24px; }
+    .nav-btn { width: 32px; height: 32px; }
   }
 </style>
 </head>
 <body>
 
-<div class="app" id="app">
-  
-  <!-- Header -->
-  <header class="header">
-    <div class="logo">
-      <div class="logo-icon">S</div>
-      <span>SciCMP Research</span>
-    </div>
-    <div class="header-meta">Portfolio Shorts · Voice Narrated</div>
-  </header>
+<div class="viewfinder" id="viewfinder">
 
-  <!-- Main Player Section -->
-  <section class="player-section" id="playerSection">
-    <div class="video-container">
+  <!-- Main Stage -->
+  <div class="stage">
+    <div class="clip-visual bg-helios" id="clipVisual">
+      <div class="paper-icon" id="paperIcon">☀️</div>
+      <h1 class="clip-title" id="clipTitle">Helios Tandem</h1>
+      <p class="clip-subtitle" id="clipSubtitle">Advanced photovoltaic tandem cell architecture achieving record efficiency through novel materials integration.</p>
+      <div class="voice-indicator" id="voiceIndicator">
+        <span class="voice-dot uk" id="voiceDot"></span>
+        <span id="voiceLabel">British RP · jam</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Film Grain -->
+  <div class="grain"></div>
+
+  <!-- HUD Overlay -->
+  <div class="hud">
+    <div class="hud-pad">
       
-      <!-- Paper Visual Display -->
-      <div class="paper-visual" id="paperVisual">
-        <div class="paper-icon" id="paperIcon">📄</div>
-        <h1 class="paper-title-main" id="paperTitleMain">Select a Research Paper</h1>
-        <p class="paper-subtitle" id="paperSubtitle">Choose from the portfolio below to hear voice narration by UK/US native speakers</p>
+      <!-- Frame Corners -->
+      <div class="frame-corner fc-tl"></div>
+      <div class="frame-corner fc-tr"></div>
+      <div class="frame-corner fc-bl"></div>
+      <div class="frame-corner fc-br"></div>
+
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <div class="top-left">
+          <span class="badge badge-accent">SciCMP</span>
+          <span id="clipIdBadge">P12</span>
+        </div>
+        <div class="top-right">
+          <button class="rec-btn" id="recBtn" aria-label="Play/Pause">
+            <span class="rec-dot"></span>
+            <span id="recLabel">PLAY</span>
+          </button>
+        </div>
       </div>
 
-      <!-- Voice Badge -->
-      <div class="voice-badge" id="voiceBadge" style="display: none;">
-        <span class="voice-dot" id="voiceDot"></span>
-        <span id="voiceLabel">British RP</span>
+      <!-- Reticle -->
+      <div class="reticle">
+        <div class="reticle-bracket rb-tl"></div>
+        <div class="reticle-bracket rb-tr"></div>
+        <div class="reticle-bracket rb-bl"></div>
+        <div class="reticle-bracket rb-br"></div>
       </div>
 
-      <!-- Waveform & Controls -->
-      <div class="waveform-container">
-        <button class="play-btn" id="mainPlayBtn" aria-label="Play narration">
-          <svg viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>
-        </button>
-        <div class="waveform-bars" id="waveform"></div>
-        <div class="time-display"><span id="currentTime">0:00</span> / <span id="totalTime">0:00</span></div>
+      <!-- Bottom Bar -->
+      <div class="bottom-bar">
+        <div class="bottom-left">
+          <div class="stack"><span id="filterName">HELIOS</span><span class="label">CLIP</span></div>
+        </div>
+        <div class="stack">
+          <span class="timecode" id="timecode">00:00:00</span>
+          <span class="label" id="durationLabel">DURATION</span>
+        </div>
+        <div class="bottom-right">
+          <div class="stack"><span id="voiceName">UK</span><span class="label">VOICE</span></div>
+        </div>
       </div>
+    </div>
+  </div>
 
-      <!-- Loading Overlay -->
-      <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner"></div>
-        <div class="loading-text">Loading audio...</div>
-      </div>
-    </div>
-  </section>
+  <!-- Waveform Controls -->
+  <div class="waveform-container">
+    <button class="play-btn-large" id="mainPlayBtn" aria-label="Play narration">
+      <svg viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>
+    </button>
+    <div class="waveform-bars" id="waveform"></div>
+    <div class="time-display"><span id="currentTime">0:00</span> / <span id="totalTime">0:45</span></div>
+  </div>
 
-  <!-- Content Section -->
-  <main class="content-section">
-    <div class="section-label">Research Portfolio Shorts</div>
-    
-    <div class="papers-grid" id="papersGrid">
-      <!-- Cards generated by JS -->
-    </div>
-  </main>
+  <!-- Clip Navigation Dots -->
+  <div class="clip-indicators" id="clipIndicators"></div>
 
-  <!-- Now Playing Info Panel -->
-  <div class="info-panel" id="infoPanel">
-    <button class="info-close" id="infoClose">&times;</button>
-    <div>
-      <div class="now-playing-label">Now Playing</div>
-      <div class="now-playing-title" id="nowPlayingTitle">-</div>
-    </div>
-    <div class="mini-waveform" id="miniWaveform">
-      <!-- Animated bars -->
-    </div>
+  <!-- Side Navigation -->
+  <div class="clip-nav left">
+    <button class="nav-btn" id="prevBtn" aria-label="Previous clip">←</button>
+  </div>
+  <div class="clip-nav right">
+    <button class="nav-btn" id="nextBtn" aria-label="Next clip">→</button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">LOADING AUDIO</div>
+  </div>
+
+  <!-- Help Tooltip -->
+  <div class="help" id="help">
+    <kbd>←</kbd><kbd>→</kbd> Switch Clips &nbsp;|&nbsp; <kbd>Space</kbd> Play/Pause &nbsp;|&nbsp; <kbd>F</kbd> Fullscreen
   </div>
 
 </div>
 
-<!-- Hidden Audio Element -->
+<!-- Audio Player -->
 <audio id="audioPlayer" preload="auto"></audio>
 
 <script>
 // ============================================================
-// RESEARCH PORTFOLIO DATA WITH VOICE NARRATIONS
+// RESEARCH CLIPS DATA WITH VOICE NARRATIONS
 // ============================================================
 
-const researchPapers = [
+const clips = [
   {
     id: 'P12',
     name: 'Helios Tandem',
-    description: 'Advanced photovoltaic tandem cell architecture achieving record efficiency through novel materials integration.',
+    subtitle: 'Advanced photovoltaic tandem cell architecture achieving record efficiency through novel materials integration.',
     icon: '☀️',
+    bgClass: 'bg-helios',
     voice: 'jam',
     voiceType: 'uk',
-    voiceLabel: 'British RP (jam)',
-    file: 'P12_jam.wav',
-    hasAudio: true,
-    duration: '~45s'
+    voiceLabel: 'British RP · jam',
+    file: './audio/portfolio-shorts/P12_jam.wav',
+    duration: '0:45',
+    filterName: 'HELIOS'
   },
   {
-    id: 'P-ai-materials',
+    id: 'P-AI',
     name: 'Lattice Forge',
-    description: 'AI-accelerated discovery of next-generation lattice materials for quantum computing applications.',
+    subtitle: 'AI-accelerated discovery of next-generation lattice materials for quantum computing applications.',
     icon: '🔬',
+    bgClass: 'bg-lattice',
     voice: 'kazi',
     voiceType: 'us',
-    voiceLabel: 'American Standard (kazi)',
-    file: 'P-ai-materials_kazi.wav',
-    hasAudio: true,
-    duration: '~52s'
-  },
-  {
-    id: 'P11',
-    name: 'Carbon Sink',
-    description: 'Novel carbon capture methodology using bio-engineered microorganisms for industrial emissions reduction.',
-    icon: '🌿',
-    voice: 'douji',
-    voiceType: 'us',
-    voiceLabel: 'American Natural (douji)',
-    file: 'P11_douji.wav',
-    hasAudio: true,
-    duration: '~38s'
-  },
-  {
-    id: 'P3',
-    name: 'Solid State Labs',
-    description: 'Breakthrough in solid-state electrolyte conductivity enabling next-gen battery performance.',
-    icon: '🔋',
-    voice: 'douji',
-    voiceType: 'us',
-    voiceLabel: 'American Natural (douji)',
-    file: null,
-    hasAudio: false,
-    duration: 'Pending'
-  },
-  {
-    id: 'P5',
-    name: 'Hydrogen Forge',
-    description: 'Green hydrogen production via photocatalytic water splitting at industrial scale feasibility.',
-    icon: '💧',
-    voice: 'jam',
-    voiceType: 'uk',
-    voiceLabel: 'British RP (jam)',
-    file: null,
-    hasAudio: false,
-    duration: 'Pending'
-  },
-  {
-    id: 'P9',
-    name: 'TMD Logic',
-    description: 'Transition metal dichalcogenide logic gates for post-silicon computing architectures.',
-    icon: '💻',
-    voice: 'kazi',
-    voiceType: 'us',
-    voiceLabel: 'American Standard (kazi)',
-    file: null,
-    hasAudio: false,
-    duration: 'Pending'
-  },
-  {
-    id: 'P-cmos-2nm',
-    name: 'Atomic Gate Systems',
-    description: 'Sub-2nm CMOS transistor design overcoming quantum tunneling limitations.',
-    icon: '⚛️',
-    voice: 'jam',
-    voiceType: 'uk',
-    voiceLabel: 'British RP (jam)',
-    file: null,
-    hasAudio: false,
-    duration: 'Pending'
+    voiceLabel: 'American Standard · kazi',
+    file: './audio/portfolio-shorts/P-ai-materials_kazi.wav',
+    duration: '0:52',
+    filterName: 'LATTICE'
   }
 ];
 
-// Base URL for audio files
-const AUDIO_BASE = './audio/portfolio-shorts/';
+let currentIndex = 0;
+let isPlaying = false;
 
 // ============================================================
 // DOM ELEMENTS
@@ -656,146 +688,110 @@ const AUDIO_BASE = './audio/portfolio-shorts/';
 const $ = id => document.getElementById(id);
 
 const audioPlayer = $('audioPlayer');
-const mainPlayBtn = $('mainPlayBtn');
-const waveformEl = $('waveform');
-const currentTimeEl = $('currentTime');
-const totalTimeEl = ('totalTime');
-const papersGrid = $('papersGrid');
-const paperVisual = $('paperVisual');
+const clipVisual = $('clipVisual');
 const paperIcon = $('paperIcon');
-const paperTitleMain = $('paperTitleMain');
-const paperSubtitle = $('paperSubtitle');
-const voiceBadge = $('voiceBadge');
+const clipTitle = $('clipTitle');
+const clipSubtitle = $('clipSubtitle');
+const voiceIndicator = $('voiceIndicator');
 const voiceDot = $('voiceDot');
 const voiceLabel = $('voiceLabel');
-const loadingOverlay = $('loadingOverlay');
-const infoPanel = $('infoPanel');
-const nowPlayingTitle = $('nowPlayingTitle');
-const miniWaveform = $('miniWaveform');
-
-let currentPaper = null;
-let isPlaying = false;
+const clipIdBadge = $('clipIdBadge');
+const recBtn = $('recBtn');
+const recLabel = $('recLabel');
+const mainPlayBtn = $('mainPlayBtn');
+const waveformEl = $('waveform');
+const timecodeEl = $('timecode');
+const currentTimeEl = $('currentTime');
+const totalTimeEl = ('totalTime');
+const filterNameEl = $('filterName');
+const voiceNameEl = $('voiceName');
+const durationLabelEl = ('durationLabel');
+const loadingEl = $('loading');
+const helpEl = $('help');
+const clipIndicatorsEl = $('clipIndicators');
 
 // ============================================================
-// INITIALIZE WAVEFORM BARS
+// INITIALIZE WAVEFORM
 // ============================================================
 
 function initWaveform() {
   waveformEl.innerHTML = '';
-  const barCount = 60;
+  const barCount = 40;
   for (let i = 0; i < barCount; i++) {
     const bar = document.createElement('div');
-    bar.className = 'bar';
-    bar.style.height = `${Math.random() * 80 + 20}%`;
+    bar.className = 'wf-bar';
+    bar.style.height = `${Math.random() * 70 + 30}%`;
     waveformEl.appendChild(bar);
   }
 }
 
-// Initialize mini waveform bars
-function initMiniWaveform() {
-  miniWaveform.innerHTML = '';
-  for (let i = 0; i < 12; i++) {
-    const bar = document.createElement('div');
-    bar.className = 'mini-bar';
-    bar.style.animationDelay = `${i * 0.05}s`;
-    miniWaveform.appendChild(bar);
-  }
-}
-
-// ============================================================
-// RENDER PAPER CARDS
-// ============================================================
-
-function renderPapers() {
-  papersGrid.innerHTML = '';
-  
-  researchPapers.forEach((paper, idx) => {
-    const card = document.createElement('div');
-    card.className = `paper-card${currentPaper && currentPaper.id === paper.id ? ' active' : ''}`;
-    card.dataset.index = idx;
-    
-    card.innerHTML = `
-      <div class="paper-header">
-        <span class="paper-id">${paper.id}</span>
-        <span class="voice-tag ${paper.voiceType}">
-          <span class="voice-dot ${paper.voiceType}"></span>
-          ${paper.voice.toUpperCase()}
-        </span>
-      </div>
-      <h3 class="paper-name">${paper.name}</h3>
-      <p class="paper-desc">${paper.description}</p>
-      <div class="paper-status">
-        <span class="status-dot ${paper.hasAudio ? 'ready' : 'missing'}"></span>
-        <span>${paper.hasAudio ? `Audio ready · ${paper.duration}` : 'Audio pending'}</span>
-      </div>
-    `;
-    
-    card.addEventListener('click', () => selectPaper(idx));
-    papersGrid.appendChild(card);
+function initClipIndicators() {
+  clipIndicatorsEl.innerHTML = '';
+  clips.forEach((_, idx) => {
+    const dot = document.createElement('div');
+    dot.className = `clip-dot${idx === currentIndex ? ' active' : ''}`;
+    dot.addEventListener('click', () => switchClip(idx));
+    clipIndicatorsEl.appendChild(dot);
   });
 }
 
 // ============================================================
-// SELECT & PLAY PAPER
+// SWITCH CLIP
 // ============================================================
 
-async function selectPaper(index) {
-  const paper = researchPapers[index];
-  if (!paper) return;
+async function switchClip(index) {
+  if (index < 0 || index >= clips.length) return;
   
-  currentPaper = paper;
+  // Animate out
+  clipVisual.classList.add('changing');
   
-  // Update visual display
-  paperIcon.textContent = paper.icon;
-  paperTitleMain.textContent = paper.name;
-  paperSubtitle.textContent = paper.description;
+  await new Promise(r => setTimeout(r, 400));
   
-  // Update voice badge
-  voiceBadge.style.display = 'flex';
-  voiceDot.className = `voice-dot ${paper.voiceType}`;
-  voiceLabel.textContent = paper.voiceLabel;
+  currentIndex = index;
+  const clip = clips[index];
   
-  // Update active state on cards
-  document.querySelectorAll('.paper-card').forEach((c, i) => {
-    c.classList.toggle('active', i === index);
+  // Update content
+  paperIcon.textContent = clip.icon;
+  clipTitle.textContent = clip.name;
+  clipSubtitle.textContent = clip.subtitle;
+  voiceDot.className = `voice-dot ${clip.voiceType}`;
+  voiceLabel.textContent = clip.voiceLabel;
+  clipIdBadge.textContent = clip.id;
+  filterNameEl.textContent = clip.filterName;
+  voiceNameEl.textContent = clip.voiceType.toUpperCase();
+  totalTimeEl.textContent = clip.duration;
+  
+  // Update background
+  clipVisual.className = `clip-visual ${clip.bgClass}`;
+  
+  // Update indicators
+  document.querySelectorAll('.clip-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === index);
   });
   
-  // Load and play audio if available
-  if (paper.hasAudio && paper.file) {
-    await loadAndPlay(paper.file);
-  } else {
-    // Show pending state
-    audioPlayer.src = '';
-    isPlaying = false;
-    updatePlayButton();
-    showInfoPanel(false);
-  }
+  // Animate in
+  setTimeout(() => clipVisual.classList.remove('changing'), 50);
+  
+  // Load audio
+  loadAudio(clip.file);
 }
 
-async function loadAndPlay(filename) {
-  loadingOverlay.classList.add('show');
+async function loadAudio(src) {
+  loadingEl.classList.add('show');
+  stopPlayback();
   
   try {
-    const audioUrl = AUDIO_BASE + filename;
-    audioPlayer.src = audioUrl;
+    audioPlayer.src = src;
     await audioPlayer.load();
     
-    // Update total time when metadata loads
-    audioPlayer.addEventListener('loadedmetadata', () => {
+    audioPlayer.addEventListener('loadeddata', () => {
+      loadingEl.classList.remove('show');
       totalTimeEl.textContent = formatTime(audioPlayer.duration);
     }, { once: true });
     
-    // Auto-play after load
-    await audioPlayer.play();
-    isPlaying = true;
-    updatePlayButton();
-    showInfoPanel(true);
-    
-  } catch (error) {
-    console.error('Error loading audio:', error);
-    paperSubtitle.textContent = 'Error loading audio. Please try again.';
-  } finally {
-    loadingOverlay.classList.remove('show');
+  } catch (err) {
+    console.error('Audio load error:', err);
+    loadingEl.classList.remove('show');
   }
 }
 
@@ -804,31 +800,56 @@ async function loadAndPlay(filename) {
 // ============================================================
 
 function togglePlay() {
-  if (!currentPaper || !currentPaper.hasAudio) return;
+  if (!audioPlayer.src) return;
   
   if (isPlaying) {
     audioPlayer.pause();
   } else {
-    audioPlayer.play();
+    audioPlayer.play().catch(console.error);
   }
-  
-  isPlaying = !isPlaying;
-  updatePlayButton();
-  showInfoPanel(isPlaying);
 }
 
-function updatePlayButton() {
+function startPlayback() {
+  isPlaying = true;
+  updatePlayButtons();
+  animateWaveform(true);
+  voiceDot.classList.add('playing');
+}
+
+function stopPlayback() {
+  isPlaying = false;
+  updatePlayButtons();
+  animateWaveform(false);
+  voiceDot.classList.remove('playing');
+}
+
+function updatePlayButtons() {
+  // Main play button
   mainPlayBtn.classList.toggle('playing', isPlaying);
-  mainPlayBtn.innerHTML = isPlaying 
+  mainPlayBtn.innerHTML = isPlaying
     ? '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>'
     : '<svg viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>';
+  
+  // REC button
+  recBtn.classList.toggle('playing', isPlaying);
+  recLabel.textContent = isPlaying ? 'REC' : 'PLAY';
 }
 
-function showInfoPanel(show) {
-  infoPanel.classList.toggle('show', show);
-  if (show && currentPaper) {
-    nowPlayingTitle.textContent = currentPaper.name;
-  }
+function animateWaveform(active) {
+  const bars = waveformEl.querySelectorAll('.wf-bar');
+  bars.forEach((bar, i) => {
+    if (active) {
+      bar.classList.add('active');
+      // Animate heights
+      setInterval(() => {
+        if (isPlaying) {
+          bar.style.height = `${Math.random() * 70 + 30}%`;
+        }
+      }, 150 + i * 10);
+    } else {
+      bar.classList.remove('active');
+    }
+  });
 }
 
 // ============================================================
@@ -842,22 +863,18 @@ function formatTime(seconds) {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
-// ============================================================
-// ANIMATE WAVEFORM DURING PLAYBACK
-// ============================================================
-
-function animateWaveform() {
-  const bars = waveformEl.querySelectorAll('.bar');
-  bars.forEach((bar, i) => {
-    if (isPlaying) {
-      bar.classList.add('active');
-      bar.style.height = `${Math.random() * 80 + 20}%`;
-    } else {
-      bar.classList.remove('active');
-    }
-  });
-  
-  requestAnimationFrame(() => setTimeout(animateWaveform, 100));
+function updateTimecode() {
+  if (isPlaying && audioPlayer.currentTime) {
+    currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
+    
+    // Update timecode display (more detailed)
+    const totalSecs = Math.floor(audioPlayer.currentTime);
+    const hh = Math.floor(totalSecs / 3600).toString().padStart(2, '0');
+    const mm = Math.floor((totalSecs % 3600) / 60).toString().padStart(2, '0');
+    const ss = (totalSecs % 60).toString().padStart(2, '0');
+    timecodeEl.textContent = `${hh}:${mm}:${ss}`;
+  }
+  requestAnimationFrame(updateTimecode);
 }
 
 // ============================================================
@@ -865,50 +882,66 @@ function animateWaveform() {
 // ============================================================
 
 mainPlayBtn.addEventListener('click', togglePlay);
+recBtn.addEventListener('click', togglePlay);
 
-$('infoClose').addEventListener('click', () => showInfoPanel(false));
+$('prevBtn').addEventListener('click', () => switchClip(currentIndex - 1));
+$('nextBtn').addEventListener('click', () => switchClip(currentIndex + 1));
 
-audioPlayer.addEventListener('timeupdate', () => {
-  currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
-});
-
+audioPlayer.addEventListener('play', startPlayback);
+audioPlayer.addEventListener('pause', stopPlayback);
 audioPlayer.addEventListener('ended', () => {
-  isPlaying = false;
-  updatePlayButton();
-  showInfoPanel(false);
+  stopPlayback();
+  // Auto advance to next clip
+  if (currentIndex < clips.length - 1) {
+    switchClip(currentIndex + 1);
+  }
 });
 
 audioPlayer.addEventListener('error', () => {
-  loadingOverlay.classList.remove('show');
+  loadingEl.classList.remove('show');
   console.error('Audio playback error');
 });
 
 // Keyboard controls
 document.addEventListener('keydown', e => {
-  if (e.code === 'Space') {
-    e.preventDefault();
-    togglePlay();
-  }
-  if (e.key >= '1' && e.key <= '7') {
-    const idx = parseInt(e.key) - 1;
-    if (researchPapers[idx]) selectPaper(idx);
+  switch(e.key) {
+    case 'ArrowLeft':
+      e.preventDefault();
+      switchClip(currentIndex - 1);
+      break;
+    case 'ArrowRight':
+      e.preventDefault();
+      switchClip(currentIndex + 1);
+      break;
+    case ' ':
+      e.preventDefault();
+      togglePlay();
+      break;
+    case 'f':
+    case 'F':
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+      break;
   }
 });
 
 // ============================================================
-// INITIALIZE
+// INITIALIZATION
 // ============================================================
 
 initWaveform();
-initMiniWaveform();
-renderPapers();
-animateWaveform();
+initClipIndicators();
+updateTimecode();
 
-// Auto-select first available audio paper
-const firstWithAudio = researchPapers.findIndex(p => p.hasAudio);
-if (firstWithAudio >= 0) {
-  selectPaper(firstWithAudio);
-}
+// Load first clip
+switchClip(0);
+
+// Show help tooltip briefly
+setTimeout(() => helpEl.classList.add('show'), 1000);
+setTimeout(() => helpEl.classList.remove('show'), 5000);
 
 </script>
 </body>
