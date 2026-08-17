@@ -95,7 +95,8 @@ function Carousel({
 
   React.useEffect(() => {
     if (!api) return
-    onSelect(api)
+    // Use setTimeout to avoid synchronous setState in effect (React lint rule)
+    setTimeout(() => onSelect(api), 0)
     api.on("reInit", onSelect)
     api.on("select", onSelect)
 

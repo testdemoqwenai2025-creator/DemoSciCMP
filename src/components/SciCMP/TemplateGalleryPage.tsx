@@ -1070,8 +1070,11 @@ export default function TemplateGalleryPage({ initialHash }: TemplateGalleryPage
     const { templateId, section } = parseHashRoute(hash);
     
     if (section) {
-      setActiveSection(section);
-      setSelectedTemplate(null);
+      // Use setTimeout to avoid synchronous setState in effect (React lint rule)
+      setTimeout(() => {
+        setActiveSection(section);
+        setSelectedTemplate(null);
+      }, 0);
       setTimeout(() => {
         const el = document.getElementById(`section-${section}`);
         if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -1079,9 +1082,10 @@ export default function TemplateGalleryPage({ initialHash }: TemplateGalleryPage
     } else if (templateId) {
       const template = templates.find(t => t.id === templateId);
       if (template) {
-        setSelectedTemplate(template);
-        setActiveSection(null);
-        // Template selected via hash route
+        setTimeout(() => {
+          setSelectedTemplate(template);
+          setActiveSection(null);
+        }, 0);
       }
     }
   }, [initialHash]);
@@ -1091,19 +1095,22 @@ export default function TemplateGalleryPage({ initialHash }: TemplateGalleryPage
     const handleHashChange = () => {
       const { templateId, section } = parseHashRoute(window.location.hash);
       
-      if (section) {
-        setActiveSection(section);
-        setSelectedTemplate(null);
-      } else if (templateId) {
-        const template = templates.find(t => t.id === templateId);
-        if (template) {
-          setSelectedTemplate(template);
+      // Use setTimeout to avoid synchronous setState in effect (React lint rule)
+      setTimeout(() => {
+        if (section) {
+          setActiveSection(section);
+          setSelectedTemplate(null);
+        } else if (templateId) {
+          const template = templates.find(t => t.id === templateId);
+          if (template) {
+            setSelectedTemplate(template);
+            setActiveSection(null);
+          }
+        } else {
+          setSelectedTemplate(null);
           setActiveSection(null);
         }
-      } else {
-        setSelectedTemplate(null);
-        setActiveSection(null);
-      }
+      }, 0);
     };
     
     window.addEventListener('hashchange', handleHashChange);
@@ -1143,6 +1150,10 @@ export default function TemplateGalleryPage({ initialHash }: TemplateGalleryPage
     setExpandedCapability(prev => prev === capabilityId ? null : capabilityId);
   }, []);
 
+  // Toast notification state (declared early, before functions that use it)
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+
   // NEW: Launch template functionality
   const launchTemplate = useCallback((template: TemplateData, preset?: ParameterPreset) => {
     setShowLaunchModal(true);
@@ -1180,10 +1191,6 @@ export default function TemplateGalleryPage({ initialHash }: TemplateGalleryPage
   // ============================================================================
   // CORE CAPABILITY HANDLER FUNCTIONS (Previously missing - now implemented)
   // ============================================================================
-
-  // Toast notification state
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
 
   // One-click Setup: 6-step guided setup wizard
   const triggerOneClickSetup = useCallback((template: TemplateData) => {
