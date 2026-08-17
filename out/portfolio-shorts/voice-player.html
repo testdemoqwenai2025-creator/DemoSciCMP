@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SciCMP Voice Player — Native Male Narrations</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:linear-gradient(135deg,#0a0a14 0%,#141428 50%,#0a0a14 100%);
+  color:#e8e8f0;
+  min-height:100vh;
+}
+
+.wrap{max-width:1000px;margin:0 auto;padding:32px 20px}
+
+/* Header */
+.hero{
+  text-align:center;
+  padding:40px 24px;
+  margin-bottom:36px;
+  background:linear-gradient(145deg,rgba(99,102,241,0.08),rgba(245,158,11,0.05));
+  border-radius:24px;
+  border:1px solid rgba(255,255,255,0.08);
+}
+.hero h1{
+  font-size:2rem;
+  font-weight:700;
+  background:linear-gradient(135deg,#00d4aa,#818cf8);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  margin-bottom:12px;
+}
+.hero p{color:#888;font-size:1rem;line-height:1.6}
+.voice-chips{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:20px}
+.chip{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 18px;border-radius:25px;font-size:0.88rem;font-weight:600;
+}
+.chip.uk{background:rgba(99,102,241,0.15);color:#a5b4fc;border:1px solid rgba(99,102,241,0.35)}
+.chip.us{background:rgba(245,158,11,0.15);color:#fcd34d;border:1px solid rgba(245,158,11,0.35)}
+
+/* Voice Selector Panel */
+.voice-panel{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:16px;
+  padding:20px 24px;
+  margin-bottom:28px;
+}
+.voice-panel h3{
+  font-size:0.9rem;color:#888;margin-bottom:14px;text-transform:uppercase;letter-spacing:0.08em}
+.voice-selects{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.voice-selects{grid-template-columns:1fr}}
+.vs-group label{display:block;font-size:0.82rem;color:#aaa;margin-bottom:6px;font-weight:500}
+.vs-group select{
+  width:100%;padding:10px 14px;
+  background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);
+  border-radius:10px;color:#fff;font-size:0.9rem;
+  cursor:pointer;appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23888'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+}
+.vs-group select:focus{outline:none;border-color:#00d4aa}
+
+/* Clips */
+.clips{display:grid;gap:18px}
+
+.card{
+  background:linear-gradient(145deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02));
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:18px;
+  padding:24px 28px;
+  transition:all 0.3s ease;
+}
+.card:hover{
+  border-color:rgba(255,255,255,0.15);
+  transform:translateY(-2px);
+  box-shadow:0 12px 40px rgba(0,0,0,0.3);
+}
+.card.active{border-color:#00d4aa;box-shadow:0 0 30px rgba(0,212,170,0.1)}
+
+.card-top{display:flex;align-items:center;gap:16px;margin-bottom:14px}
+.card-icon{
+  font-size:2.4rem;width:56px;height:56px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.04);border-radius:14px;flex-shrink:0
+}
+.card-info h2{font-size:1.2rem;font-weight:650;margin-bottom:4px}
+.card-id{font-size:0.78rem;color:#555;font-family:'SF Mono',monospace;background:rgba(255,255,255,0.05);padding:3px 8px;border-radius:5px}
+
+.vtag{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 13px;border-radius:18px;font-size:0.8rem;font-weight:600;margin-top:10px
+}
+.vtag.uk{background:rgba(99,102,241,0.12);color:#818cf8;border:1px solid rgba(99,102,241,0.25)}
+.vtag.us{background:rgba(245,158,11,0.12);color:#fbbf24;border:1px solid rgba(245,158,11,0.25)}
+.vdot{width:8px;height:8px;border-radius:50%;animation:pulse 2s infinite}
+.vtag.uk .vdot{background:#818cf8}.vtag.us .vdot{background:#fbbf24}
+.vtag.speaking .vdot{animation:speak-pulse 0.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+@keyframes speak-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.4);opacity:0.7}}
+
+.desc{color:#999;font-size:0.93rem;line-height:1.65;margin:14px 0 18px}
+
+.controls{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+
+.btn{
+  width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;flex-shrink:0
+}
+.btn.play{
+  background:linear-gradient(135deg,#00d4aa,#00ff88);
+  box-shadow:0 4px 20px rgba(0,212,170,0.35)
+}
+.btn.play:hover{transform:scale(1.08)}
+.btn.play svg{fill:#0a0a0f;width:22px;height:22px;margin-left:3px}
+.btn.play.playing{
+  background:linear-gradient(135deg,#ef4444,#f87171);
+  box-shadow:0 4px 20px rgba(239,68,68,0.35)
+}
+.btn.play.playing svg{margin-left:0}
+
+.prog{flex:1;min-width:180px}
+.prog-bar{
+  width:100%;height:8px;background:rgba(255,255,255,0.08);
+  border-radius:4px;cursor:pointer;overflow:hidden
+}
+.prog-fill{
+  height:100%;background:linear-gradient(90deg,#00d4aa,#00ff88);
+  border-radius:4px;width:0%;transition:width 0.1s linear
+}
+.prog-time{
+  display:flex;justify-content:space-between;
+  font-size:0.72rem;color:#555;margin-top:6px;
+  font-family:'SF Mono',monospace
+}
+
+.sts{
+  font-size:0.76rem;padding:7px 14px;border-radius:8px;
+  min-width:80px;text-align:center;font-weight:500
+}
+.sts.ok{background:rgba(0,212,170,0.1);color:#34d399;border:1px solid rgba(0,212,170,0.2)}
+.sts.on{background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2);animation:glow 1.2s infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 0}50%{box-shadow:0 0 10px rgba(239,68,68,0.2)}}
+
+.footer{text-align:center;margin-top:48px;padding:28px;color:#444;font-size:0.85rem;line-height:1.7;border-top:1px solid rgba(255,255,255,0.06)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<div class="hero">
+  <h1>🎙️ SciCMP Portfolio Shorts</h1>
+  <p>Research clips with <strong>native male voice narrations</strong><br>Select your preferred voices below, then press PLAY</p>
+  <div class="voice-chips">
+    <div class="chip uk">🇬🇧 British RP Male</div>
+    <div class="chip us">🇺🇸 American Standard Male</div>
+  </div>
+</div>
+
+<!-- Voice Selector -->
+<div class="voice-panel" id="voicePanel">
+  <h3>🔊 Select Native Voices</h3>
+  <div class="voice-selects">
+    <div class="vs-group">
+      <label>🇬🇧 British RP (UK) Voice</label>
+      <select id="ukVoiceSelect"><option>Loading voices...</option></select>
+    </div>
+    <div class="vs-group">
+      <label>🇺🇸 American Standard (US) Voice</label>
+      <select id="usVoiceSelect"><option>Loading voices...</option></select>
+    </div>
+  </div>
+</div>
+
+<!-- Clips Grid -->
+<div class="clips" id="clipsGrid"></div>
+
+<div class="footer">
+  Uses Web Speech API · Voices from your operating system<br>
+  <span style="color:#666">Open browser console (F12) to see which voice is selected</span>
+</div>
+
+</div>
+
+<script>
+// ============================================================
+// RESEARCH CLIPS
+// ============================================================
+const CLIPS = [
+  {id:'P12',name:'Helios Tandem Photovoltaics',icon:'☀️',
+   desc:'Advanced photovoltaic tandem cell architecture achieving record efficiency through novel materials integration. This breakthrough combines perovskite-silicon heterojunction designs to surpass theoretical efficiency limits of single-junction cells.',
+   voiceType:'uk',voiceLabel:'British RP'},
+  {id:'P-AI',name:'Lattice Forge — AI Materials Discovery',icon:'🔬',
+   desc:'AI-accelerated discovery of next-generation lattice materials for quantum computing applications. Deep learning models predict stable crystal structures with optimized electronic band properties for qubit coherence.',
+   voiceType:'us',voiceLabel:'American Standard'},
+  {id:'P11',name:'Carbon Sink Bioengineering',icon:'🌿',
+   desc:'Novel carbon capture methodology using bio-engineered microorganisms for industrial emissions reduction. Engineered cyanobacteria strains demonstrate forty percent improved CO2 sequestration rates.',
+   voiceType:'us',voiceLabel:'American Natural'},
+  {id:'P3',name:'Solid State Battery Labs',icon:'🔋',
+   desc:'Breakthrough in solid-state electrolyte conductivity enabling next-generation battery performance. Ceramic-polymer composite electrolytes achieve ionic conductivity exceeding ten milliSiemens per centimeter at room temperature.',
+   voiceType:'us',voiceLabel:'American Standard'},
+  {id:'P5',name:'Hydrogen Forge Production',icon:'💧',
+   desc:'Green hydrogen production via photocatalytic water splitting at industrial scale feasibility. Novel dual-doped graphene photocatalysts achieve solar-to-hydrogen efficiency above eighteen percent under ambient conditions.',
+   voiceType:'uk',voiceLabel:'British RP'},
+  {id:'P9',name:'TMD Logic Gates',icon:'💻',
+   desc:'Transition metal dichalcogenide logic gates for post-silicon computing architectures. Molybdenum disulfide transistors demonstrate sub-threshold swing below sixty millivolts per decade with high on-current ratios.',
+   voiceType:'uk',voiceLabel:'British RP'},
+  {id:'P-CMOS',name:'Atomic Gate CMOS Systems',icon:'⚛️',
+   desc:'Sub-two-nanometer CMOS transistor design overcoming quantum tunneling limitations through novel gate-all-around architecture with work-function-engineered metal electrodes.',
+   voiceType:'us',voiceLabel:'American Standard'}
+];
+
+let currentIdx = -1;
+let speaking = false;
+let utt = null;
+let progInt = null;
+
+const grid = document.getElementById('clipsGrid');
+const ukSelect = document.getElementById('ukVoiceSelect');
+const usSelect = document.getElementById('usVoiceSelect');
+
+// ============================================================
+// VOICE MANAGEMENT
+// ============================================================
+
+function loadVoices() {
+  const voices = speechSynthesis.getVoices();
+  
+  if (voices.length === 0) {
+    console.log('Waiting for voices...');
+    return;
+  }
+  
+  console.log(`\n🎤 Found ${voices.length} total voices\n`);
+  
+  // Filter and categorize English voices
+  const enVoices = voices.filter(v => v.lang.startsWith('en'));
+  const ukVoices = enVoices.filter(v => v.lang === 'en-GB' || v.lang.toLowerCase().includes('gb') || v.name.toLowerCase().includes('british'));
+  const usVoices = enVoices.filter(v => v.lang === 'en-US' || v.lang.toLowerCase().includes('us') || v.name.toLowerCase().includes('american'));
+  
+  console.log(`🇬🇧 UK/British voices: ${ukVoices.length}`);
+  console.log(`🇺🇸 US/American voices: ${usVoices.length}`);
+  
+  // Populate UK selector
+  populateSelect(ukSelect, ukVoices.length > 0 ? ukVoices : enVoices.filter(v => v.lang.includes('GB') || v.lang.startsWith('en')), 'en-GB');
+  
+  // Populate US selector  
+  populateSelect(usSelect, usVoices.length > 0 ? usVoices : enVoices.filter(v => v.lang.includes('US') || v.lang.startsWith('en')), 'en-US');
+  
+  // Log all English voices for debugging
+  console.log('\n📋 All available English voices:');
+  enVoices.forEach((v,i) => {
+    const marker = v.lang.includes('GB') ? '🇬🇧' : v.lang.includes('US') ? '🇺🇸' : '  ';
+    console.log(`   ${marker} [${i}] "${v.name}" (${v.lang})`);
+  });
+}
+
+function populateSelect(select, voices, defaultLang) {
+  select.innerHTML = '';
+  
+  if (voices.length === 0) {
+    select.innerHTML = '<option>No voices found</option>';
+    return;
+  }
+  
+  // Sort: prefer Google/Microsoft/Apple native voices first
+  const sorted = [...voices].sort((a,b) => {
+    const scoreA = getVoiceScore(a, defaultLang);
+    const scoreB = getVoiceScore(b, defaultLang);
+    return scoreB - scoreA;
+  });
+  
+  sorted.forEach((voice, i) => {
+    const opt = document.createElement('option');
+    opt.value = voice.name;
+    opt.textContent = `${voice.name} (${voice.lang})`;
+    
+    // Mark recommended male voices
+    if (isMaleVoice(voice.name)) {
+      opt.textContent += ' ♂';
+      if (i === 0) opt.selected = true;
+    }
+    
+    select.appendChild(opt);
+  });
+  
+  // Auto-select best option
+  if (select.options.length > 0) {
+    select.selectedIndex = 0;
+  }
+}
+
+function getVoiceScore(voice, lang) {
+  let score = 0;
+  const name = voice.name.toLowerCase();
+  const service = (voice.service || '').toLowerCase();
+  
+  // Prefer major providers
+  if (service.includes('google')) score += 50;
+  if (service.includes('microsoft')) score += 45;
+  if (service.includes('apple')) score += 40;
+  if (service.includes('amazon')) score += 35;
+  
+  // Prefer exact language match
+  if (voice.lang === lang) score += 30;
+  if (voice.lang.startsWith(lang.split('-')[0])) score += 15;
+  
+  // Prefer known male voices
+  const maleNames = ['daniel','david','oliver','james','alex','ryan','chris','michael','george','harry','thomas','jack'];
+  if (maleNames.some(n => name.includes(n))) score += 25;
+  
+  return score;
+}
+
+function isMaleVoice(name) {
+  const lower = name.toLowerCase();
+  const maleNames = ['daniel','david','oliver','james','alex','ryan','chris','michael','george','harry','thomas','jack','guy','mark','john','paul','andrew','simon','richard','nicholas'];
+  return maleNames.some(n => lower.includes(n));
+}
+
+function getSelectedVoice(type) {
+  const select = type === 'uk' ? ukSelect : usSelect;
+  const selectedName = select.value;
+  const voices = speechSynthesis.getVoices();
+  return voices.find(v => v.name === selectedName) || voices.find(v => v.lang.startsWith(type === 'uk' ? 'en-GB' : 'en-US'));
+}
+
+// ============================================================
+// RENDER CLIPS
+// ============================================================
+
+function renderClips() {
+  grid.innerHTML = CLIPS.map((c,i) => `
+    <div class="card" data-i="${i}" id="card${i}">
+      <div class="card-top">
+        <div class="card-icon">${c.icon}</div>
+        <div class="card-info">
+          <h2>${c.name}</h2>
+          <span class="card-id">${c.id}</span>
+        </div>
+      </div>
+      <p class="desc">${c.desc}</p>
+      <div class="vtag ${c.voiceType}" id="vt${i}">
+        <span class="vdot"></span>
+        ${c.voiceType==='uk'?'🇬🇧':'🇺🇸'} ${c.voiceLabel}
+      </div>
+      <div class="controls">
+        <button class="btn play" onclick="playClip(${i})" aria-label="Play">
+          <svg viewBox="0 0 24 24"><polygon points="7,4 20,12 7,20"/></svg>
+        </button>
+        <div class="prog">
+          <div class="prog-bar" onclick="seekIt(event,${i})"><div class="prog-fill" id="pf${i}"></div></div>
+          <div class="prog-time"><span id="tm${i}">Ready</span><span id="dr${i}">--:--</span></div>
+        </div>
+        <div class="sts ok" id="st${i}">Ready</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// SPEECH CONTROL
+// ============================================================
+
+function playClip(i) {
+  // Toggle if same clip
+  if (i === currentIdx && speaking) {
+    stopSpeech();
+    return;
+  }
+  
+  stopSpeech();
+  currentIdx = i;
+  
+  // Highlight card
+  document.querySelectorAll('.card').forEach(c=>c.classList.remove('active'));
+  document.getElementById(`card${i}`).classList.add('active');
+  
+  const clip = CLIPS[i];
+  const voice = getSelectedVoice(clip.voiceType);
+  
+  console.log(`\n▶️ Playing: ${clip.name}`);
+  console.log(`   Type: ${clip.voiceType}`);
+  console.log(`   Voice: ${voice?.name || 'default'} (${voice?.lang || clip.voiceType === 'uk'?'en-GB':'en-US'})`);
+  console.log(`   Service: ${voice?.service || 'native/system'}`);
+  
+  utt = new SpeechSynthesisUtterance(clip.desc);
+  
+  if (voice) {
+    utt.voice = voice;
+    utt.lang = voice.lang;
+  } else {
+    utt.lang = clip.voiceType === 'uk' ? 'en-GB' : 'en-US';
+  }
+  
+  // Male voice settings
+  utt.rate = 0.90;     // Slightly slower for clarity
+  utt.pitch = 0.92;    // Lower pitch for male
+  utt.volume = 1.0;
+  
+  const dur = estimateDur(clip.desc);
+  let startT = null;
+  
+  utt.onstart = () => {
+    startT = Date.now();
+    speaking = true;
+    setUI(i,true);
+    document.getElementById(`dr${i}`).textContent = fmt(dur);
+    simulateProg(i,dur);
+    console.log('✅ Speech started');
+  };
+  
+  utt.onend = () => {
+    speaking = false;
+    setUI(i,false);
+    doneProg(i);
+    console.log('✅ Speech ended');
+  };
+  
+  utt.onerror = e => {
+    console.error('❌ Error:', e.error);
+    speaking = false;
+    setUI(i,false);
+    errSt(i,e.error);
+  };
+  
+  speechSynthesis.speak(utt);
+}
+
+function stopSpeech() {
+  speechSynthesis.cancel();
+  if (currentIdx >= 0) {
+    setUI(currentIdx,false);
+    doneProg(currentIdx);
+  }
+  speaking = false;
+}
+
+function setUI(i,on){
+  const btn=document.querySelector(`#card${i} .btn`);
+  const vt=document.getElementById(`vt${i}`);
+  const st=document.getElementById(`st${i}`);
+  if(on){
+    btn.classList.add('playing');
+    btn.innerHTML='<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+    vt.classList.add('speaking');
+    st.className='sts on';st.textContent='Speaking';
+  }else{
+    btn.classList.remove('playing');
+    btn.innerHTML='<svg viewBox="0 0 24 24"><polygon points="7,4 20,12 7,20"/></svg>';
+    vt.classList.remove('speaking');
+    st.className='sts ok';st.textContent='Ready';
+  }
+}
+
+// Progress simulation
+function simulateProg(i,dur){
+  clearInterval(progInt);
+  const t0=Date.now();
+  const pf=document.getElementById(`pf${i}`);
+  const tm=document.getElementById(`tm${i}`);
+  progInt=setInterval(()=>{
+    if(!speaking)return;
+    const el=(Date.now()-t0)/1000;
+    const pct=Math.min(100,(el/dur)*100);
+    pf.style.width=pct+'%';
+    tm.textContent=fmt(el);
+  },80);
+}
+function doneProg(i){clearInterval(progInt);document.getElementById(`pf${i}`).style.width='100%';document.getElementById(`tm${i}`).textContent='Done'}
+function seekIt(e,i){if(i!==currentIdx)playClip(i)}
+
+// Utils
+function estimateDur(t){return(t.split(/\s+/).length/140)*60}
+function fmt(s){if(!s||isNaN(s))return'0:00';return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0')}
+function errSt(i,m){const s=document.getElementById(`st${i}`);s.className='sts';s.style.background='rgba(239,68,68,0.2)';s.style.color='#ef4444';s.textContent=m||'Error'}
+
+// ============================================================
+// INIT
+// ============================================================
+
+function init(){
+  renderClips();
+  
+  if(speechSynthesis.onvoiceschanged!==undefined){
+    speechSynthesis.onvoiceschanged=loadVoices;
+  }
+  loadVoices();
+  
+  console.log('🎙️ SciCMP Voice Player Initialized');
+  console.log(`📦 ${CLIPS.length} clips ready`);
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',init);
+}else{
+  init();
+}
+
+window.addEventListener('beforeunload',()=>speechSynthesis.cancel());
+</script>
+
+</body>
+</html>

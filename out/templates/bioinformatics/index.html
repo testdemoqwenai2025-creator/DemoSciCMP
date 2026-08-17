@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bioinformatics Suite | SciCMPMATH Studio</title>
+    <meta name="description" content="Comprehensive bioinformatics tools for sequence alignment, phylogenetic analysis, and genome-wide association studies. Production-ready pipelines for computational biology research.">
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Premium Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Scientific Premium Design System -->
+    <link rel="stylesheet" href="/DemoSciCMP/templates/scientific-premium-core.css">
+    
+    <style>
+        /* Bioinformatics-specific theme overrides */
+        :root {
+            --sp-accent-primary: #34d399;
+            --sp-accent-primary-dim: rgba(52, 211, 153, 0.15);
+            --sp-gradient-hero: radial-gradient(ellipse at top, rgba(52, 211, 153, 0.12), transparent 60%);
+            --sp-gradient-text: linear-gradient(135deg, #34d399 0%, #22d3ee 50%, #a78bfa 100%);
+            --sp-border-glow: rgba(52, 211, 153, 0.3);
+        }
+        
+        .sp-logo-icon {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .sp-badge { color: #34d399; background: rgba(52, 211, 153, 0.08); border-color: rgba(52, 211, 153, 0.2); }
+        .sp-badge-dot { background: #34d399; box-shadow: 0 0 12px #34d399; }
+        
+        .sp-btn-primary { 
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.25);
+        }
+        .sp-btn-primary:hover {
+            box-shadow: 0 8px 32px rgba(16, 185, 129, 0.4), 0 0 30px rgba(52, 211, 153, 0.2);
+        }
+        
+        .sp-card:hover { border-color: rgba(52, 211, 153, 0.35); }
+        .sp-card-icon { background: rgba(52, 211, 153, 0.12); border-color: rgba(52, 211, 153, 0.2); }
+        .sp-card:hover .sp-card-icon { box-shadow: 0 0 20px rgba(52, 211, 153, 0.2); }
+        
+        .sp-step-number { background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25); }
+        .sp-step-command { color: #34d399; }
+        
+        .sp-stats-bar { background: linear-gradient(135deg, rgba(16, 185, 129, 0.06), rgba(5, 150, 105, 0.06)); }
+        
+        .sp-float-btn:hover { background: rgba(52, 211, 153, 0.15); border-color: rgba(52, 211, 153, 0.4); color: #34d399; }
+        
+        .sp-breadcrumb-current { color: #34d399; }
+        .sp-breadcrumb a:hover { color: #34d399; }
+        
+        /* Hero animation */
+        .sp-hero::after {
+            background: radial-gradient(circle, rgba(52, 211, 153, 0.07) 0%, transparent 70%);
+        }
+        
+        /* DNA helix decoration */
+        .dna-decoration {
+            position: absolute;
+            top: 50%;
+            left: -100px;
+            transform: translateY(-50%);
+            width: 200px;
+            height: 400px;
+            opacity: 0.05;
+            pointer-events: none;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 200'%3E%3Cpath d='M30 10 Q70 30 30 50 Q-10 70 30 90 Q70 110 30 130 Q-10 150 30 170 Q70 190 30 190' stroke='%2334d399' fill='none' stroke-width='2'/%3E%3Cpath d='M70 10 Q30 30 70 50 Q110 70 70 90 Q30 110 70 130 Q110 150 70 170 Q30 190 70 190' stroke='%2334d399' fill='none' stroke-width='2'/%3E%3C/svg%3E") center/contain no-repeat;
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(-50%) rotate(0deg); }
+            50% { transform: translateY(-55%) rotate(2deg); }
+        }
+        
+        @media (max-width: 1400px) {
+            .dna-decoration { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip Link for Accessibility -->
+    <a href="#main-content" class="sp-skip-link">Skip to main content</a>
+
+    <!-- Navigation -->
+    <nav class="sp-navbar" role="navigation" aria-label="Main navigation">
+        <div class="nav-left" style="display: flex; align-items: center; gap: 32px;">
+            <a href="/DemoSciCMP/" class="sp-logo" aria-label="SciCMPMATH Home">
+                <div class="logo-icon sp-logo-icon" aria-hidden="true">🧬</div>
+                <span>SciCMPMATH</span>
+            </a>
+            <div class="sp-nav-links">
+                <a href="/DemoSciCMP/" class="sp-nav-link">Home</a>
+                <a href="/DemoSciCMP/#/templates" class="sp-nav-link active">Templates</a>
+                <a href="/DemoSciCMP/templates/bioinformatics/index.html" class="sp-nav-link">Bioinfo</a>
+                <a href="/DemoSciCMP/templates/machine-learning.html" class="sp-nav-link">ML Hub</a>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <button onclick="goHome()" class="sp-btn btn-home" aria-label="Return to home page">
+                🏠 Home
+            </button>
+            <button onclick="openStudioIDE()" class="sp-btn sp-btn-ide" aria-label="Open in Studio IDE">
+                ⌥ Open in Studio IDE
+            </button>
+            <a href="https://github.com/testdemoqwenai2025-creator/DemoSciCMP" target="_blank" rel="noopener noreferrer" class="sp-btn sp-btn-secondary">
+                GitHub →
+            </a>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <nav class="sp-breadcrumb" aria-label="Breadcrumb">
+        <a href="/DemoSciCMP/">Home</a><span class="sp-breadcrumb-sep" aria-hidden="true">›</span>
+        <a href="/DemoSciCMP/#/templates">Templates</a><span class="sp-breadcrumb-sep" aria-hidden="true">›</span>
+        <span class="sp-breadcrumb-current" aria-current="page">Bioinformatics Suite</span>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="sp-hero" aria-labelledby="hero-title">
+        <div class="dna-decoration" aria-hidden="true"></div>
+        <div class="sp-badge">
+            <span class="sp-badge-dot" aria-hidden="true"></span>
+            Bioinformatics • Genomics • Sequence Analysis
+        </div>
+        <h1 id="hero-title">
+            Bioinformatics <span class="sp-gradient-text">Suite</span>
+        </h1>
+        <p>
+            Comprehensive tools for sequence alignment, phylogenetic analysis, and genome-wide association studies. 
+            From raw reads to biological insights with production-ready pipelines.
+        </p>
+        <div class="sp-hero-buttons">
+            <button onclick="launchTemplate('alignment')" class="sp-btn sp-btn-primary">
+                🧬 Sequence Alignment
+            </button>
+            <button onclick="launchTemplate('phylogeny')" class="sp-btn sp-btn-primary">
+                🌳 Phylogenetics
+            </button>
+            <button onclick="launchTemplate('gwas')" class="sp-btn sp-btn-primary">
+                🔬 GWAS Analysis
+            </button>
+            <button onclick="openStudioIDE()" class="sp-btn sp-btn-ide">
+                ⌥ Studio IDE
+            </button>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main id="main-content" class="sp-container">
+        <!-- Features Grid -->
+        <h2 class="sp-section-title">Powerful Bioinformatics Workflows</h2>
+        <p class="sp-section-subtitle">
+            Production-ready pipelines for modern computational biology research.
+        </p>
+
+        <div class="sp-card-grid">
+            <article class="sp-card">
+                <div class="sp-card-icon" aria-hidden="true">🔗</div>
+                <h3>Sequence Alignment Engine</h3>
+                <p>Multiple sequence alignment with MAFFT, Clustal Omega, and MUSCLE. Supports DNA, RNA, and protein sequences with customizable scoring matrices and iterative refinement.</p>
+            </article>
+            
+            <article class="sp-card">
+                <div class="sp-card-icon" aria-hidden="true">🌳</div>
+                <h3>Phylogenetic Reconstruction</h3>
+                <p>Build evolutionary trees using Maximum Likelihood (RAxML, IQ-TREE), Bayesian inference (MrBayes), and distance-based methods (Neighbor-Joining) with bootstrap support.</p>
+            </article>
+            
+            <article class="sp-card">
+                <div class="sp-card-icon" aria-hidden="true">📊</div>
+                <h3>GWAS Pipeline</h3>
+                <p>Genome-wide association studies with PLINK integration, quality control workflows, population stratification correction (PCA), and Manhattan/QQ plot generation.</p>
+            </article>
+            
+            <article class="sp-card">
+                <div class="sp-card-icon" aria-hidden="true">🧬</div>
+                <h3>Variant Calling</h3>
+                <p>GATK best practices pipeline for SNP/indel detection from NGS data. Includes variant filtration, annotation with VEP/SnpEff, and clinical interpretation.</p>
+            </article>
+            
+            <article class="sp-card">
+                <div class="sp-card-icon" aria-hidden="true">📈</div>
+                <h3>Expression Analysis</h3>
+                <p>RNA-seq differential expression analysis with DESeq2, edgeR, and limma-voom. Generate heatmaps, volcano plots, PCA biplots, and pathway enrichment results.</p>
+            </article>
+            
+            <article class="sp-card">
+                <div class="sp-card-icon" aria-hidden="true">🔄</div>
+                <h3>Workflow Automation</h3>
+                <p>Snakemake and Nextflow integration for reproducible, scalable analysis pipelines with Conda environment management and container support.</p>
+            </article>
+        </div>
+
+        <!-- Workflow Section -->
+        <div class="sp-workflow" aria-labelledby="workflow-title">
+            <h2 id="workflow-title" class="sp-section-title">Quick Start: Sequence Analysis Workflow</h2>
+            <p class="sp-section-subtitle">From FASTA files to phylogenetic tree in 5 systematic steps.</p>
+
+            <div class="sp-steps-container">
+                <div class="sp-step">
+                    <div class="sp-step-number" aria-hidden="true">1</div>
+                    <div class="sp-step-content">
+                        <h4>Data Import & Quality Control</h4>
+                        <p>Import sequences in FASTA/FASTQ format, perform comprehensive quality checks with FastQC, generate MultiQC reports, and trim adapters with Trimmomatic.</p>
+                        <div class="step-command" tabindex="0"># Quality control pipeline
+fastqc raw_reads/*.fastq.gz -o qc_results/
+multiqc qc_results/ -o multiqc_report/
+trimmomatic PE -phred33 input_R1.fastq input_R2.fastq \
+  paired_R1.paired.fastq paired_R1.unpaired.fastq \
+  paired_R2.paired.fastq paired_R2.unpaired.fastq \
+  ILLUMINACLIP:adapters.fa:2:30:10 LEADING:3 TRAILING:3 \
+  SLIDINGWINDOW:4:15 MINLEN:36</div>
+                    </div>
+                </div>
+                
+                <div class="sp-step">
+                    <div class="sp-step-number" aria-hidden="true">2</div>
+                    <div class="sp-step-content">
+                        <h4>Multiple Sequence Alignment</h4>
+                        <p>Align sequences using progressive methods with iterative refinement. Choose from MAFFT (speed), Clustal Omega (accuracy), or MUSCLE (large datasets).</p>
+                        <div class="step-command" tabindex="0"># Run MSA with MAFFT (auto mode)
+mafft --auto --thread 8 --reorder input.fasta > aligned.fasta
+
+# Alternative: Clustal Omega for better accuracy
+clustalo -i input.fasta -o aligned_clustal.fasta \
+  --outfmt=fasta --threads=8 --force</div>
+                    </div>
+                </div>
+                
+                <div class="sp-step">
+                    <div class="sp-step-number" aria-hidden="true">3</div>
+                    <div class="sp-step-content">
+                        <h4>Alignment Refinement & Trimming</h4>
+                        <p>Trim poorly aligned regions with trimAl or BMGE. Check for recombination signals with GARD. Assess alignment quality with Zorro confidence scores.</p>
+                        <div class="step-command" tabindex="0"># Trim alignment automatically
+trimal -in aligned.fasta -out trimmed.fasta \
+  -automated1 -leavegaps  # Automated gap handling
+
+# Check alignment statistics
+alignstat.py trimmed.fasta > alignment_stats.txt</div>
+                    </div>
+                </div>
+                
+                <div class="sp-step">
+                    <div class="sp-step-number" aria-hidden="true">4</div>
+                    <div class="sp-step-content">
+                        <h4>Model Selection & Tree Building</h4>
+                        <p>Select best-fit substitution model with ModelTest-NG, then build maximum likelihood tree with ultrafast bootstrap support using IQ-TREE2.</p>
+                        <div class="step-command" tabindex="0"># Build tree with IQ-TREE2 (automated)
+iqtree2 -s trimmed.fasta -m MF -B 1000 -alrt 1000 \
+  -T AUTO -pre output_tree
+
+# MF = ModelFinder (auto model selection)
+# B = Ultrafast bootstrap (1000 replicates)
+# alrt = SH-aLRT test (1000 replicates)</div>
+                    </div>
+                </div>
+                
+                <div class="sp-step">
+                    <div class="sp-step-number" aria-hidden="true">5</div>
+                    <div class="sp-step-content">
+                        <h4>Visualization & Interpretation</h4>
+                        <p>Annotate tree with metadata (geography, host, time). Generate publication-ready figures with iTOL or FigTree. Interpret evolutionary patterns and divergence times.</p>
+                        <div class="step-command" tabindex="0"># Visualize interactive tree
+# Upload output_tree.treefile to https://itol.embl.de/
+# Or use FigTree for local visualization:
+
+# Convert to Newick with support values
+cat output_tree.treefile | treeviewer
+
+# Export as high-resolution figure
+# Recommended: SVG → PDF/ PNG at 300 DPI</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="sp-stats-bar" role="region" aria-label="Platform Statistics">
+            <div class="sp-stat-item">
+                <div class="sp-stat-value" data-count="50000">50K+</div>
+                <div class="sp-stat-label">Sequences Processed</div>
+            </div>
+            <div class="sp-stat-item">
+                <div class="sp-stat-value">&lt;5min</div>
+                <div class="sp-stat-label">Alignment Time</div>
+            </div>
+            <div class="sp-stat-item">
+                <div class="sp-stat-value" data-count="99.5">99.5%</div>
+                <div class="sp-stat-label">Accuracy Rate</div>
+            </div>
+            <div class="sp-stat-item">
+                <div class="sp-stat-value" data-count="200">200+</div>
+                <div class="sp-stat-label">Supported Formats</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- CTA Section -->
+    <section class="sp-cta-section" aria-labelledby="cta-title">
+        <h2 id="cta-title">Ready to Analyze Biological Data?</h2>
+        <p>Launch any bioinformatics workflow or explore our full template gallery.</p>
+        <div class="sp-hero-buttons">
+            <button onclick="openStudioIDE()" class="sp-btn sp-btn-primary">
+                🚀 Launch in Studio IDE
+            </button>
+            <a href="/DemoSciCMP/templates/machine-learning.html" class="sp-btn sp-btn-secondary">
+                View ML Templates →
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="sp-footer" role="contentinfo">
+        <p>&copy; 2026 SciCMPMATH by Endeavor Science | Made with 🧬 for Biology</p>
+        <p style="margin-top: 12px; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+            <a href="/DemoSciCMP/">Home</a> • 
+            <a href="/DemoSciCMP/studio.html">Studio IDE</a> • 
+            <a href="/DemoSciCMP/templates/machine-learning.html">ML Hub</a> • 
+            <a href="https://github.com/testdemoqwenai2025-creator/DemoSciCMP" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </p>
+    </footer>
+
+    <!-- Floating Navigation -->
+    <div class="sp-floating-nav" aria-label="Quick navigation">
+        <button onclick="goHome()" class="sp-float-btn" title="Return to Home" aria-label="Return to Home">
+            🏠
+        </button>
+        <button onclick="scrollToTop()" class="sp-float-btn" title="Back to Top" aria-label="Scroll back to top">
+            ↑
+        </button>
+    </div>
+
+    <!-- Progressive Enhancement Layer -->
+    <script src="/DemoSciCMP/templates/scientific-premium-enhance.js"></script>
+    
+    <script>
+        // Page-specific initialization
+        console.log('🧬 Bioinformatics Suite Loaded | SciCMPMATH Studio Ready ✅');
+    </script>
+</body>
+</html>

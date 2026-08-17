@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environmental Science Hub | SciCMPMATH Studio</title>
+    <meta name="description" content="Analyze climate data, model species distributions, and study ecosystem dynamics with comprehensive environmental research tools for sustainability science.">
+    
+    <!-- Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Premium Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Scientific Premium Design System -->
+    <link rel="stylesheet" href="/DemoSciCMP/templates/scientific-premium-core.css">
+    
+    <style>
+        /* Environmental-specific theme overrides */
+        :root {
+            --sp-accent-primary: #4ade80;
+            --sp-accent-primary-dim: rgba(74, 222, 128, 0.15);
+            --sp-gradient-hero: radial-gradient(ellipse at top, rgba(74, 222, 128, 0.12), transparent 60%);
+            --sp-gradient-text: linear-gradient(135deg, #4ade80 0%, #22d3ee 50%, #a78bfa 100%);
+            --sp-border-glow: rgba(74, 222, 128, 0.3);
+        }
+        
+        .sp-logo-icon { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); }
+        
+        .sp-badge { color: #4ade80; background: rgba(74, 222, 128, 0.08); border-color: rgba(74, 222, 128, 0.2); }
+        .sp-badge-dot { background: #4ade80; box-shadow: 0 0 12px #4ade80; }
+        
+        .sp-btn-primary { 
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            box-shadow: 0 4px 20px rgba(34, 197, 94, 0.25);
+        }
+        .sp-btn-primary:hover {
+            box-shadow: 0 8px 32px rgba(34, 197, 94, 0.4), 0 0 30px rgba(74, 222, 128, 0.2);
+        }
+        
+        .sp-card:hover { border-color: rgba(74, 222, 128, 0.35); }
+        .sp-card-icon { background: rgba(74, 222, 128, 0.12); border-color: rgba(74, 222, 128, 0.2); }
+        .sp-card:hover .sp-card-icon { box-shadow: 0 0 20px rgba(74, 222, 128, 0.2); }
+        
+        .sp-step-number { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); box-shadow: 0 4px 16px rgba(34, 197, 94, 0.25); }
+        .sp-step-command { color: #4ade80; }
+        
+        .sp-stats-bar { background: linear-gradient(135deg, rgba(34, 197, 94, 0.06), rgba(22, 163, 74, 0.06)); }
+        
+        .sp-float-btn:hover { background: rgba(74, 222, 128, 0.15); border-color: rgba(74, 222, 128, 0.4); color: #4ade80; }
+        
+        .sp-breadcrumb-current { color: #4ade80; }
+        .sp-breadcrumb a:hover { color: #4ade80; }
+        
+        /* Earth/globe decoration */
+        .sp-hero::after {
+            background: radial-gradient(circle, rgba(74, 222, 128, 0.07) 0%, transparent 70%);
+        }
+
+        /* Leaf pattern decoration */
+        .leaf-pattern {
+            position: absolute;
+            top: 20%;
+            right: -50px;
+            width: 150px;
+            height: 200px;
+            opacity: 0.03;
+            pointer-events: none;
+            animation: leafSway 8s ease-in-out infinite;
+        }
+        
+        @keyframes leafSway {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+        
+        @media (max-width: 1400px) {
+            .leaf-pattern { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip Link -->
+    <a href="#main-content" class="sp-skip-link">Skip to main content</a>
+
+    <!-- Navigation -->
+    <nav class="sp-navbar" role="navigation" aria-label="Main navigation">
+        <div class="nav-left" style="display: flex; align-items: center; gap: 32px;">
+            <a href="/DemoSciCMP/" class="sp-logo" aria-label="SciCMPMATH Home">
+                <div class="logo-icon sp-logo-icon" aria-hidden="true">🌿</div>
+                <span>SciCMPMATH</span>
+            </a>
+            <div class="sp-nav-links">
+                <a href="/DemoSciCMP/" class="sp-nav-link">Home</a>
+                <a href="/DemoSciCMP/#/templates" class="sp-nav-link active">Templates</a>
+                <a href="/DemoSciCMP/templates/environmental-science/index.html" class="sp-nav-link">Environmental</a>
+                <a href="/DemoSciCMP/templates/machine-learning.html" class="sp-nav-link">ML Hub</a>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <button onclick="goHome()" class="sp-btn btn-home" aria-label="Return to home page">🏠 Home</button>
+            <button onclick="openStudioIDE()" class="sp-btn sp-btn-ide" aria-label="Open in Studio IDE">⌥ Open in Studio IDE</button>
+            <a href="https://github.com/testdemoqwenai2025-creator/DemoSciCMP" target="_blank" rel="noopener noreferrer" class="sp-btn sp-btn-secondary">GitHub →</a>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <nav class="sp-breadcrumb" aria-label="Breadcrumb">
+        <a href="/DemoSciCMP/">Home</a><span class="sp-breadcrumb-sep" aria-hidden="true">›</span>
+        <a href="/DemoSciCMP/#/templates">Templates</a><span class="sp-breadcrumb-sep" aria-hidden="true">›</span>
+        <span class="sp-breadcrumb-current" aria-current="page">Environmental Science Hub</span>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="sp-hero" aria-labelledby="hero-title">
+        <svg class="leaf-pattern" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M50 10 Q70 30 65 60 Q60 90 40 110 Q35 85 45 55 Q48 30 50 10Z" fill="#4ade80"/>
+            <line x1="50" y1="10" x2="50" y2="115" stroke="#22c55e" stroke-width="1"/>
+        </svg>
+        
+        <div class="sp-badge">
+            <span class="sp-badge-dot" aria-hidden="true"></span>
+            Environmental Science • Climate • Ecology
+        </div>
+        <h1 id="hero-title">Environmental Science <span class="sp-gradient-text">Hub</span></h1>
+        <p>
+            Analyze climate data, model species distributions, and study ecosystem dynamics 
+            with comprehensive environmental research tools for sustainability science.
+        </p>
+        <div class="sp-hero-buttons">
+            <button onclick="launchTemplate('climate')" class="sp-btn sp-btn-primary">🌡️ Climate Analysis</button>
+            <button onclick="launchTemplate('species')" class="sp-btn sp-btn-primary">🦋 Species Distribution</button>
+            <button onclick="launchTemplate('ecosystem')" class="sp-btn sp-btn-primary">🌍 Ecosystem Modeling</button>
+            <button onclick="openStudioIDE()" class="sp-btn sp-btn-ide">⌥ Studio IDE</button>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main id="main-content" class="sp-container">
+        <h2 class="sp-section-title">Environmental Research Workflows</h2>
+        <p class="sp-section-subtitle">Professional tools for climate science, ecology, and sustainability research.</p>
+
+        <div class="sp-card-grid">
+            <article class="sp-card">
+                <div class="sp-card-icon" aria-hidden="true">🌡️</div>
+                <h3>Climate Data Analysis</h3>
+                <p>Process temperature, precipitation, and atmospheric data from NOAA, NASA, and IPCC datasets. Perform trend analysis, anomaly detection, and generate IPCC-compliant visualizations.</p>
+            </article>
+            
+            <article class="sp-card">
+                <div class="sp-card-icon" aria-hidden="true">🦋</div>
+                <h3>Species Distribution Models</h3>
+                <p>Build ecological niche models using MaxEnt, random forests, and ensemble methods. Integrate occurrence data from GBIF, environmental layers from WorldClim, and predict habitat suitability under climate scenarios.</p>
+            </article>
+            
+            <article class="sp-card">
+                <div class="sp-card-icon" aria-hidden="true">🌊</div>
+                <h3>Ocean & Atmospheric Modeling</h3>
+                <p>Sea level rise projections, ocean acidification analysis, carbon cycle modeling, ENSO pattern detection, and extreme weather event attribution studies.</p>
+            </article>
+            
+            <article class="sp-card">
+                <div class="sp-card-icon" aria-hidden="true">🗺️</div>
+                <h3>GIS & Remote Sensing</h3>
+                <p>Satellite imagery processing (Landsat, Sentinel), land use/land cover classification, deforestation monitoring, NDVI time series analysis, and spatial statistics with GeoPandas/Rasterio.</p>
+            </article>
+            
+            <article class="sp-card">
+                <div class="sp-card-icon" aria-hidden="true">♻️</div>
+                <h3>Sustainability Metrics</h3>
+                <p>Carbon footprint calculation, life cycle assessment (LCA), renewable energy potential mapping, ESG data analysis, and sustainable development goal (SDG) tracking dashboards.</p>
+            </article>
+            
+            <article class="sp-card">
+                <div class="sp-card-icon" aria-hidden="true">📊</div>
+                <h3>Biodiversity Analytics</h3>
+                <p>Species richness estimation, diversity indices (Shannon, Simpson), community composition analysis (NMDS, PCoA), conservation priority scoring, and red list assessments.</p>
+            </article>
+        </div>
+
+        <!-- Workflow Section -->
+        <div class="sp-workflow" aria-labelledby="workflow-title">
+            <h2 id="workflow-title" class="sp-section-title">Quick Start: Climate Data Analysis Workflow</h2>
+            <p class="sp-section-subtitle">From raw climate data to actionable insights in 5 steps.</p>
+
+            <div class="sp-steps-container">
+                <div class="sp-step">
+                    <div class="sp-step-number" aria-hidden="true">1</div>
+                    <div class="sp-step-content">
+                        <h4>Data Acquisition & Preprocessing</h4>
+                        <p>Download climate datasets from authoritative sources (NOAA NCEI, NASA GISS, Copernicus). Handle NetCDF/HDF5 formats, regrid to common resolution, and validate coordinate systems.</p>
+                        <div class="step-command" tabindex="0"># Load climate data with xarray
+import xarray as xr
+import pandas as pd
+
+# Open NetCDF file (common format for climate data)
+ds = xr.open_dataset('ERA5_temperature_1980-2020.nc')
+
+# Explore dataset structure
+print(ds)  # Shows dimensions, coordinates, variables
+
+# Select variable and time range
+temp = ds['t2m']  # 2-meter temperature
+temp_selected = temp.sel(
+    time=slice('1980-01-01', '2020-12-31'),
+    latitude=slice(90, -90),
+    longitude=slice(-180, 180)
+)
+
+print(f'Data shape: {temp_selected.shape}')
+print(f'Time range: {temp_selected.time.values[0]} to {temp_selected.time.values[-1]}')</div>
+                    </div>
+                </div>
+                
+                <div class="sp-step">
+                    <div class="sp-step-number" aria-hidden="true">2</div>
+                    <div class="sp-step-content">
+                        <h4>Quality Control & Homogenization</h4>
+                        <p>Detect outliers and missing values, correct for station relocations, apply homogenization algorithms for consistent long-term time series analysis.</p>
+                        <div class="step-command" tabindex="0"># Quality control and cleaning
+import numpy as np
+
+# Remove impossible values
+temp_clean = temp_selected.where(temp_selected > -100)  # Physical limits
+
+# Calculate anomalies relative to reference period (1981-2010)
+climatology = temp_clean.sel(time=slice('1981', '2010')).mean(dim='time')
+temp_anomaly = temp_clean - climatology
+
+# Handle missing data - interpolate small gaps
+temp_filled = temp_anomaly.interpolate_na(dim='time', method='linear', max_gap=pd.Timedelta(days=7))
+
+# Quality flags
+print(f'Missing values before QC: {temp_selected.isnull().sum().values}')
+print(f'Missing values after QC: {temp_filled.isnull().sum().values}')</div>
+                    </div>
+                </div>
+                
+                <div class="sp-step">
+                    <div class="sp-step-number" aria-hidden="true">3</div>
+                    <div class="sp-step-content">
+                        <h4>Trend & Statistical Analysis</h4>
+                        <p>Compute linear trends with Mann-Kendall significance test, Sen's slope estimator for robust trend quantification, perform breakpoint detection for regime shifts.</p>
+                        <div class="step-command" tabindex="0"># Statistical trend analysis
+from scipy import stats
+import pymannkendall as mk
+
+# Global mean temperature time series
+global_mean = temp_filled.mean(dim=['latitude', 'longitude'])
+
+# Linear regression for trend
+years = np.arange(1980, 2021)
+slope, intercept, r_value, p_value, std_err = stats.linregress(years, global_mean)
+
+# Convert slope to °C/decade
+trend_per_decade = slope * 10
+
+# Mann-Kendall test (non-parametric)
+result = mk.original_test(global_mean.values)
+
+print(f'Linear Trend: {trend_per_decade:.3f} °C/decade')
+print(f'R²: {r_value**2:.4f}')
+print(f'P-value (regression): {p_value:.2e}')
+print(f'\nMann-Kendall Test:')
+print(f'  Tau: {result.Tau:.4f}')
+print(f'  P-value: {result.p:.2e}')
+print(f'  Trend: {result.trend}')  # 'increasing', 'decreasing', or 'no trend'</div>
+                    </div>
+                </div>
+                
+                <div class="sp-step">
+                    <div class="sp-step-number" aria-hidden="true">4</div>
+                    <div class="sp-step-content">
+                        <h4>Spatial Visualization & Mapping</h4>
+                        <p>Create publication-quality maps of temperature patterns, precipitation changes, and extreme event frequency using Cartopy and Matplotlib.</p>
+                        <div class="step-command" tabindex="0"># Create publication-quality climate map
+import matplotlib.pyplot as plt
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
+
+# Set up figure with projection
+fig = plt.figure(figsize=(14, 8))
+ax = plt.axes(projection=ccrs.Robinson(central_longitude=0))
+
+# Add map features
+ax.add_feature(cfeature.LAND.with_edgecolor('#333333'), facecolor='#1a1a2e')
+ax.add_feature(cfeature.OCEAN.with_facecolor('#0a1628'))
+ax.coastlines(linewidth=0.5)
+ax.gridlines(color='rgba(255,255,255,0.1)', linestyle='--')
+
+# Plot temperature anomaly field
+data_plot = temp_filled.mean(dim='time').plot(
+    ax=ax,
+    transform=ccrs.PlateCarree(),
+    cmap='RdBu_r',
+    vmin=-3, vmax=3,
+    add_colorbar=False,
+    extend='both'
+)
+
+# Add colorbar
+cbar = plt.colorbar(data_plot, ax=ax, orientation='horizontal', 
+                   pad=0.05, shrink=0.8, aspect=40)
+cbar.set_label('Temperature Anomaly (°C)', fontsize=11)
+cbar.ax.tick_params(labelsize=10)
+
+plt.title('Global Mean Temperature Anomaly (1980-2020)\nRelative to 1981-2010 Baseline', 
+          fontsize=14, fontweight='bold', pad=20)
+plt.savefig('temperature_anomaly_map.png', dpi=300, bbox_inches='tight', 
+           facecolor='#0a0a0f')
+plt.show()</div>
+                    </div>
+                </div>
+                
+                <div class="sp-step">
+                    <div class="sp-step-number" aria-hidden="true">5</div>
+                    <div class="sp-step-content">
+                        <h4>Projection & Reporting</h4>
+                        <p>Generate future climate scenarios using CMIP6 model outputs, create summary statistics for policy briefs, produce IPCC-style figures with uncertainty ranges.</p>
+                        <div class="step-command" tabindex="0"># Export results and generate report
+import json
+from datetime import datetime
+
+# Compile analysis results
+results = {
+    'analysis_metadata': {
+        'title': 'Global Temperature Trend Analysis',
+        'author': 'SciCMPMATH Environmental Suite',
+        'date': datetime.now().isoformat(),
+        'data_source': 'ERA5 Reanalysis (1980-2020)',
+        'baseline_period': '1981-2010'
+    },
+    'trend_statistics': {
+        'linear_trend_c_per_decade': round(float(trend_per_decade), 3),
+        'r_squared': round(float(r_value**2), 4),
+        'p_value_regression': float(p_value),
+        'mann_kendall_tau': float(result.Tau),
+        'mann_kendall_p_value': float(result.p),
+        'trend_direction': str(result.trend)
+    },
+    'key_findings': [
+        f"Global mean temperature increased by {trend_per_decade*4:.2f}°C over the analysis period",
+        f"Trend is statistically significant (p < 0.001)" if p_value < 0.001 else "Trend not statistically significant",
+        f"Mann-Kendall tau indicates {'strong' if abs(result.Tau) > 0.5 else 'moderate'} monotonic trend"
+    ],
+    'output_files': [
+        'temperature_anomaly_map.png',
+        'timeseries_plot.png',
+        'climate_summary.csv'
+    ]
+}
+
+# Save JSON report
+with open('climate_analysis_report.json', 'w') as f:
+    json.dump(results, f, indent=2)
+
+# Save summary table
+summary_df = pd.DataFrame([{
+    'Metric': 'Trend (°C/decade)',
+    'Value': f'{trend_per_decade:.3f}',
+    'Significance': '***' if p_value < 0.001 else '**' if p_value < 0.01 else '*' if p_value < 0.05 else 'ns'
+}, {
+    'Metric': 'R²',
+    'Value': f'{r_value**2:.4f}',
+    'Significance': '-'
+}, {
+    'Metric': 'M-K Tau',
+    'Value': f'{result.Tau:.4f}',
+    'Significance': '***' if result.p < 0.001 else '**' if result.p < 0.01 else '*' if result.p < 0.05 else 'ns'
+}])
+summary_df.to_csv('climate_summary.csv', index=False)
+
+print('✅ Climate analysis complete! Report saved.')
+print(f'Files generated: {len(results["output_files"])}')</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="sp-stats-bar" role="region" aria-label="Platform Statistics">
+            <div class="sp-stat-item">
+                <div class="sp-stat-value" data-count="50">50+</div>
+                <div class="sp-stat-label">Data Sources</div>
+            </div>
+            <div class="sp-stat-item">
+                <div class="sp-stat-value">&lt;15min</div>
+                <div class="sp-stat-label">Analysis Time</div>
+            </div>
+            <div class="sp-stat-item">
+                <div class="sp-stat-value">IPCC</div>
+                <div class="sp-stat-label">Compliant</div>
+            </div>
+            <div class="sp-stat-item">
+                <div class="sp-stat-value" data-count="1000">1000+</div>
+                <div class="sp-stat-label">Species Tracked</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- CTA Section -->
+    <section class="sp-cta-section" aria-labelledby="cta-title">
+        <h2 id="cta-title">Ready to Study Our Planet?</h2>
+        <p>Launch any environmental workflow or explore our full template gallery.</p>
+        <div class="sp-hero-buttons">
+            <button onclick="openStudioIDE()" class="sp-btn sp-btn-primary">🚀 Launch in Studio IDE</button>
+            <a href="/DemoSciCMP/templates/quantum-computing/index.html" class="sp-btn sp-btn-secondary">View Quantum Templates →</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="sp-footer" role="contentinfo">
+        <p>&copy; 2026 SciCMPMATH by Endeavor Science | Made with 🌿 for Earth</p>
+        <p style="margin-top: 12px; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+            <a href="/DemoSciCMP/">Home</a> • 
+            <a href="/DemoSciCMP/studio.html">Studio IDE</a> • 
+            <a href="/DemoSciCMP/templates/quantum-computing/index.html">Quantum</a> • 
+            <a href="https://github.com/testdemoqwenai2025-creator/DemoSciCMP" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </p>
+    </footer>
+
+    <!-- Floating Navigation -->
+    <div class="sp-floating-nav" aria-label="Quick navigation">
+        <button onclick="goHome()" class="sp-float-btn" title="Return to Home" aria-label="Return to Home">🏠</button>
+        <button onclick="scrollToTop()" class="sp-float-btn" title="Back to Top" aria-label="Scroll back to top">↑</button>
+    </div>
+
+    <!-- Progressive Enhancement Layer -->
+    <script src="/DemoSciCMP/templates/scientific-premium-enhance.js"></script>
+    
+    <script>
+        console.log('🌿 Environmental Science Hub Loaded | SciCMPMATH Studio Ready ✅');
+    </script>
+</body>
+</html>

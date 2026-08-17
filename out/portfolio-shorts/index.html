@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research Portfolio Shorts — SciCMP</title>
+<style>
+  :root {
+    --hud: #ffffff;
+    --hud-dim: rgba(255,255,255,0.5);
+    --accent: #00d4aa;
+    --voice-uk: #6366f1;
+    --voice-us: #f59e0b;
+    --mono: 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: #000;
+    overflow: hidden;
+    font-family: var(--mono);
+    color: var(--hud);
+  }
+
+  .app {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ========== MAIN DISPLAY ========== */
+  .display {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    text-align: center;
+    transition: opacity 0.5s ease;
+  }
+
+  .display.helios { background: radial-gradient(ellipse at 30% 30%, rgba(255,180,50,0.12) 0%, transparent 60%), #0a0a12; }
+  .display.lattice { background: radial-gradient(ellipse at 70% 30%, rgba(99,102,241,0.12) 0%, transparent 60%), #08081a; }
+  .display.carbon { background: radial-gradient(ellipse at 50% 70%, rgba(16,185,129,0.12) 0%, transparent 60%), #0a120e; }
+  .display.solid { background: radial-gradient(ellipse at 60% 40%, rgba(245,158,11,0.12) 0%, transparent 60%), #120e08; }
+  .display.hydrogen { background: radial-gradient(ellipse at 40% 60%, rgba(56,189,248,0.12) 0%, transparent 60%), #080e14; }
+  .display.tmd { background: radial-gradient(ellipse at 50% 50%, rgba(236,72,153,0.12) 0%, transparent 60%), #140810; }
+  .display.atomic { background: radial-gradient(ellipse at 70% 60%, rgba(139,92,246,0.12) 0%, transparent 60%), #0c0814; }
+
+  .icon {
+    font-size: 72px;
+    margin-bottom: 24px;
+    animation: float 2.5s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .title {
+    font-family: var(--sans);
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 700;
+    margin-bottom: 12px;
+    letter-spacing: -0.02em;
+  }
+
+  .subtitle {
+    font-family: var(--sans);
+    font-size: clamp(13px, 2vw, 16px);
+    color: var(--hud-dim);
+    max-width: 550px;
+    line-height: 1.6;
+    margin-bottom: 28px;
+  }
+
+  .voice-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 20px;
+    font-size: 12px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .dot.uk { background: var(--voice-uk); box-shadow: 0 0 10px var(--voice-uk); }
+  .dot.us { background: var(--voice-us); box-shadow: 0 0 10px var(--voice-us); }
+  .dot.playing { animation: blink 0.5s infinite; }
+
+  @keyframes blink { 50% { opacity: 0.3; } }
+
+  /* ========== CONTROLS BAR ========== */
+  .controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px 32px 28px;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    z-index: 20;
+  }
+
+  .play-btn {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(0,212,170,0.4);
+  }
+
+  .play-btn:hover { transform: scale(1.08); }
+  .play-btn:active { transform: scale(0.95); }
+  .play-btn svg { width: 20px; height: 20px; fill: #000; margin-left: 2px; }
+  .play-btn.playing svg { margin-left: 0; }
+
+  .progress-bar {
+    flex: 1;
+    height: 48px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    gap: 3px;
+    cursor: pointer;
+  }
+
+  .bar {
+    flex: 1;
+    height: 20px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    transition: all 0.1s;
+  }
+  .bar.active { background: var(--accent); }
+
+  .time {
+    font-size: 13px;
+    min-width: 85px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ========== HUD ELEMENTS ========== */
+  .hud-top {
+    position: absolute;
+    top: 16px;
+    left: 24px;
+    right: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 20;
+    font-size: 12px;
+  }
+
+  .badge {
+    padding: 5px 10px;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 4px;
+    font-size: 11px;
+  }
+
+  .rec-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .rec-indicator:hover { background: rgba(255,255,255,0.08); }
+
+  .rec-dot {
+    width: 8px;
+    height: 8px;
+    background: #ff3b30;
+    border-radius: 50%;
+  }
+  .rec-dot.on { animation: blink 1s infinite; }
+
+  /* ========== CLIP NAVIGATION ========== */
+  .nav-left, .nav-right {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
+  }
+
+  .nav-left { left: 16px; }
+  .nav-right { right: 16px; }
+
+  .nav-btn {
+    width: 40px;
+    height: 40px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px;
+    color: var(--hud-dim);
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-btn:hover { 
+    background: rgba(0,212,170,0.15); 
+    border-color: var(--accent); 
+    color: var(--accent); 
+  }
+
+  /* ========== CLIP DOTS ========== */
+  .clip-dots {
+    position: absolute;
+    bottom: 110px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 20;
+  }
+
+  .clip-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    cursor: pointer;
+    transition: all 0.25s;
+    border: none;
+  }
+
+  .clip-dot:hover { transform: scale(1.3); }
+  .clip-dot.active { 
+    background: var(--accent); 
+    box-shadow: 0 0 12px var(--accent);
+    transform: scale(1.2);
+  }
+
+  /* ========== INFO PANEL ========== */
+  .info-panel {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(150%);
+    background: rgba(18,18,28,0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    z-index: 100;
+    transition: transform 0.4s cubic-bezier(.2,.8,.2,1);
+    min-width: 320px;
+  }
+
+  .info-panel.show { transform: translateX(-50%) translateY(0); }
+
+  .close-info {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: var(--hud-dim);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px 8px;
+  }
+
+  .now-playing-label {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--hud-dim);
+  }
+
+  .now-playing-title {
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  /* ========== LOADING ========== */
+  .loading {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .loading.show { opacity: 1; pointer-events: auto; }
+
+  .spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid rgba(255,255,255,0.15);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 14px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text { font-size: 11px; color: var(--hud-dim); letter-spacing: 0.2em; }
+
+  /* ========== HELP ========== */
+  .help-tip {
+    position: absolute;
+    bottom: 160px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: var(--hud-dim);
+    letter-spacing: 0.15em;
+    opacity: 0;
+    transition: opacity 0.5s;
+    white-space: nowrap;
+  }
+
+  .help-tip.show { opacity: 1; }
+
+  .help-tip kbd {
+    display: inline-block;
+    padding: 2px 6px;
+    border: 1px solid var(--hud-dim);
+    border-radius: 3px;
+    font-size: 9px;
+    margin: 0 2px;
+  }
+
+  @media (max-width: 600px) {
+    .controls { padding: 16px 20px 24px; gap: 14px; }
+    .play-btn { width: 44px; height: 44px; }
+    .progress-bar { height: 38px; }
+    .icon { font-size: 56px; }
+    .nav-btn { width: 34px; height: 34px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- Main Display -->
+  <div class="display helios" id="display">
+    <div class="icon" id="icon">☀️</div>
+    <h1 class="title" id="title">Helios Tandem</h1>
+    <p class="subtitle" id="subtitle">Advanced photovoltaic tandem cell architecture achieving record efficiency through novel materials integration.</p>
+    <div class="voice-badge" id="voiceBadge">
+      <span class="dot uk" id="voiceDot"></span>
+      <span id="voiceLabel">British RP · jam</span>
+    </div>
+  </div>
+
+  <!-- HUD Top -->
+  <div class="hud-top">
+    <div style="display:flex;gap:10px;align-items:center;">
+      <span class="badge" style="background:rgba(0,212,170,0.15);color:var(--accent);border-color:var(--accent);">SciCMP</span>
+      <span class="badge" id="idBadge">P12</span>
+      <span style="font-size:11px;color:var(--hud-dim);" id="counter">1 / 7</span>
+    </div>
+    <button class="rec-indicator" id="recBtn" onclick="togglePlay()">
+      <span class="rec-dot" id="recDot"></span>
+      <span id="recLabel">PLAY</span>
+    </button>
+  </div>
+
+  <!-- Navigation -->
+  <div class="nav-left"><button class="nav-btn" onclick="prevClip()">‹</button></div>
+  <div class="nav-right"><button class="nav-btn" onclick="nextClip()">›</button></div>
+
+  <!-- Clip Dots -->
+  <div class="clip-dots" id="dots"></div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="play-btn" id="mainPlayBtn" onclick="togglePlay()">
+      <svg viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>
+    </button>
+    <div class="progress-bar" id="progressBar" onclick="seek(event)">
+      <!-- Bars generated by JS -->
+    </div>
+    <div class="time"><span id="curTime">0:00</span> / <span id="durTime">0:45</span></div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">LOADING</div>
+  </div>
+
+  <!-- Info Panel -->
+  <div class="info-panel" id="infoPanel">
+    <button class="close-info" onclick="hideInfo()">×</button>
+    <div>
+      <div class="now-playing-label">Now Playing</div>
+      <div class="now-playing-title" id="npTitle">-</div>
+    </div>
+  </div>
+
+  <!-- Help Tip -->
+  <div class="help-tip" id="helpTip">
+    <kbd>←</kbd><kbd>→</kbd> Navigate &nbsp;|&nbsp; <kbd>Space</kbd> Play/Pause
+  </div>
+
+</div>
+
+<audio id="audio" preload="auto"></audio>
+
+<script>
+// ============================================================
+// ALL 7 RESEARCH CLIPS WITH VOICE NARRATIONS
+// Using ABSOLUTE paths from site root
+// ============================================================
+
+const BASE = '/DemoSciCMP';
+
+const clips = [
+  {
+    id: 'P12',
+    name: 'Helios Tandem',
+    desc: 'Advanced photovoltaic tandem cell architecture achieving record efficiency through novel materials integration.',
+    icon: '☀️',
+    bgClass: 'helios',
+    voiceType: 'uk',
+    voiceLabel: 'British RP · jam',
+    audio: `${BASE}/audio/portfolio-shorts/P12_jam.wav`
+  },
+  {
+    id: 'P-AI',
+    name: 'Lattice Forge',
+    desc: 'AI-accelerated discovery of next-generation lattice materials for quantum computing applications.',
+    icon: '🔬',
+    bgClass: 'lattice',
+    voiceType: 'us',
+    voiceLabel: 'American Standard · kazi',
+    audio: `${BASE}/audio/portfolio-shorts/P-ai-materials_kazi.wav`
+  },
+  {
+    id: 'P11',
+    name: 'Carbon Sink',
+    desc: 'Novel carbon capture methodology using bio-engineered microorganisms for industrial emissions reduction.',
+    icon: '🌿',
+    bgClass: 'carbon',
+    voiceType: 'us',
+    voiceLabel: 'American Natural · douji',
+    audio: `${BASE}/audio/portfolio-shorts/P11_douji.wav`
+  },
+  {
+    id: 'P3',
+    name: 'Solid State Labs',
+    desc: 'Breakthrough in solid-state electrolyte conductivity enabling next-gen battery performance.',
+    icon: '🔋',
+    bgClass: 'solid',
+    voiceType: 'us',
+    voiceLabel: 'American Standard · kazi',
+    audio: `${BASE}/audio/portfolio-shorts/P3_kazi.wav`
+  },
+  {
+    id: 'P5',
+    name: 'Hydrogen Forge',
+    desc: 'Green hydrogen production via photocatalytic water splitting at industrial scale feasibility.',
+    icon: '💧',
+    bgClass: 'hydrogen',
+    voiceType: 'uk',
+    voiceLabel: 'British RP · jam',
+    audio: `${BASE}/audio/portfolio-shorts/P5_jam.wav`
+  },
+  {
+    id: 'P9',
+    name: 'TMD Logic',
+    desc: 'Transition metal dichalcogenide logic gates for post-silicon computing architectures.',
+    icon: '💻',
+    bgClass: 'tmd',
+    voiceType: 'uk',
+    voiceLabel: 'British RP · jam',
+    audio: `${BASE}/audio/portfolio-shorts/P9_jam.wav`
+  },
+  {
+    id: 'P-CMOS',
+    name: 'Atomic Gate Systems',
+    desc: 'Sub-2nm CMOS transistor design overcoming quantum tunneling limitations.',
+    icon: '⚛️',
+    bgClass: 'atomic',
+    voiceType: 'us',
+    voiceLabel: 'American Standard · kazi',
+    audio: `${BASE}/audio/portfolio-shorts/P-cmos-2nm_kazi.wav`
+  }
+];
+
+let current = 0;
+let playing = false;
+
+const audio = document.getElementById('audio');
+const display = document.getElementById('display');
+const mainPlayBtn = document.getElementById('mainPlayBtn');
+
+// ============================================================
+// INIT DOTS
+// ============================================================
+
+function initDots() {
+  const container = document.getElementById('dots');
+  container.innerHTML = '';
+  clips.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = `clip-dot${i === 0 ? ' active' : ''}`;
+    dot.onclick = () => goTo(i);
+    container.appendChild(dot);
+  });
+}
+
+// ============================================================
+// INIT PROGRESS BARS
+// ============================================================
+
+function initProgress() {
+  const bar = document.getElementById('progressBar');
+  bar.innerHTML = '';
+  for (let i = 0; i < 45; i++) {
+    const b = document.createElement('div');
+    b.className = 'bar';
+    b.style.height = `${Math.random() * 60 + 30}%`;
+    bar.appendChild(b);
+  }
+}
+
+// ============================================================
+// GO TO CLIP
+// ============================================================
+
+function goTo(idx) {
+  if (idx < 0 || idx >= clips.length) return;
+  
+  // Fade out
+  display.style.opacity = '0';
+  
+  setTimeout(() => {
+    current = idx;
+    const c = clips[idx];
+    
+    // Update content
+    document.getElementById('icon').textContent = c.icon;
+    document.getElementById('title').textContent = c.name;
+    document.getElementById('subtitle').textContent = c.desc;
+    
+    const dot = document.getElementById('voiceDot');
+    dot.className = `dot ${c.voiceType}`;
+    
+    document.getElementById('voiceLabel').textContent = c.voiceLabel;
+    document.getElementById('idBadge').textContent = c.id;
+    document.getElementById('counter').textContent = `${idx + 1} / ${clips.length}`;
+    
+    // Background
+    display.className = `display ${c.bgClass}`;
+    
+    // Update dots
+    document.querySelectorAll('.clip-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === idx);
+    });
+    
+    // Fade in
+    display.style.opacity = '1';
+    
+    // Load audio
+    loadAudio(c.audio);
+    
+  }, 250);
+}
+
+function nextClip() { goTo((current + 1) % clips.length); }
+function prevClip() { goTo((current - 1 + clips.length) % clips.length); }
+
+// ============================================================
+// AUDIO
+// ============================================================
+
+function loadAudio(url) {
+  showLoading(true);
+  stopAudio();
+  
+  audio.src = url;
+  audio.load();
+  
+  audio.oncanplaythrough = () => {
+    showLoading(false);
+    document.getElementById('durTime').textContent = formatTime(audio.duration);
+    console.log('✅ Audio loaded:', url);
+  };
+  
+  audio.onerror = (e) => {
+    console.error('❌ Audio error:', e, audio.error?.message);
+    showLoading(false);
+  };
+}
+
+function togglePlay() {
+  if (!audio.src) return;
+  
+  if (playing) {
+    audio.pause();
+    stopAudioUI();
+  } else {
+    audio.play().then(startAudioUI).catch(err => {
+      console.error('Play error:', err);
+    });
+  }
+}
+
+function startAudioUI() {
+  playing = true;
+  updatePlayBtn(true);
+  document.getElementById('recDot').classList.add('on');
+  document.getElementById('recLabel').textContent = 'REC';
+  document.getElementById('voiceDot').classList.add('playing');
+  showInfo(true);
+  animateBars(true);
+}
+
+function stopAudioUI() {
+  playing = false;
+  updatePlayBtn(false);
+  document.getElementById('recDot').classList.remove('on');
+  document.getElementById('recLabel').textContent = 'PLAY';
+  document.getElementById('voiceDot').classList.remove('playing');
+  animateBars(false);
+}
+
+function updatePlayBtn(isPlaying) {
+  mainPlayBtn.classList.toggle('playing', isPlaying);
+  mainPlayBtn.innerHTML = isPlaying
+    ? '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>'
+    : '<svg viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>';
+}
+
+function stopAudio() {
+  audio.pause();
+  stopAudioUI();
+}
+
+// ============================================================
+// ANIMATE BARS
+// ============================================================
+
+function animateBars(active) {
+  const bars = document.querySelectorAll('.progress-bar .bar');
+  bars.forEach((bar, i) => {
+    if (active) {
+      bar.classList.add('active');
+      setInterval(() => {
+        if (playing) bar.style.height = `${Math.random() * 60 + 30}%`;
+      }, 120 + i * 15);
+    } else {
+      bar.classList.remove('active');
+    }
+  });
+}
+
+// ============================================================
+// TIME
+// ============================================================
+
+function formatTime(s) {
+  if (!s || isNaN(s)) return '0:00';
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return `${m}:${sec.toString().padStart(2,'0')}`;
+}
+
+setInterval(() => {
+  if (playing && audio.currentTime) {
+    document.getElementById('curTime').textContent = formatTime(audio.currentTime);
+  }
+}, 200);
+
+// ============================================================
+// SEEK
+// ============================================================
+
+function seek(e) {
+  const bar = document.getElementById('progressBar');
+  const rect = bar.getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
+  if (audio.duration && !isNaN(audio.duration)) {
+    audio.currentTime = pct * audio.duration;
+  }
+}
+
+// ============================================================
+// INFO PANEL
+// ============================================================
+
+function showInfo(show) {
+  document.getElementById('infoPanel').classList.toggle('show', show);
+  if (show) {
+    document.getElementById('npTitle').textContent = clips[current].name;
+  }
+}
+function hideInfo() { showInfo(false); }
+
+function showLoading(show) {
+  document.getElementById('loading').classList.toggle('show', show);
+}
+
+// ============================================================
+// KEYBOARD
+// ============================================================
+
+document.addEventListener('keydown', e => {
+  switch(e.key) {
+    case 'ArrowLeft': e.preventDefault(); prevClip(); break;
+    case 'ArrowRight': e.preventDefault(); nextClip(); break;
+    case ' ': e.preventDefault(); togglePlay(); break;
+  }
+});
+
+// ============================================================
+// AUTO ADVANCE
+// ============================================================
+
+audio.addEventListener('ended', () => {
+  stopAudioUI();
+  setTimeout(nextClip, 500);
+});
+
+// ============================================================
+// INIT
+// ============================================================
+
+initDots();
+initProgress();
+
+// Load first clip
+goTo(0);
+
+// Show help briefly
+setTimeout(() => document.getElementById('tip').classList.add('show'), 800);
+setTimeout(() => document.getElementById('tip').classList.remove('show'), 4000);
+
+console.log('🎬 SciCMP Portfolio Shorts loaded with', clips.length, 'clips');
+
+</script>
+</body>
+</html>
+<!-- v2 -->

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Science Toolkit | SciCMPMATH Studio</title>
+    <meta name="description" content="End-to-end data science workflows from exploratory analysis to production models. EDA dashboards, feature engineering, and model comparison tools for professional data scientists.">
+    
+    <!-- Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Premium Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Scientific Premium Design System -->
+    <link rel="stylesheet" href="/DemoSciCMP/templates/scientific-premium-core.css">
+    
+    <style>
+        /* Data Science-specific theme overrides */
+        :root {
+            --sp-accent-primary: #60a5fa;
+            --sp-accent-primary-dim: rgba(96, 165, 250, 0.15);
+            --sp-gradient-hero: radial-gradient(ellipse at top, rgba(96, 165, 250, 0.12), transparent 60%);
+            --sp-gradient-text: linear-gradient(135deg, #60a5fa 0%, #22d3ee 50%, #a78bfa 100%);
+            --sp-border-glow: rgba(96, 165, 250, 0.3);
+        }
+        
+        .sp-logo-icon { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+        
+        .sp-badge { color: #60a5fa; background: rgba(96, 165, 250, 0.08); border-color: rgba(96, 165, 250, 0.2); }
+        .sp-badge-dot { background: #60a5fa; box-shadow: 0 0 12px #60a5fa; }
+        
+        .sp-btn-primary { 
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.25);
+        }
+        .sp-btn-primary:hover {
+            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.4), 0 0 30px rgba(96, 165, 250, 0.2);
+        }
+        
+        .sp-card:hover { border-color: rgba(96, 165, 250, 0.35); }
+        .sp-card-icon { background: rgba(96, 165, 250, 0.12); border-color: rgba(96, 165, 250, 0.2); }
+        .sp-card:hover .sp-card-icon { box-shadow: 0 0 20px rgba(96, 165, 250, 0.2); }
+        
+        .sp-step-number { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); box-shadow: 0 4px 16px rgba(59, 130, 246, 0.25); }
+        .sp-step-command { color: #60a5fa; }
+        
+        .sp-stats-bar { background: linear-gradient(135deg, rgba(59, 130, 246, 0.06), rgba(37, 99, 235, 0.06)); }
+        
+        .sp-float-btn:hover { background: rgba(96, 165, 250, 0.15); border-color: rgba(96, 165, 250, 0.4); color: #60a5fa; }
+        
+        .sp-breadcrumb-current { color: #60a5fa; }
+        .sp-breadcrumb a:hover { color: #60a5fa; }
+        
+        /* Chart decoration */
+        .sp-hero::after {
+            background: radial-gradient(circle, rgba(96, 165, 250, 0.07) 0%, transparent 70%);
+        }
+
+        /* Data visualization pattern */
+        .chart-pattern {
+            position: absolute;
+            top: 50%;
+            right: -80px;
+            transform: translateY(-50%);
+            width: 200px;
+            height: 300px;
+            opacity: 0.04;
+            pointer-events: none;
+            animation: chartFloat 15s ease-in-out infinite;
+        }
+        
+        @keyframes chartFloat {
+            0%, 100% { transform: translateY(-50%) translateY(0); }
+            50% { transform: translateY(-50%) translateY(-10px); }
+        }
+        
+        @media (max-width: 1400px) {
+            .chart-pattern { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip Link -->
+    <a href="#main-content" class="sp-skip-link">Skip to main content</a>
+
+    <!-- Navigation -->
+    <nav class="sp-navbar" role="navigation" aria-label="Main navigation">
+        <div class="nav-left" style="display: flex; align-items: center; gap: 32px;">
+            <a href="/DemoSciCMP/" class="sp-logo" aria-label="SciCMPMATH Home">
+                <div class="logo-icon sp-logo-icon" aria-hidden="true">📊</div>
+                <span>SciCMPMATH</span>
+            </a>
+            <div class="sp-nav-links">
+                <a href="/DemoSciCMP/" class="sp-nav-link">Home</a>
+                <a href="/DemoSciCMP/#/templates" class="sp-nav-link active">Templates</a>
+                <a href="/DemoSciCMP/templates/data-science/index.html" class="sp-nav-link">Data Science</a>
+                <a href="/DemoSciCMP/templates/machine-learning.html" class="sp-nav-link">ML Hub</a>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <button onclick="goHome()" class="sp-btn btn-home" aria-label="Return to home page">🏠 Home</button>
+            <button onclick="openStudioIDE()" class="sp-btn sp-btn-ide" aria-label="Open in Studio IDE">⌥ Open in Studio IDE</button>
+            <a href="https://github.com/testdemoqwenai2025-creator/DemoSciCMP" target="_blank" rel="noopener noreferrer" class="sp-btn sp-btn-secondary">GitHub →</a>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <nav class="sp-breadcrumb" aria-label="Breadcrumb">
+        <a href="/DemoSciCMP/">Home</a><span class="sp-breadcrumb-sep" aria-hidden="true">›</span>
+        <a href="/DemoSciCMP/#/templates">Templates</a><span class="sp-breadcrumb-sep" aria-hidden="true">›</span>
+        <span class="sp-breadcrumb-current" aria-current="page">Data Science Toolkit</span>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="sp-hero" aria-labelledby="hero-title">
+        <svg class="chart-pattern" viewBox="0 0 100 150" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="10" y="120" width="10" height="30" fill="#60a5fa"/>
+            <rect x="25" y="90" width="10" height="60" fill="#60a5fa"/>
+            <rect x="40" y="110" width="10" height="40" fill="#60a5fa"/>
+            <rect x="55" y="60" width="10" height="90" fill="#60a5fa"/>
+            <rect x="70" y="40" width="10" height="110" fill="#60a5fa"/>
+            <rect x="85" y="20" width="10" height="130" fill="#60a5fa"/>
+        </svg>
+        
+        <div class="sp-badge">
+            <span class="sp-badge-dot" aria-hidden="true"></span>
+            Data Science • Analytics • Visualization
+        </div>
+        <h1 id="hero-title">Data Science <span class="sp-gradient-text">Toolkit</span></h1>
+        <p>
+            End-to-end data science workflows from exploratory analysis to production models. 
+            EDA dashboards, feature engineering pipelines, and comprehensive model comparison tools.
+        </p>
+        <div class="sp-hero-buttons">
+            <button onclick="launchTemplate('eda')" class="sp-btn sp-btn-primary">📈 EDA Dashboard</button>
+            <button onclick="launchTemplate('features')" class="sp-btn sp-btn-primary">⚙️ Feature Engineering</button>
+            <button onclick="launchTemplate('comparison')" class="sp-btn sp-btn-primary">🔬 Model Comparison</button>
+            <button onclick="openStudioIDE()" class="sp-btn sp-btn-ide">⌥ Studio IDE</button>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main id="main-content" class="sp-container">
+        <h2 class="sp-section-title">Complete Data Science Workflows</h2>
+        <p class="sp-section-subtitle">Professional-grade templates for every stage of the data science lifecycle.</p>
+
+        <div class="sp-card-grid">
+            <article class="sp-card">
+                <div class="sp-card-icon" aria-hidden="true">📊</div>
+                <h3>Exploratory Data Analysis</h3>
+                <p>Interactive dashboards with automatic univariate/multivariate analysis, correlation heatmaps, distribution plots, missing value detection, and outlier identification using pandas-profiling integration.</p>
+            </article>
+            
+            <article class="sp-card">
+                <div class="sp-card-icon" aria-hidden="true">⚙️</div>
+                <h3>Feature Engineering Suite</h3>
+                <p>Automated feature creation with polynomial features, interaction terms, target encoding, scaling transformations, and intelligent feature selection using importance scores and correlation analysis.</p>
+            </article>
+            
+            <article class="sp-card">
+                <div class="sp-card-icon" aria-hidden="true">🔬</div>
+                <h3>Model Comparison Framework</h3>
+                <p>Benchmark multiple algorithms with stratified k-fold cross-validation, hyperparameter optimization via Optuna, statistical significance testing, and ensemble method construction.</p>
+            </article>
+            
+            <article class="sp-card">
+                <div class="sp-card-icon" aria-hidden="true">📉</div>
+                <h3>Statistical Analysis</h3>
+                <p>Hypothesis testing suite (t-test, ANOVA, chi-square), A/B test analysis with confidence intervals, regression diagnostics, time series decomposition, and survival analysis capabilities.</p>
+            </article>
+            
+            <article class="sp-card">
+                <div class="sp-card-icon" aria-hidden="true">🎨</div>
+                <h3>Visualization Library</h3>
+                <p>Publication-ready figures with Plotly interactive charts, Seaborn statistical visualizations, Matplotlib templates for scatter plots, heatmaps, and custom dashboard layouts.</p>
+            </article>
+            
+            <article class="sp-card">
+                <div class="sp-card-icon" aria-hidden="true">🔄</div>
+                <h3>Pipeline Automation</h3>
+                <p>Scikit-learn pipelines with MLflow experiment tracking, DVC for dataset versioning, model registry management, and reproducible experiment documentation with automatic artifact logging.</p>
+            </article>
+        </div>
+
+        <!-- Workflow Section -->
+        <div class="sp-workflow" aria-labelledby="workflow-title">
+            <h2 id="workflow-title" class="sp-section-title">Quick Start: End-to-End Data Science Pipeline</h2>
+            <p class="sp-section-subtitle">From raw data to actionable insights in 5 systematic steps.</p>
+
+            <div class="sp-steps-container">
+                <div class="sp-step">
+                    <div class="sp-step-number" aria-hidden="true">1</div>
+                    <div class="sp-step-content">
+                        <h4>Data Ingestion & Profiling</h4>
+                        <p>Load data from various sources (CSV, SQL databases, APIs, cloud storage). Generate automated profile report with pandas-profiling including statistics, correlations, and missing value analysis.</p>
+                        <div class="step-command" tabindex="0"># Load and profile data
+import pandas as pd
+from ydata_profiling import ProfileReport
+
+# Load from multiple sources
+df = pd.read_csv('data.csv')
+# df = pd.read_sql(query, engine)
+# df = pd.read_json('api_response.json')
+
+# Generate comprehensive profile report
+profile = ProfileReport(df, title='Data Quality Report', 
+                       explorative=True)
+profile.to_file('reports/data_profile.html')</div>
+                    </div>
+                </div>
+                
+                <div class="sp-step">
+                    <div class="sp-step-number" aria-hidden="true">2</div>
+                    <div class="sp-step-content">
+                        <h4>Exploratory Data Analysis</h4>
+                        <p>Detect patterns, outliers, and anomalies. Create visualizations to understand distributions, relationships between variables, and potential feature-target correlations.</p>
+                        <div class="step-command" tabindex="0"># Comprehensive EDA visualization
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Set premium style
+sns.set_style('whitegrid', {'grid.linestyle': '--'})
+
+fig, axes = plt.subplots(2, 2, figsize=(14, 12))
+
+# Distribution plot
+sns.histplot(df['target'], kde=True, ax=axes[0,0])
+axes[0,0].set_title('Target Distribution')
+
+# Correlation heatmap
+corr = df.select_dtypes(include=['number']).corr()
+sns.heatmap(corr, annot=True, cmap='coolwarm', 
+           ax=axes[0,1], fmt='.2f')
+
+# Pairplot for key features
+sns.pairplot(df[['feature1', 'feature2', 
+                  'feature3', 'target']], hue='target')
+
+plt.tight_layout()
+plt.savefig('eda_analysis.png', dpi=300, bbox_inches='tight')</div>
+                    </div>
+                </div>
+                
+                <div class="sp-step">
+                    <div class="sp-step-number" aria-hidden="true">3</div>
+                    <div class="sp-step-content">
+                        <h4>Feature Engineering Pipeline</h4>
+                        <p>Create new features through domain-driven transformations, handle missing values strategically, encode categorical variables appropriately, and scale numerical features for optimal model performance.</p>
+                        <div class="step-command" tabindex="0"># Advanced feature pipeline
+from sklearn.preprocessing import (
+    StandardScaler, OneHotEncoder, PolynomialFeatures
+)
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+
+# Define column types
+numeric_features = ['age', 'income', 'score']
+categorical_features = ['category', 'region']
+
+# Numeric pipeline
+numeric_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='median')),
+    ('scaler', StandardScaler()),
+    ('poly', PolynomialFeatures(degree=2, include_bias=False))
+])
+
+# Categorical pipeline  
+categorical_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
+    ('encoder', OneHotEncoder(handle_unknown='ignore'))
+])
+
+# Combine transformers
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', numeric_transformer, numeric_features),
+        ('cat', categorical_transformer, categorical_features)
+    ])
+
+# Fit and transform
+X_processed = preprocessor.fit_transform(X)</div>
+                    </div>
+                </div>
+                
+                <div class="sp-step">
+                    <div class="sp-step-number" aria-hidden="true">4</div>
+                    <div class="sp-step-content">
+                        <h4>Model Training & Selection</h4>
+                        <p>Train multiple candidate models with cross-validation, optimize hyperparameters using Bayesian optimization or genetic algorithms, evaluate with comprehensive metrics and statistical tests.</p>
+                        <div class="step-command" tabindex="0"># Model comparison framework
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.model_selection import cross_val_score, StratifiedKFold
+import numpy as np
+
+# Define models to evaluate
+models = {
+    'Logistic Regression': LogisticRegression(max_iter=1000),
+    'Random Forest': RandomForestClassifier(n_estimators=200),
+    'Gradient Boosting': GradientBoostingClassifier(n_estimators=150),
+    'SVM (RBF)': SVC(kernel='rbf', probability=True)
+}
+
+# Cross-validation setup
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+# Evaluate each model
+results = {}
+for name, model in models.items():
+    scores = cross_val_score(model, X_train, y_train, 
+                            cv=cv, scoring='roc_auc')
+    results[name] = {
+        'mean_auc': scores.mean(),
+        'std_auc': scores.std(),
+        'scores': scores
+    }
+    print(f'{name}: AUC = {scores.mean():.3f} ± {scores.std():.3f}')
+
+# Select best model
+best_model_name = max(results, key=lambda x: results[x]['mean_auc'])
+print(f'\nBest Model: {best_model_name}')</div>
+                    </div>
+                </div>
+                
+                <div class="sp-step">
+                    <div class="sp-step-number" aria-hidden="true">5</div>
+                    <div class="sp-step-content">
+                        <h4>Evaluation & Deployment</h4>
+                        <p>Generate comprehensive evaluation metrics with confusion matrix, ROC curves, precision-recall curves. Create SHAP explanations for interpretability. Export best model for production deployment.</p>
+                        <div class="step-command" tabindex="0"># Final evaluation & export
+import joblib
+import shap
+from sklearn.metrics import (
+    classification_report, roc_curve, auc, confusion_matrix
+)
+
+# Train final model on full training set
+best_model = models[best_model_name]
+best_model.fit(X_train, y_train)
+
+# Generate predictions
+y_pred = best_model.predict(X_test)
+y_proba = best_model.predict_proba(X_test)[:, 1]
+
+# Comprehensive evaluation report
+print(classification_report(y_test, y_pred))
+
+# SHAP explanations for interpretability
+explainer = shap.TreeExplainer(best_model)
+shap_values = explainer.shap_values(X_test)
+shap.summary_plot(shap_values, X_test, show=False)
+plt.savefig('shap_importance.png', dpi=300, bbox_inches='tight')
+
+# Export model for production
+joblib.dump(best_model, 'production_model.pkl')
+joblib.dump(preprocessor, 'preprocessor.pkl')
+print('✅ Model exported successfully!')</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="sp-stats-bar" role="region" aria-label="Platform Statistics">
+            <div class="sp-stat-item">
+                <div class="sp-stat-value" data-count="100">100+</div>
+                <div class="sp-stat-label">Analysis Templates</div>
+            </div>
+            <div class="sp-stat-item">
+                <div class="sp-stat-value">&lt;10min</div>
+                <div class="sp-stat-label">Setup Time</div>
+            </div>
+            <div class="sp-stat-item">
+                <div class="sp-stat-value" data-count="95">95%</div>
+                <div class="sp-stat-label">Automation Rate</div>
+            </div>
+            <div class="sp-stat-item">
+                <div class="sp-stat-value" data-count="50">50+</div>
+                <div class="sp-stat-label">Chart Types</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- CTA Section -->
+    <section class="sp-cta-section" aria-labelledby="cta-title">
+        <h2 id="cta-title">Ready to Unlock Your Data's Potential?</h2>
+        <p>Launch any data science workflow or explore our full template gallery.</p>
+        <div class="sp-hero-buttons">
+            <button onclick="openStudioIDE()" class="sp-btn sp-btn-primary">🚀 Launch in Studio IDE</button>
+            <a href="/DemoSciCMP/templates/bioinformatics/index.html" class="sp-btn sp-btn-secondary">View Bioinfo Templates →</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="sp-footer" role="contentinfo">
+        <p>&copy; 2026 SciCMPMATH by Endeavor Science | Made with 📊 for Data Science</p>
+        <p style="margin-top: 12px; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+            <a href="/DemoSciCMP/">Home</a> • 
+            <a href="/DemoSciCMP/studio.html">Studio IDE</a> • 
+            <a href="/DemoSciCMP/templates/bioinformatics/index.html">Bioinfo</a> • 
+            <a href="https://github.com/testdemoqwenai2025-creator/DemoSciCMP" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </p>
+    </footer>
+
+    <!-- Floating Navigation -->
+    <div class="sp-floating-nav" aria-label="Quick navigation">
+        <button onclick="goHome()" class="sp-float-btn" title="Return to Home" aria-label="Return to Home">🏠</button>
+        <button onclick="scrollToTop()" class="sp-float-btn" title="Back to Top" aria-label="Scroll back to top">↑</button>
+    </div>
+
+    <!-- Progressive Enhancement Layer -->
+    <script src="/DemoSciCMP/templates/scientific-premium-enhance.js"></script>
+    
+    <script>
+        console.log('📊 Data Science Toolkit Loaded | SciCMPMATH Studio Ready ✅');
+    </script>
+</body>
+</html>

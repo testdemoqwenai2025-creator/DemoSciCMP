@@ -1,0 +1,60 @@
+{
+  "generatedAt": "2026-08-17T12:55:10.388Z",
+  "policy": "UK/US NATIVE VOICES ONLY",
+  "voices": {
+    "jam": "British RP",
+    "kazi": "American Standard",
+    "douji": "American Natural"
+  },
+  "shorts": [
+    {
+      "id": "P12",
+      "name": "Helios Tandem",
+      "voice": "jam",
+      "file": "P12_jam.wav",
+      "ok": true
+    },
+    {
+      "id": "P-ai-materials",
+      "name": "Lattice Forge",
+      "voice": "kazi",
+      "file": "P-ai-materials_kazi.wav",
+      "ok": true
+    },
+    {
+      "id": "P3",
+      "name": "Solid State Labs",
+      "voice": "douji",
+      "file": null,
+      "ok": false
+    },
+    {
+      "id": "P5",
+      "name": "Hydrogen Forge",
+      "voice": "jam",
+      "file": null,
+      "ok": false
+    },
+    {
+      "id": "P9",
+      "name": "TMD Logic",
+      "voice": "kazi",
+      "file": null,
+      "ok": false
+    },
+    {
+      "id": "P-cmos-2nm",
+      "name": "Atomic Gate Systems",
+      "voice": "jam",
+      "file": null,
+      "ok": false
+    },
+    {
+      "id": "P11",
+      "name": "Carbon Sink",
+      "voice": "douji",
+      "file": "P11_douji.wav",
+      "ok": true
+    }
+  ]
+}
