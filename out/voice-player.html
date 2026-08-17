@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SciCMP Voice Player</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:#0a0a0f;color:#e8e8f0;min-height:100vh;padding:24px
+}
+.wrap{max-widt:900px;margin:0 auto}
+
+/* Header */
+.hd{text-align:center;padding:40px 20px;margin-bottom:32px;
+  background:linear-gradient(145deg,rgba(99,102,241,0.1),rgba(0,212,170,0.05));
+  border:1px solid rgba(255,255,255,0.08);border-radius:20px}
+.hd h1{font-size:2rem;font-weight:700;margin-bottom:10px;
+  background:linear-gradient(135deg,#00d4aa,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hd p{color:#888;font-size:1rem;line-height:1.6}
+.chips{display:flex;justify-content:center;gap:16px;margin-top:18px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:22px;font-size:0.85rem;font-weight:600}
+.chip.uk{background:rgba(99,102,241,0.15);color:#a5b4fc;border:1px solid rgba(99,102,241,0.35)}
+.chip.us{background:rgba(245,158,11,0.15);color:#fcd34d;border:1px solid rgba(245,158,11,0.35)}
+
+/* Voice Panel */
+.vp{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+  border-radius:14px;padding:20px;margin-bottom:24px}
+.vp h3{font-size:0.85rem;color:#777;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.08em}
+.sel-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.sel-row{grid-template-columns:1fr}}
+.grp label{display:block;font-size:0.8rem;color:#999;margin-bottom:6px;font-weight:500}
+.grp select{width:100%;padding:10px 14px;background:#000;border:1px solid rgba(255,255,255,0.15);
+  border-radius:10px;color:#fff;font-size:0.88rem;cursor:pointer}
+
+/* Cards */
+.cards{display:grid;gap:16px}
+.card{background:linear-gradient(145deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02));
+  border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:22px 26px;
+  transition:all 0.3s ease}
+.card:hover{border-color:rgba(255,255,255,0.15);transform:translateY(-2px)}
+.card.on{border-color:#00d4aa;box-shadow:0 0 25px rgba(0,212,170,0.1)}
+
+.ctop{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.cicon{font-size:2.2rem;width:52px;height:52px;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.04);border-radius:12px;flex-shrink:0}
+.cinfo h2{font-size:1.15rem;font-weight:650;margin-bottom:3px}
+.cid{font-size:0.75rem;color:#555;font-family:monospace;background:rgba(255,255,255,0.05);
+  padding:2px 8px;border-radius:4px}
+
+.desc{color:#999;font-size:0.9rem;line-height:1.65;margin:12px 0 16px}
+
+.vtag{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:18px;
+  font-size:0.78rem;font-weight:600;margin-top:8px}
+.vtag.uk{background:rgba(99,102,241,0.12);color:#818cf8;border:1px solid rgba(99,102,241,0.25)}
+.vtag.us{background:rgba(245,158,11,0.12);color:#fbbf24;border:1px solid rgba(245,158,11,0.25)}
+.vdot{width:7px;height:7px;border-radius:50%;animation:pulse 2s infinite}
+.vtag.uk .vdot{background:#818cf8}.vtag.us .vdot{background:#fbbf24}
+.vtag.spk .vdot{animation:speak 0.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+@keyframes speak{0%,100%{transform:scale(1)}50%{transform:scale(1.4)}}
+
+.ctrls{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:16px}
+
+.btn{width:52px;height:52px;border-radius:50%;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0}
+.btn.go{background:linear-gradient(135deg,#00d4aa,#00ff88);
+  box-shadow:0 4px 18px rgba(0,212,170,0.35)}
+.btn.go:hover{transform:scale(1.07)}
+.btn.go svg{fill:#000;width:20px;height:20px;margin-left:2px}
+.btn.go.on{background:linear-gradient(135deg,#ef4444,#f87171);
+  box-shadow:0 4px 18px rgba(239,68,68,0.35)}
+.btn.go.on svg{margin-left:0}
+
+.prog{flex:1;min-width:160px}
+.pbar{width:100%;height:7px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden}
+.pfill{height:100%;background:linear-gradient(90deg,#00d4aa,#00ff88);border-radius:4px;width:0%;transition:width 0.1s}
+.ptm{display:flex;justify-content:space-between;font-size:0.7rem;color:#555;margin-top:5px;font-family:monospace}
+
+.sts{font-size:0.74rem;padding:6px 13px;border-radius:8px;min-width:72px;text-align:center;font-weight:500}
+.sts.ok{background:rgba(0,212,170,0.1);color:#34d399;border:1px solid rgba(0,212,170,0.2)}
+.sts.act{background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2);animation:glow 1.2s infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 0}50%{box-shadow:0 0 10px rgba(239,68,68,0.2)}}
+
+.ft{text-align:center;margin-top:40px;padding:24px;color:#444;font-size:0.82rem;line-height:1.7;
+  border-top:1px solid rgba(255,255,255,0.06)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<div class="hd">
+  <h1>🎙️ SciCMP Portfolio Shorts</h1>
+  <p>Research clips with native male voice narrations<br>Select voices below, then press PLAY</p>
+  <div class="chips">
+    <div class="chip uk">🇬🇧 British RP Male</div>
+    <div class="chip us">🇺🇸 American Standard Male</div>
+  </div>
+</div>
+
+<!-- Voice Selection -->
+<div class="vp" id="voicePanel">
+  <h3>🔊 Select Native Male Voices</h3>
+  <div class="sel-row">
+    <div class="grp">
+      <label>🇬🇧 British RP (UK) — Male Voice</label>
+      <select id="ukSel" onchange="logVoice('uk')"></select>
+    </div>
+    <div class="grp">
+      <label>🇺🇸 American (US) — Male Voice</label>
+      <select id="usSel" onchange="logVoice('us')"></select>
+    </div>
+  </div>
+</div>
+
+<!-- Clips -->
+<div class="cards" id="cards"></div>
+
+<div class="ft">
+  Pure HTML/JS · Web Speech API · No framework overhead<br>
+  <span style="color:#555">Console (F12) shows active voice details</span>
+</div>
+
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+var CLIPS = [
+  {id:'P12',name:'Helios Tandem Photovoltaics',icon:'☀️',
+   desc:'Advanced photovoltaic tandem cell architecture achieving record efficiency through novel materials integration.',
+   vt:'uk',vl:'British RP'},
+  {id:'P-AI',name:'Lattice Forge — AI Materials Discovery',icon:'🔬',
+   desc:'AI-accelerated discovery of next-generation lattice materials for quantum computing applications.',
+   vt:'us',vl:'American Standard'},
+  {id:'P11',name:'Carbon Sink Bioengineering',icon:'🌿',
+   desc:'Novel carbon capture methodology using bio-engineered microorganisms for industrial emissions reduction.',
+   vt:'us',vl:'American Natural'},
+  {id:'P3',name:'Solid State Battery Labs',icon:'🔋',
+   desc:'Breakthrough in solid-state electrolyte conductivity enabling next-generation battery performance.',
+   vt:'us',vl:'American Standard'},
+  {id:'P5',name:'Hydrogen Forge Production',icon:'💧',
+   desc:'Green hydrogen production via photocatalytic water splitting at industrial scale feasibility.',
+   vt:'uk',vl:'British RP'},
+  {id:'P9',name:'TMD Logic Gates',icon:'💻',
+   desc:'Transition metal dichalcogenide logic gates for post-silicon computing architectures.',
+   vt:'uk',vl:'British RP'},
+  {id:'P-CMOS',name:'Atomic Gate CMOS Systems',icon:'⚛️',
+   desc:'Sub-two-nanometer CMOS transistor design overcoming quantum tunneling limitations.',
+   vt:'us',vl:'American Standard'}
+];
+
+// ============================================================
+// STATE
+// ============================================================
+var cur = -1;
+var spk = false;
+
+// ============================================================
+// INIT
+// ============================================================
+function init(){
+  renderCards();
+  loadVoices();
+  console.log('✅ SciCMP Voice Player loaded');
+  console.log('📦 '+CLIPS.length+' clips ready');
+}
+
+function renderCards(){
+  var html='';
+  for(var i=0;i<CLIPS.length;i++){
+    var c=CLIPS[i];
+    html+='<div class="card" id="c'+i+'">';
+    html+='<div class="ctop">';
+    html+='<div class="cicon">'+c.icon+'</div>';
+    html+='<div class="cinfo"><h2>'+c.name+'</h2><span class="cid">'+c.id+'</span></div>';
+    html+='</div>';
+    html+='<p class="desc">'+c.desc+'</p>';
+    html+='<div class="vtag '+c.vt+'" id="vt'+i+'"><span class="vdot"></span>'+(c.vt==='uk'?'🇬🇧':'🇺🇸')+' '+c.vl+'</div>';
+    html+='<div class="ctrls">';
+    html+='<button class="btn go" onclick="play('+i+')" aria-label="Play"><svg viewBox="0 0 24 24"><polygon points="7,4 20,12 7,20"/></svg></button>';
+    html+='<div class="prog"><div class="pbar"><div class="pfill" id="pf'+i+'"></div></div><div class="ptm"><span id="tm'+i+'">Ready</span><span>--:--</span></div></div>';
+    html+='<div class="sts ok" id="st'+i+'">Ready</div>';
+    html+='</div></div>';
+  }
+  document.getElementById('cards').innerHTML=html;
+}
+
+function loadVoices(){
+  var vs=speechSynthesis.getVoices();
+  if(vs.length===0){
+    setTimeout(loadVoices,100);
+    return;
+  }
+  
+  console.log('\n🎤 Found '+vs.length+' voices\n');
+  
+  // Filter and sort
+  var uk=[],us=[];
+  for(var i=0;i<vs.length;i++){
+    var v=vs[i];
+    if(v.lang.indexOf('GB')!==-1||v.lang.toLowerCase().indexOf('british')!==-1) uk.push(v);
+    if(v.lang.indexOf('US')!==-1||v.lang.toLowerCase().indexOf('american')!==-1) us.push(v);
+  }
+  
+  // Fallback to any English
+  if(uk.length===0) for(var i=0;i<vs.length;i++) if(vs[i].lang.startsWith('en')) uk.push(vs[i]);
+  if(us.length===0) for(var i=0;i<vs.length;i++) if(vs[i].lang.startsWith('en')) us.push(vs[i]);
+  
+  // Sort: prefer known male names
+  function score(n){
+    var s=0,l=n.toLowerCase();
+    var males=['daniel','david','oliver','james','alex','ryan','chris','michael','george','harry'];
+    for(var j=0;j<males.length;j++) if(l.indexOf(males[j])!==-1) s+=30;
+    if(l.indexOf('google')!==-1) s+=10;
+    if(l.indexOf('microsoft')!==-1) s+=8;
+    return s;
+  }
+  uk.sort(function(a,b){return score(b.name)-score(a.name)});
+  us.sort(function(a,b){return score(b.name)-score(a.name)});
+  
+  // Populate selects
+  populate('ukSel',uk,'en-GB');
+  populate('usSel',us,'en-US');
+  
+  // Log available
+  console.log('🇬🇧 UK voices ('+uk.length+'):');
+  for(var i=0;i<Math.min(5,uk.length);i++) console.log('   ['+i+'] "'+uk[i].name+'" ('+uk[i].lang+')');
+  console.log('🇺🇸 US voices ('+us.length+'):');
+  for(var i=0;i<Math.min(5,us.length);i++) console.log('   ['+i+'] "'+us[i].name+'" ('+us[i].lang+')');
+}
+
+function populate(id,list,defLang){
+  var sel=document.getElementById(id);
+  sel.innerHTML='';
+  for(var i=0;i<list.length;i++){
+    var opt=document.createElement('option');
+    opt.value=list[i].name;
+    opt.textContent=list[i].name+' ('+list[i].lang+')';
+    // Mark likely male
+    var males=['daniel','david','oliver','james','alex','ryan','chris','michael','george','harry'];
+    for(var j=0;j<males.length;j++){
+      if(list[i].name.toLowerCase().indexOf(males[j])!==-1){
+        opt.textContent+=' ♂';
+        break;
+      }
+    }
+    sel.appendChild(opt);
+  }
+  // Auto-select best
+  if(sel.options.length>0) sel.selectedIndex=0;
+}
+
+function logVoice(type){
+  var sel=document.getElementById(type==='uk'?'ukSel':'usSel');
+  var name=sel.value;
+  var voices=speechSynthesis.getVoices();
+  var voice=null;
+  for(var i=0;i<voices.length;i++){
+    if(voices[i].name===name){voice=voices[i];break;}
+  }
+  console.log((type==='uk'?'🇬🇧':'🇺🇸')+' Selected: "'+name+'" ('+(voice?voice.lang:'?')+')');
+}
+
+// ============================================================
+// SPEECH CONTROL
+// ============================================================
+function play(i){
+  // Toggle
+  if(i===cur&&spk){
+    stop();
+    return;
+  }
+  
+  stop();
+  cur=i;
+  
+  // Highlight card
+  var cards=document.querySelectorAll('.card');
+  for(var j=0;j<cards.length;j++) cards[j].classList.remove('on');
+  document.getElementById('c'+i).classList.add('on');
+  
+  var c=CLIPS[i];
+  
+  // Get selected voice
+  var selId=c.vt==='uk'?'ukSel':'usSel';
+  var selName=document.getElementById(selId).value;
+  var voices=speechSynthesis.getVoices();
+  var voice=null;
+  for(var j=0;j<voices.length;j++){
+    if(voices[j].name===selName){voice=voices[j];break;}
+  }
+  
+  // Log
+  console.log('\n▶️ PLAY: '+c.name);
+  console.log('   Type: '+c.vt.toUpperCase()+' ('+c.vl+')');
+  console.log('   Voice: '+(voice?'"'+voice.name+'" ('+voice.lang+')':'default'));
+  console.log('   Service: '+(voice&&voice.service?voice.service:'system native'));
+  
+  // Create utterance
+  var utt=new SpeechSynthesisUtterance(c.desc);
+  
+  if(voice){
+    utt.voice=voice;
+    utt.lang=voice.lang;
+  }else{
+    utt.lang=c.vt==='uk'?'en-GB':'en-US';
+  }
+  
+  // MALE VOICE SETTINGS - critical!
+  utt.rate=0.88;     // Slightly slower = more authoritative
+  utt.pitch=0.85;     // Lower pitch = male
+  utt.volume=1.0;
+  
+  // Timing
+  var dur=(c.desc.split(/\s+/).length/130)*60; // ~130 wpm for male
+  var t0=Date.now();
+  
+  utt.onstart=function(){
+    spk=true;
+    setUI(i,true);
+    document.getElementById('st'+i).textContent='Speaking...';
+    
+    // Progress simulation
+    var iv=setInterval(function(){
+      if(!spk){clearInterval(iv);return;}
+      var el=(Date.now()-t0)/1000;
+      var pct=Math.min(100,(el/dur)*100);
+      document.getElementById('pf'+i).style.width=pct+'%';
+      document.getElementById('tm'+i).textContent=fmt(el);
+    },80);
+  };
+  
+  utt.onend=function(){
+    spk=false;
+    setUI(i,false);
+    document.getElementById('pf'+i).style.width='100%';
+    document.getElementById('tm'+i).textContent='Done';
+    document.getElementById('st'+i).textContent='Ready';
+    console.log('✅ Finished: '+c.name);
+  };
+  
+  utt.onerror=function(e){
+    console.error('❌ Error:',e.error);
+    spk=false;
+    setUI(i,false);
+    document.getElementById('st'+i).textContent='Error';
+  };
+  
+  speechSynthesis.speak(utt);
+}
+
+function stop(){
+  speechSynthesis.cancel();
+  if(cur>=0){
+    setUI(cur,false);
+    document.getElementById('st'+cur).textContent='Ready';
+  }
+  spk=false;
+}
+
+function setUI(i,on){
+  var btn=document.querySelector('#c'+i+' .btn');
+  var vt=document.getElementById('vt'+i);
+  var st=document.getElementById('st'+i);
+  
+  if(on){
+    btn.classList.add('on');
+    btn.innerHTML='<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+    vt.classList.add('spk');
+    st.className='sts act';
+  }else{
+    btn.classList.remove('on');
+    btn.innerHTML='<svg viewBox="0 0 24 24"><polygon points="7,4 20,12 7,20"/></svg>';
+    vt.classList.remove('spk');
+    st.className='sts ok';
+  }
+}
+
+function fmt(s){
+  if(!s||isNaN(s)) return '0:00';
+  var m=Math.floor(s/60);
+  var sec=Math.floor(s%60);
+  return m+':'+(sec<10?'0':'')+sec;
+}
+
+// Start
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',init);
+}else{
+  init();
+}
+
+window.addEventListener('beforeunload',function(){speechSynthesis.cancel()});
+</script>
+
+</body>
+</html>
