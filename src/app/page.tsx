@@ -34,7 +34,13 @@ const TemplateGalleryPage = dynamic(() => import('@/components/SciCMP/TemplateGa
   loading: () => <div className="min-h-screen bg-background flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>
 });
 
-type PageId = 'landing' | 'dashboard' | 'features' | 'template-gallery' | 'research-trends' | 'pricing' | 'about';
+const MLResearchPage = dynamic(() => import('@/components/SciCMP/MLResearchPage'), {
+  loading: () => <div className="min-h-screen bg-background flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>
+});
+
+import FloatingNavigationButtons from '@/components/SciCMP/FloatingNavigationButtons';
+
+type PageId = 'landing' | 'dashboard' | 'features' | 'template-gallery' | 'ml-research' | 'research-trends' | 'pricing' | 'about';
 
 export default function HomePage() {
   const [currentPage, setCurrentPage] = useState<PageId>('landing');
@@ -97,6 +103,8 @@ export default function HomePage() {
         return <ResearchTrendsPage />;
       case 'template-gallery':
         return <TemplateGalleryPage />;
+      case 'ml-research':
+        return <MLResearchPage />;
       default:
         return <LandingPage onNavigate={handleNavigate} />;
     }
@@ -123,6 +131,12 @@ export default function HomePage() {
         {/* Footer */}
         <SciCMPFooter onNavigate={handleNavigate} />
       </div>
+
+      {/* Floating Navigation Buttons - Visible on ALL pages */}
+      <FloatingNavigationButtons 
+        onNavigate={handleNavigate}
+        showStudioIDE={true}
+      />
 
       {/* Page Transition Overlay */}
       {isTransitioning && (

@@ -10,7 +10,10 @@ import {
   FlaskConical, 
   ChevronDown,
   Github,
-  Twitter
+  Twitter,
+  Code2,
+  ArrowUp,
+  Home
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -27,6 +30,7 @@ const navItems = [
   { id: 'features', label: 'Features' },
   { id: 'dashboard', label: 'Dashboard' },
   { id: 'template-gallery', label: 'Templates' },
+  { id: 'ml-research', label: 'ML Research ⭐' },
   { id: 'research-trends', label: 'Research Trends' },
   { id: 'pricing', label: 'Pricing' },
   { id: 'about', label: 'About' },
@@ -130,6 +134,16 @@ export default function Header({
               >
                 <Github className="h-5 w-5" />
               </a>
+            </Button>
+
+            {/* Studio IDE Button - Visible on ALL pages */}
+            <Button
+              onClick={() => window.open('/DemoSciCMP/studio.html', '_blank', 'noopener,noreferrer')}
+              className="hidden md:flex bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white border-0 rounded-full px-4 text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+              title="Open in Studio IDE"
+            >
+              <Code2 className="mr-1.5 h-4 w-4" />
+              <span className="hidden lg:inline">Studio IDE</span>
             </Button>
 
             {/* CTA Button */}
