@@ -2032,18 +2032,21 @@ print("✅ Analysis complete!")`}
             <button 
               onClick={() => navigateToSection('capabilities')}
               className={`px-4 py-2 rounded-lg transition-all ${activeSection === 'capabilities' ? 'bg-violet-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}
+              style={{ cursor: 'pointer' }}
             >
               <Settings className="w-4 h-4 inline mr-1" /> Core Capabilities
             </button>
             <button 
               onClick={() => navigateToSection('use-cases')}
               className={`px-4 py-2 rounded-lg transition-all ${activeSection === 'use-cases' ? 'bg-violet-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}
+              style={{ cursor: 'pointer' }}
             >
               <Target className="w-4 h-4 inline mr-1" /> Use Cases
             </button>
             <button 
               onClick={() => navigateToSection('free-tier')}
               className={`px-4 py-2 rounded-lg transition-all ${activeSection === 'free-tier' ? 'bg-violet-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}
+              style={{ cursor: 'pointer' }}
             >
               <Gift className="w-4 h-4 inline mr-1" /> Free Tier ({freeTierResources.filter(r => r.isAvailable).length})
             </button>
@@ -2075,7 +2078,8 @@ print("✅ Analysis complete!")`}
               return (
                 <div
                   key={capability.id}
-                  className="bg-slate-900 rounded-xl border border-slate-700 overflow-hidden hover:border-violet-500/50 transition-all cursor-pointer group/cap"
+                  className="bg-slate-900 rounded-xl border border-slate-700 overflow-hidden hover:border-violet-500/50 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] hover:shadow-lg hover:shadow-violet-500/10 group/cap"
+                  style={{ cursor: 'pointer' }}
                   onClick={() => toggleCapability(capability.id)}
                 >
                   <div className="p-6">
@@ -2110,7 +2114,8 @@ print("✅ Analysis complete!")`}
                           setTimeout(() => setActiveTab('presets'), 100);
                         }
                       }}
-                      className="cursor-pointer text-violet-400 hover:text-white text-sm font-medium flex items-center gap-1.5 px-4 py-2 bg-violet-500/10 hover:bg-violet-500/25 rounded-lg transition-all border border-violet-500/20 hover:border-violet-500/50"
+                      className="cursor-pointer text-violet-400 hover:text-white text-sm font-medium flex items-center gap-1.5 px-4 py-2 bg-violet-500/10 hover:bg-violet-500/25 rounded-lg transition-all border border-violet-500/20 hover:border-violet-500/50 hover:scale-105 active:scale-95"
+                      style={{ cursor: 'pointer' }}
                     >
                       {capability.actionLabel}
                     </button>
@@ -2223,7 +2228,8 @@ print("✅ Analysis complete!")`}
               return (
                 <div
                   key={useCase.id}
-                  className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-6 border border-slate-700 hover:border-yellow-500/50 transition-all cursor-pointer group/uc"
+                  className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-6 border border-slate-700 hover:border-yellow-500/50 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] hover:shadow-lg hover:shadow-yellow-500/10 group/uc"
+                  style={{ cursor: 'pointer' }}
                   onClick={() => {
                     openUseCaseWizard(useCase.id);
                   }}
@@ -2279,7 +2285,8 @@ print("✅ Analysis complete!")`}
                       e.stopPropagation();
                       openUseCaseWizard(useCase.id);
                     }}
-                    className="cursor-pointer w-full py-2.5 bg-yellow-600 hover:bg-yellow-500 rounded-lg text-sm font-semibold flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-yellow-600/20 hover:shadow-yellow-500/30 border border-yellow-500/30"
+                    className="cursor-pointer w-full py-2.5 bg-yellow-600 hover:bg-yellow-500 rounded-lg text-sm font-semibold flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-yellow-600/20 hover:shadow-yellow-500/30 border border-yellow-500/30 active:scale-95"
+                    style={{ cursor: 'pointer' }}
                   >
                     Launch Wizard <ArrowRight className="w-4 h-4" />
                   </button>
